@@ -1,6 +1,20 @@
 {$include_once Static.simba}
 {$include_once RSStructures.simba}
 
+Function RSClient.LoopCycle: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_LOOPCYCLE);
+end;
+
+Function RSClient.LoginState: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_LOGINSTATE);
+end;
+
+Function RSClient.GameState: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_GAMESTATE);
+end;
 
 Function RSClient.GetTileSettings(X, Y, Z: Int32): UInt8; static;
 begin
@@ -17,6 +31,26 @@ begin
   Result := RGetInt(R_EIOS, nil, CLIENT_PLANE);
 end;
 
+Function RSClient.BaseX: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_BASEX);
+end;
+
+Function RSClient.BaseY: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_BASEY);
+end;
+
+Function RSClient.DestinationX: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_DESTINATIONX);
+end;
+
+Function RSClient.DestinationY: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_DESTINATIONY);
+end;
+
 Function RSClient.ViewPortWidth: Int32; static;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTWIDTH);
@@ -30,6 +64,11 @@ end;
 Function RSClient.ViewPortScale: Int32; static;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTSCALE);
+end;
+
+Function RSClient.MapAngle: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_MAPANGLE);
 end;
 
 Function RSClient.PlayerIndices: Array of Int32; static;

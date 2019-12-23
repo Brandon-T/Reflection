@@ -1,36 +1,63 @@
+{$include_once Static.simba}
+{$include_once Functions.simba}
+
 type
-  RSClient = record
-    eios: Pointer;
-  end;
-
-  RSCamera = record
-    eios: Pointer;
-  end;
-
-  RSNode = record
+  RSType = packed record
     ref: Pointer;
   end;
 
-  RSHashTable = record
-    ref: Pointer;
+  PRSType = Array of ^RSType;
+  RSTypeArray = Array of RSType;
+  PRSTypeArray = Array of ^RSType;
+
+  RSTile = type TPoint;
+
+  RSClient = type RSType;
+
+  RSCamera = type RSType;
+
+  RSNode = type RSType;
+
+  RSHashTable = type RSType;
+
+  RSQueue = type RSType;
+
+  RSModel = type RSType;
+
+  RSPlayerDefinition = type RSType;
+
+  RSActor = type RSType;
+
+  RSPlayer = type RSActor;
+
+  RSLocalPlayer = type RSPlayer;
+
+  RSNameInfo = type RSType;
+
+
+Procedure RSType.Free;
+begin
+  if ref <> nil then
+    RFreeObject(R_EIOS, ref);
+end;
+
+Procedure RSTypeArray.Free;
+var
+  I, J: Integer;
+  Arr: Array of Pointer;
+begin
+  SetLength(Arr, Length(self));
+  for I := 0 to High(Arr) do
+  begin
+    if self[I].ref <> nil then
+    begin
+      Arr[J] := self[I].ref;
+      Inc(J);
+    end;
   end;
 
-  RSQueue = record
-    ref: Pointer;
-  end;
+  if J > 0 then
+    SetLength(Arr, J - 1);
 
-  RSModel = record
-    ref: Pointer;
-  end;
-
-  RSPlayerDefinition = record
-    ref: Pointer;
-  end;
-
-  RSPlayer = record
-    ref: Pointer;
-  end;
-
-  RSNameInfo = record
-    ref: Pointer;
-  end;
+  RFreeObjects(R_EIOS, Arr);
+end;

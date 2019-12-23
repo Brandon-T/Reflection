@@ -1,0 +1,49 @@
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+
+
+Function RSActor.Orientation: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_ORIENTATION);
+end;
+
+Function RSActor.WorldX: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDX);
+end;
+
+Function RSActor.WorldY: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDY);
+end;
+
+Function RSActor.Tile: RSTile;
+begin
+  Result.X := RSClient.BaseX + self.WorldX div 128;
+  Result.Y:= RSClient.BaseY + self.WorldY div 128;
+end;
+
+Function RSActor.AnimationId: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATION);
+end;
+
+Function RSActor.IsAnimating: Boolean;
+begin
+  Result := self.AnimationId > -1;
+end;
+
+Function RSActor.InteractingIndex: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_INTERACTINGINDEX);
+end;
+
+Function RSActor.CombatCycle: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_COMBATCYCLE);
+end;
+
+Function RSActor.IsInCombat: Boolean;
+begin
+  Result := self.CombatCycle > RSClient.LoopCycle;
+end;

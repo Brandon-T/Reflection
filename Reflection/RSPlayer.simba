@@ -3,7 +3,7 @@
 {$include_once RSStructures.simba}
 
 
-Function RSPlayer.Me: RSPlayer; static;
+Function RSPlayer.Me: RSLocalPlayer; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYER);
 end;
@@ -17,7 +17,7 @@ var
 begin
   Indices := RSClient.PlayerIndices;
   if Length(Indices) < 1 then
-    exit;
+    Exit;
 
   PlayersSize := 0;
   Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
@@ -38,7 +38,7 @@ var
 begin
   NameInfo.ref := RGetObject(R_EIOS, ref, PLAYER_NAME);
   Result := NameInfo.Name;
-  RFreeObject(R_EIOS, NameInfo.ref);
+  NameInfo.Free;
 end;
 
 Function RSPlayer.Model: RSModel;
@@ -59,21 +59,6 @@ end;
 Function RSPlayer.CombatLevel: Int32;
 begin
   Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
-end;
-
-Function RSPlayer.Orientation: Int32;
-begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_ORIENTATION);
-end;
-
-Function RSPlayer.WorldX: Int32;
-begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDX);
-end;
-
-Function RSPlayer.WorldY: Int32;
-begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDY);
 end;
 
 
