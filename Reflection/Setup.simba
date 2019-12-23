@@ -1,0 +1,15 @@
+{$include_once Static.simba}
+
+Procedure RSetup(pid: Int32);
+begin
+  SetEIOSTarget('RemoteInput', IntToStr(pid));
+
+  R_EIOS := RIGetEIOS(pid);
+  if R_EIOS = nil then
+    RaiseException(erCustomError, 'Reflection Not Setup - No EIOS Target');
+
+
+  RInitializeConstants;
+  RInitializeTileSettings(R_EIOS);
+  //RInitializeTileHeights(R_EIOS);
+end;

@@ -1,0 +1,71 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+
+
+Function RSClient.GetTileSettings(X, Y, Z: Int32): UInt8; static;
+begin
+  Result := CACHED_TILE_SETTINGS[X][Y][Z];
+end;
+
+Function RSClient.GetTileHeights(X, Y, Z: Int32): Int32; static;
+begin
+  Result := CACHED_TILE_HEIGHTS[X][Y][Z];
+end;
+
+Function RSClient.Plane: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_PLANE);
+end;
+
+Function RSClient.ViewPortWidth: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTWIDTH);
+end;
+
+Function RSClient.ViewPortHeight: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTHEIGHT);
+end;
+
+Function RSClient.ViewPortScale: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTSCALE);
+end;
+
+Function RSClient.PlayerIndices: Array of Int32; static;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_PLAYERINDICES);
+  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSClient.AllPlayers: Array of RSPlayer; static;
+var
+  Players: Pointer;
+  PlayersArray: Array of Pointer;
+  I, J, PlayersSize: SizeUInt;
+begin
+  PlayersSize := 0;
+  Players := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYERS);
+  PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
+  RFreeObject(R_EIOS, Players);
+
+  SetLength(Result, PlayersSize);
+
+  for I := 0 to PlayersSize - 1 do
+  begin
+    if PlayersArray[I] <> nil then
+    begin
+      Result[J].ref := PlayersArray[I];
+      Inc(J);
+    end;
+  end;
+
+  if J > 0 then
+    SetLength(Result, J - 1);
+end;
+

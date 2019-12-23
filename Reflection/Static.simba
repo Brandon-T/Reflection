@@ -1,0 +1,83 @@
+{$include_once Reflection/Functions.simba}
+{$include_once Reflection/Hooks.simba}
+
+const
+  SINGLEUNIT: Double = PI / 1024.0;
+
+var
+  R_EIOS: Pointer;
+
+var
+  SINE: array[0..2048] of Int32;
+  COSINE: array[0..2048] of Int32;
+
+  CACHED_TILE_SETTINGS: array of array of array of UInt8;
+  CACHED_TILE_HEIGHTS: array of array of array of Int32;
+
+Procedure RInitializeConstants;
+var
+  I: Integer;
+begin
+  for I := 0 to High(SINE) do
+  begin
+    SINE[I] := Trunc(Double(65535.0) * Double(sin(Double(I) * SINGLEUNIT)));
+    COSINE[I] := Trunc(Double(65535.0) * Double(cos(Double(I) * SINGLEUNIT)));
+  end;
+end;
+
+Procedure RInitializeTileSettings(eios: Pointer);
+var
+  Settings: Pointer;
+  I, J, SettingsSize: SizeUInt;
+  SX, SY: Array of Pointer;
+begin
+  SettingsSize := 0;
+  Settings := RGetArray(eios, nil, SettingsSize, CLIENT_TILESETTINGS);
+  SX := RGetObjectArray(eios, Settings, 0, SettingsSize);
+  RFreeObject(eios, Settings);
+
+  SetLength(CACHED_TILE_SETTINGS, SettingsSize);
+
+  for I := 0 to SettingsSize - 1 do
+  begin
+    SY := RGetObjectArray(eios, SX[I], 0, RGetArraySize(eios, SX[I]));
+    SetLength(CACHED_TILE_SETTINGS[I], Length(SY));
+
+    for J := 0 to High(SY) do
+    begin
+      CACHED_TILE_SETTINGS[I][J] := RGetByteArray(eios, SY[J], 0, RGetArraySize(eios, SY[J]));
+    end;
+
+    RFreeObjects(eios, SY);
+  end;
+  RFreeObjects(eios, SX);
+end;
+
+Procedure RInitializeTileHeights(eios: Pointer);
+var
+  Heights: Pointer;
+  I, J, HeightsSize: SizeUInt;
+  SX, SY: Array of Pointer;
+begin
+  HeightsSize := 0;
+  Heights := RGetArray(eios, nil, HeightsSize, CLIENT_TILEHEIGHTS);
+  SX := RGetObjectArray(eios, Heights, 0, HeightsSize);
+  RFreeObject(eios, Heights);
+
+  SetLength(CACHED_TILE_HEIGHTS, HeightsSize);
+
+  for I := 0 to HeightsSize - 1 do
+  begin
+    SY := RGetObjectArray(eios, SX[I], 0, RGetArraySize(eios, SX[I]));
+    SetLength(CACHED_TILE_HEIGHTS[I], Length(SY));
+
+    for J := 0 to High(SY) do
+    begin
+      CACHED_TILE_HEIGHTS[I][J] := RGetIntArray(eios, SY[J], 0, RGetArraySize(eios, SY[J]));
+    end;
+
+    RFreeObjects(eios, SY);
+  end;
+
+  RFreeObjects(eios, SX);
+end;

@@ -1,0 +1,79 @@
+{$include_once RSClient.simba}
+{$include_once RSNameInfo.simba}
+{$include_once RSStructures.simba}
+
+
+Function RSPlayer.Me: RSPlayer; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYER);
+end;
+
+Function RSPlayer.AllPlayers: Array of RSPlayer; static;
+var
+  Players: Pointer;
+  PlayersArray: Array of Pointer;
+  Indices: Array of Int32;
+  I, PlayersSize: SizeUInt;
+begin
+  Indices := RSClient.PlayerIndices;
+  if Length(Indices) < 1 then
+    exit;
+
+  PlayersSize := 0;
+  Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
+  RFreeObject(R_EIOS, Players);
+
+  SetLength(Result, Length(Indices));
+
+  for I := 0 to High(Indices) do
+  begin
+    Result[I].ref := PlayersArray[Indices[I]];
+  end;
+end;
+
+Function RSPlayer.Name: String;
+var
+  NameInfo: RSNameInfo;
+begin
+  NameInfo.ref := RGetObject(R_EIOS, ref, PLAYER_NAME);
+  Result := NameInfo.Name;
+  RFreeObject(R_EIOS, NameInfo.ref);
+end;
+
+Function RSPlayer.Model: RSModel;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, PLAYER_MODEL);
+end;
+
+Function RSPlayer.IsVisible: Boolean;
+begin
+  Result := RGetBool(R_EIOS, ref, PLAYER_VISIBLE);
+end;
+
+Function RSPlayer.Definition: RSPlayerDefinition;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, PLAYER_DEFINITION);
+end;
+
+Function RSPlayer.CombatLevel: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
+end;
+
+Function RSPlayer.Orientation: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_ORIENTATION);
+end;
+
+Function RSPlayer.WorldX: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDX);
+end;
+
+Function RSPlayer.WorldY: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDY);
+end;
+
+

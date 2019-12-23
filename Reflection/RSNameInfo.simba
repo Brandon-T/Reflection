@@ -1,0 +1,11 @@
+{$include_once RSStructures.simba}
+
+Function RSNameInfo.Name: String;
+begin
+  Result := RGetString(R_EIOS, ref, NAMEINFO_NAME);
+end;
+
+Function RSNameInfo.DecodedName: String;
+begin
+  Result := RGetString(R_EIOS, ref, NAMEINFO_DECODEDNAME);
+end;

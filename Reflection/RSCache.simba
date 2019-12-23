@@ -1,0 +1,27 @@
+{$include_once RSHashTable.simba}
+
+type
+  RSCache = record
+    ref: Pointer;
+  end;
+
+
+Function RSCache.HashTable: RSHashTable;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, CACHE_HASHTABLE);
+end;
+
+Function RSCache.Queue: RSQueue;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, CACHE_QUEUE);
+end;
+
+Function RSCache.Remaining: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, CACHE_REMAINING);
+end;
+
+Function RSCache.Capacity: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, CACHE_CAPACITY);
+end;

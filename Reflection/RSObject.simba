@@ -1,0 +1,4 @@
+type
+  RSObject = packed record
+    ref: Pointer;
+  end;

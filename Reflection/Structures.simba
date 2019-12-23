@@ -1,0 +1,10 @@
+type
+  TVector = record
+    x, y, z: Int32;
+  end;
+
+  TTriangle = record
+    a, b, c: TVector;
+  end;
+
+

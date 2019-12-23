@@ -1,0 +1,36 @@
+type
+  RSClient = record
+    eios: Pointer;
+  end;
+
+  RSCamera = record
+    eios: Pointer;
+  end;
+
+  RSNode = record
+    ref: Pointer;
+  end;
+
+  RSHashTable = record
+    ref: Pointer;
+  end;
+
+  RSQueue = record
+    ref: Pointer;
+  end;
+
+  RSModel = record
+    ref: Pointer;
+  end;
+
+  RSPlayerDefinition = record
+    ref: Pointer;
+  end;
+
+  RSPlayer = record
+    ref: Pointer;
+  end;
+
+  RSNameInfo = record
+    ref: Pointer;
+  end;

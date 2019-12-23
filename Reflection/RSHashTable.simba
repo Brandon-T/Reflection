@@ -1,0 +1,42 @@
+{$include_once RSNode.simba}
+{$include_once RSStructures.simba}
+
+
+Function RSHashTable.Head: RSNode;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, HASHTABLE_HEAD);
+end;
+
+Function RSHashTable.Tail: RSNode;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, HASHTABLE_TAIL);
+end;
+
+Function RSHashTable.Buckets: Array of RSNode;
+var
+  Buckets: Pointer;
+  Nodes: Array of Pointer;
+  I, BucketsSize: SizeUInt;
+begin
+  BucketsSize := 0;
+  Buckets := RGetArray(R_EIOS, ref, BucketsSize, HASHTABLE_BUCKETS);
+  Nodes := RGetObjectArray(R_EIOS, Buckets, 0, BucketsSize);
+  RFreeObject(R_EIOS, Buckets);
+
+  SetLength(Result, BucketsSize);
+
+  for I := 0 to BucketsSize - 1 do
+  begin
+    Result[I].ref := Nodes[I];
+  end;
+end;
+
+Function RSHashTable.Index: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, HASHTABLE_INDEX);
+end;
+
+Function RSHashTable.Size: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, HASHTABLE_SIZE);
+end;

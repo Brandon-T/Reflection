@@ -1,0 +1,100 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$include_once Structures.simba}
+
+
+Function RSModel.GetRawVertices: Array[0..3] of Array of Int32;
+var
+  VerticesSize: SizeUInt;
+  VerticesX, VerticesY, VerticesZ: Pointer;
+begin
+  VerticesSize := 0;
+  VerticesX := RGetArray(R_EIOS, ref, VerticesSize, MODEL_VERTICESX);
+  VerticesY := RGetArray(R_EIOS, ref, MODEL_VERTICESY);
+  VerticesZ := RGetArray(R_EIOS, ref, MODEL_VERTICESZ);
+
+  Result[0] := RGetIntArray(R_EIOS, VerticesX, 0, VerticesSize);
+  Result[1] := RGetIntArray(R_EIOS, VerticesY, 0, VerticesSize);
+  Result[2] := RGetIntArray(R_EIOS, VerticesZ, 0, VerticesSize);
+
+  RFreeObjects(R_EIOS, [VerticesX, VerticesY, VerticesZ]);
+end;
+
+Function RSModel.GetRawIndices: Array[0..3] of Array of Int32;
+var
+  IndicesSize: SizeUInt;
+  IndicesX, IndicesY, IndicesZ: Pointer;
+begin
+  IndicesSize := 0;
+  IndicesX := RGetArray(R_EIOS, ref, IndicesSize, MODEL_INDICESX);
+  IndicesY := RGetArray(R_EIOS, ref, MODEL_INDICESY);
+  IndicesZ := RGetArray(R_EIOS, ref, MODEL_INDICESZ);
+
+  Result[0] := RGetIntArray(R_EIOS, IndicesX, 0, IndicesSize);
+  Result[1] := RGetIntArray(R_EIOS, IndicesY, 0, IndicesSize);
+  Result[2] := RGetIntArray(R_EIOS, IndicesZ, 0, IndicesSize);
+
+  RFreeObjects(R_EIOS, [IndicesX, IndicesY, IndicesZ]);
+end;
+
+Function RSModel.GetVertices: Array of TVector;
+var
+  I, VerticesSize: SizeUInt;
+  Vertices: Array[0..3] of Array of Int32;
+begin
+  Vertices := self.GetRawVertices;
+  VerticesSize := Length(Vertices);
+  SetLength(Result, VerticesSize);
+
+  for I := 0 to VerticesSize - 1 do
+  begin
+    Result[I].X := Vertices[0][I];
+    Result[I].Y := Vertices[1][I];
+    Result[I].Z := Vertices[2][I];
+  end;
+end;
+
+Function RSModel.GetIndices: Array of TVector;
+var
+  I, IndicesSize: SizeUInt;
+  Indices: Array[0..3] of Array of Int32;
+begin
+  Indices := self.GetRawIndices;
+  IndicesSize := Length(Indices);
+  SetLength(Result, IndicesSize);
+
+  for I := 0 to IndicesSize - 1 do
+  begin
+    Result[I].X := Indices[0][I];
+    Result[I].Y := Indices[1][I];
+    Result[I].Z := Indices[2][I];
+  end;
+end;
+
+Function RSModel.GetTriangleFaces: Array of TTriangle;
+var
+  I, IndicesSize: SizeUInt;
+  Indices: Array[0..3] of Array of Int32;
+  Vertices: Array[0..3] of Array of Int32;
+begin
+  Indices := self.GetRawIndices;
+  Vertices := self.GetRawVertices;
+
+  IndicesSize := Length(Indices);
+  SetLength(Result, IndicesSize);
+
+  for I := 0 to IndicesSize - 1 do
+  begin
+    Result[I].A.x := Vertices[0][Indices[0][I]];
+    Result[I].A.y := Vertices[1][Indices[0][I]];
+    Result[I].A.z := Vertices[2][Indices[0][I]];
+
+    Result[I].B.x := Vertices[0][Indices[1][I]];
+    Result[I].B.y := Vertices[1][Indices[1][I]];
+    Result[I].B.z := Vertices[2][Indices[1][I]];
+
+    Result[I].C.x := Vertices[0][Indices[2][I]];
+    Result[I].C.y := Vertices[1][Indices[2][I]];
+    Result[I].C.z := Vertices[2][Indices[2][I]];
+  end;
+end;
