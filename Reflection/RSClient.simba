@@ -71,6 +71,17 @@ begin
   Result := RGetInt(R_EIOS, nil, CLIENT_MAPANGLE);
 end;
 
+Function RSClient.NPCIndices: Array of Int32; static;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_NPCINDICES);
+  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
+  RFreeObject(R_EIOS, Indices);
+end;
+
 Function RSClient.PlayerIndices: Array of Int32; static;
 var
   Indices: Pointer;
@@ -82,6 +93,32 @@ begin
   RFreeObject(R_EIOS, Indices);
 end;
 
+Function RSClient.AllNPCs: Array of RSNPC; static;
+var
+  NPCs: Pointer;
+  NPCsArray: Array of Pointer;
+  I, J, NPCsSize: SizeUInt;
+begin
+  NPCsSize := 0;
+  NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCs);
+  NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
+  RFreeObject(R_EIOS, NPCs);
+
+  SetLength(Result, NPCsSize);
+
+  for I := 0 to NPCsSize - 1 do
+  begin
+    if NPCsArray[I] <> nil then
+    begin
+      Result[J].ref := NPCsArray[I];
+      Inc(J);
+    end;
+  end;
+
+  if J > 0 then
+    SetLength(Result, J - 1);
+end;
+
 Function RSClient.AllPlayers: Array of RSPlayer; static;
 var
   Players: Pointer;
@@ -89,7 +126,7 @@ var
   I, J, PlayersSize: SizeUInt;
 begin
   PlayersSize := 0;
-  Players := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYERS);
+  Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
   PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
   RFreeObject(R_EIOS, Players);
 
@@ -108,3 +145,7 @@ begin
     SetLength(Result, J - 1);
 end;
 
+Function RSClient.AnimationFrameCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, CLIENT_ANIMATIONFRAMECACHE);
+end;

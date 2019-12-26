@@ -1,0 +1,39 @@
+{$include_once RSStructures.simba}
+{$include_once Static.simba}
+
+Function RSNPCDefinition.ID: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, NPCDEFINITION_ID);
+end;
+
+Function RSNPCDefinition.Name: String;
+begin
+  Result := RGetString(R_EIOS, ref, NPCDEFINITION_NAME);
+end;
+
+Function RSNPCDefinition.Actions: Array of String;
+var
+  Actions: Pointer;
+  ActionsSize: SizeUInt;
+begin
+  ActionsSize := 0;
+  Actions := RGetArray(R_EIOS, ref, ActionsSize, NPCDEFINITION_ACTIONS);
+  Result := RGetStringArray(R_EIOS, Actions, 0, ActionsSize);
+  RFreeObject(R_EIOS, Actions);
+end;
+
+Function RSNPCDefinition.ModelIDs: Array of Int32;
+var
+  ModelIDs: Pointer;
+  ModelIDsSize: SizeUInt;
+begin
+  ModelIDsSize := 0;
+  ModelIDs := RGetArray(R_EIOS, ref, ModelIDsSize, NPCDEFINITION_MODELIDS);
+  Result := RGetIntArray(R_EIOS, ModelIDs, 0, ModelIDsSize);
+  RFreeObject(R_EIOS, ModelIDs);
+end;
+
+Function RSNPCDefinition.CombatLevel: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, NPCDEFINITION_COMBATLEVEL);
+end;

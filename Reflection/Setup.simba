@@ -2,7 +2,7 @@
 
 Procedure RSetup(pid: Int32);
 begin
-  SetEIOSTarget('RemoteInput', IntToStr(pid));
+  SetEIOSTarget('LibRemoteInput', IntToStr(pid));
 
   R_EIOS := RIGetEIOS(pid);
   if R_EIOS = nil then
@@ -11,5 +11,5 @@ begin
 
   RInitializeConstants;
   RInitializeTileSettings(R_EIOS);
-  //RInitializeTileHeights(R_EIOS);
+  RInitializeTileHeights(R_EIOS);
 end;

@@ -12,6 +12,20 @@ begin
   Result.ref := RGetObject(R_EIOS, ref, HASHTABLE_TAIL);
 end;
 
+Function RSHashTable.Bucket(Index: SizeUInt): RSNode;
+var
+  Buckets: Pointer;
+  BucketsSize: SizeUInt;
+begin
+  Buckets := RGetArray(R_EIOS, ref, BucketsSize, HASHTABLE_BUCKETS);
+  if Index < BucketsSize then
+  begin
+    Result.ref := RGetObjectArray(R_EIOS, Buckets, Index);
+  end;
+
+  RFreeObject(R_EIOS, Buckets);
+end;
+
 Function RSHashTable.Buckets: Array of RSNode;
 var
   Buckets: Pointer;
@@ -39,4 +53,40 @@ end;
 Function RSHashTable.Size: Int32;
 begin
   Result := RGetInt(R_EIOS, ref, HASHTABLE_SIZE);
+end;
+
+Function RSHashTable.GetObject(ID: Int64): RSNode;
+var
+  Index, CurrentUID: Int64;
+  Head, Current: RSNode;
+  Garbage: RSTypeArray;
+begin
+  Result.ref := nil;
+  Index := ID and (self.Size - 1);
+  Head := self.Bucket(Index);
+
+  if Head.ref <> nil then
+  begin
+    Garbage += Head;
+    Current := Head.Next;
+    if Current.ref <> nil then
+    begin
+      while Head.UID <> (CurrentUID := Current.UID) do
+      begin
+        if CurrentUID = ID then
+        begin
+          Garbage.Free;
+          Exit(Current);
+        end;
+
+        Garbage += Current;
+
+        if CurrentUID = -1 then
+          break;
+
+        Current := Current.Next;
+      end;
+    end;
+  end;
+  Garbage.Free;
 end;

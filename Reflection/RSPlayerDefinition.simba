@@ -1,5 +1,6 @@
 {$include_once RSCache.simba}
 {$include_once RSStructures.simba}
+{$include_once RSAnimationSequence.simba}
 
 
 Function RSPlayerDefinition.ID: Int32;
@@ -36,4 +37,53 @@ end;
 Function RSPlayerDefinition.ModelCache: RSCache; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, PLAYERDEFINITION_MODELCACHE);
+end;
+
+Function RSPlayerDefinition.CachedModel: RSModel;
+var
+  ModelID: Int64;
+  Cache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  if self.ref <> nil then
+  begin
+    ModelID := self.AnimatedModelID;
+    Cache := self.ModelCache;
+
+    if Cache.ref <> nil then
+    begin
+      HashTable := Cache.HashTable;
+      if HashTable.ref <> nil then
+      begin
+        Result.ref := HashTable.GetObject(ModelID).ref;
+      end;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;
+
+Function RSPlayerDefinition.GetModel(Model: RSModel; IdleSequence: RSAnimationSequence; AnimationFrame: Int32; MovementSequence: RSAnimationSequence; MovementFrame: Int32): RSAnimatedModel; static;
+begin
+  if (IdleSequence.ref = nil) and (MovementSequence.ref = nil) then
+  begin
+    Result.ref := Model.ref;
+    Result.vertices := Model.Vertices;
+    Result.triangles := Model.TriangleFaces;
+    Exit(Result);
+  end;
+
+  if (IdleSequence.ref <> nil) and (MovementSequence.ref <> nil) then
+  begin
+    Exit(IdleSequence.ApplyTransformations(Model, AnimationFrame, MovementSequence, MovementFrame));
+  end;
+
+  if IdleSequence.ref <> nil then
+  begin
+    Exit(IdleSequence.TransformActorModel(Model, AnimationFrame));
+  end;
+
+  Exit(MovementSequence.TransformActorModel(Model, MovementFrame));
 end;

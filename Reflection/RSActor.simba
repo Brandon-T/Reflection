@@ -1,26 +1,33 @@
 {$include_once RSStructures.simba}
+{$include_once RSNode.simba}
 {$include_once RSClient.simba}
+{$include_once RSCombatInfo.simba}
 
+
+Function RSActor.SpokenText: String;
+begin
+  Result := RGetString(R_EIOS, ref, ACTOR_SPOKENTEXT);
+end;
 
 Function RSActor.Orientation: Int32;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_ORIENTATION);
 end;
 
-Function RSActor.WorldX: Int32;
+Function RSActor.LocalX: Int32;
 begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDX);
+  Result := RGetInt(R_EIOS, ref, ACTOR_LOCALX);
 end;
 
-Function RSActor.WorldY: Int32;
+Function RSActor.LocalY: Int32;
 begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_WORLDY);
+  Result := RGetInt(R_EIOS, ref, ACTOR_LOCALY);
 end;
 
 Function RSActor.Tile: RSTile;
 begin
-  Result.X := RSClient.BaseX + self.WorldX div 128;
-  Result.Y:= RSClient.BaseY + self.WorldY div 128;
+  Result.X := RSClient.BaseX + self.LocalX div 128;
+  Result.Y:= RSClient.BaseY + self.LocalY div 128;
 end;
 
 Function RSActor.AnimationId: Int32;
@@ -31,6 +38,31 @@ end;
 Function RSActor.IsAnimating: Boolean;
 begin
   Result := self.AnimationId > -1;
+end;
+
+Function RSActor.AnimationFrame: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATIONFRAME);
+end;
+
+Function RSActor.MovementSequenceId: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_MOVEMENTSEQUENCE);
+end;
+
+Function RSActor.MovementFrame: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_MOVEMENTFRAME);
+end;
+
+Function RSActor.CurrentSequenceId: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_CURRENTSEQUENCE);
+end;
+
+Function RSActor.IsIdle: Boolean;
+begin
+  Result := RGetBool(R_EIOS, ref, ACTOR_ISANIMATING);
 end;
 
 Function RSActor.InteractingIndex: Int32;
@@ -47,3 +79,89 @@ Function RSActor.IsInCombat: Boolean;
 begin
   Result := self.CombatCycle > RSClient.LoopCycle;
 end;
+
+Function RSActor.Health: Int32;
+var
+  CombatInfoList, CombatInfoHolder: RSCombatInfoList;
+  Head, HolderHead, Next, HolderNext: RSNode;
+  Garbage: RSTypeArray;
+begin
+  Result := -1;
+  CombatInfoList.ref := RGetObject(R_EIOS, ref, ACTOR_COMBATINFOLIST);
+  Head := CombatInfoList.Head;
+  Next := Head.Next;
+
+  if Next.ref <> nil then
+  begin
+    CombatInfoHolder.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST);
+    HolderHead := CombatInfoHolder.Head;
+    HolderNext := HolderHead.Next;
+
+    if HolderNext.ref <> nil then
+    begin
+      Result := RSCombatInfo(HolderNext).Health;
+    end;
+  end;
+
+  Garbage := [HolderNext, HolderHead, CombatInfoHolder, Next, Head, CombatInfoList];
+  Garbage.Free;
+end;
+
+Function RSActor.HealthRatio: Int32;
+var
+  CombatInfoList, CombatInfoHolder: RSCombatInfoList;
+  Head, HolderHead, Next, HolderNext: RSNode;
+  Garbage: RSTypeArray;
+begin
+  Result := -1;
+  CombatInfoList.ref := RGetObject(R_EIOS, ref, ACTOR_COMBATINFOLIST);
+  Head := CombatInfoList.Head;
+  Next := Head.Next;
+
+  if Next.ref <> nil then
+  begin
+    CombatInfoHolder.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST);
+    HolderHead := CombatInfoHolder.Head;
+    HolderNext := HolderHead.Next;
+
+    if HolderNext.ref <> nil then
+    begin
+      Result := RSCombatInfo(HolderNext).HealthRatio;
+    end;
+  end;
+
+  Garbage := [HolderNext, HolderHead, CombatInfoHolder, Next, Head, CombatInfoList];
+  Garbage.Free;
+end;
+
+Function RSActor.HealthScale: Int32;
+var
+  CombatInfoList: RSCombatInfoList;
+  CombatInfo: RSCombatInfo;
+  Head, Next: RSNode;
+  Garbage: RSTypeArray;
+begin
+  Result := -1;
+  CombatInfoList.ref := RGetObject(R_EIOS, ref, ACTOR_COMBATINFOLIST);
+  Head := CombatInfoList.Head;
+  Next := Head.Next;
+
+  if Next.ref <> nil then
+  begin
+    CombatInfo.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFO2);
+    if CombatInfo.ref <> nil then
+    begin
+      Result := CombatInfo.HealthScale;
+    end;
+  end;
+
+  Garbage := [CombatInfo, Next, Head, CombatInfoList];
+  Garbage.Free;
+end;
+
+Function RSActor.HealthPercentage: Single;
+begin
+  Result := (self.Health / self.HealthScale) * 100.0;
+end;
+
+

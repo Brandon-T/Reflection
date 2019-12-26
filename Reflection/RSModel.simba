@@ -1,9 +1,12 @@
 {$include_once Static.simba}
-{$include_once RSStructures.simba}
 {$include_once Structures.simba}
+{$include_once RSStructures.simba}
+{$include_once RSAnimationFrame.simba}
+{$include_once RSAnimationSkeleton.simba}
+{$include_once RSAnimation.simba}
 
 
-Function RSModel.GetRawVertices: Array[0..3] of Array of Int32;
+Function RSModel.RawVertices: Array[0..3] of Array of Int32;
 var
   VerticesSize: SizeUInt;
   VerticesX, VerticesY, VerticesZ: Pointer;
@@ -20,7 +23,7 @@ begin
   RFreeObjects(R_EIOS, [VerticesX, VerticesY, VerticesZ]);
 end;
 
-Function RSModel.GetRawIndices: Array[0..3] of Array of Int32;
+Function RSModel.RawIndices: Array[0..3] of Array of Int32;
 var
   IndicesSize: SizeUInt;
   IndicesX, IndicesY, IndicesZ: Pointer;
@@ -37,13 +40,13 @@ begin
   RFreeObjects(R_EIOS, [IndicesX, IndicesY, IndicesZ]);
 end;
 
-Function RSModel.GetVertices: Array of TVector;
+Function RSModel.Vertices: Array of TVector;
 var
   I, VerticesSize: SizeUInt;
   Vertices: Array[0..3] of Array of Int32;
 begin
-  Vertices := self.GetRawVertices;
-  VerticesSize := Length(Vertices);
+  Vertices := self.RawVertices;
+  VerticesSize := Length(Vertices[0]);
   SetLength(Result, VerticesSize);
 
   for I := 0 to VerticesSize - 1 do
@@ -54,13 +57,13 @@ begin
   end;
 end;
 
-Function RSModel.GetIndices: Array of TVector;
+Function RSModel.Indices: Array of TVector;
 var
   I, IndicesSize: SizeUInt;
   Indices: Array[0..3] of Array of Int32;
 begin
-  Indices := self.GetRawIndices;
-  IndicesSize := Length(Indices);
+  Indices := self.RawIndices;
+  IndicesSize := Length(Indices[0]);
   SetLength(Result, IndicesSize);
 
   for I := 0 to IndicesSize - 1 do
@@ -71,16 +74,16 @@ begin
   end;
 end;
 
-Function RSModel.GetTriangleFaces: Array of TTriangle;
+Function RSModel.TriangleFaces: Array of TTriangle;
 var
   I, IndicesSize: SizeUInt;
   Indices: Array[0..3] of Array of Int32;
   Vertices: Array[0..3] of Array of Int32;
 begin
-  Indices := self.GetRawIndices;
-  Vertices := self.GetRawVertices;
+  Indices := self.RawIndices;
+  Vertices := self.RawVertices;
 
-  IndicesSize := Length(Indices);
+  IndicesSize := Length(Indices[0]);
   SetLength(Result, IndicesSize);
 
   for I := 0 to IndicesSize - 1 do
@@ -97,4 +100,23 @@ begin
     Result[I].C.y := Vertices[1][Indices[2][I]];
     Result[I].C.z := Vertices[2][Indices[2][I]];
   end;
+end;
+
+Function RSModel.Skins: Array of Array of Int32;
+var
+  Skins: Pointer;
+  I, SkinsSize: SizeUInt;
+  SkinsArray: Array of Pointer;
+begin
+  Skins := RGetArray(R_EIOS, ref, SkinsSize, MODEL_SKINS);
+  SkinsArray := RGetObjectArray(R_EIOS, Skins, 0, SkinsSize);
+  SetLength(Result, SkinsSize);
+  RFreeObject(R_EIOS, Skins);
+
+  for I := 0 to SkinsSize - 1 do
+  begin
+    Result[I] := RGetIntArray(R_EIOS, SkinsArray[I], 0, RGetArraySize(R_EIOS, SkinsArray[I]));
+  end;
+
+  RSTypeArray(SkinsArray).Free;
 end;

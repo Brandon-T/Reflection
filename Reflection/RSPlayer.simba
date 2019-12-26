@@ -1,6 +1,10 @@
+{$include_once RSStructures.simba}
 {$include_once RSClient.simba}
 {$include_once RSNameInfo.simba}
-{$include_once RSStructures.simba}
+{$include_once RSActor.simba}
+{$include_once RSPlayerDefinition.simba}
+{$include_once RSHashTable.simba}
+{$include_once RSAnimation.simba}
 
 
 Function RSPlayer.Me: RSLocalPlayer; static;
@@ -41,11 +45,6 @@ begin
   NameInfo.Free;
 end;
 
-Function RSPlayer.Model: RSModel;
-begin
-  Result.ref := RGetObject(R_EIOS, ref, PLAYER_MODEL);
-end;
-
 Function RSPlayer.IsVisible: Boolean;
 begin
   Result := RGetBool(R_EIOS, ref, PLAYER_VISIBLE);
@@ -61,4 +60,64 @@ begin
   Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
 end;
 
+Function RSPlayer.Model: RSModel;
+var
+  Definition: RSPlayerDefinition;
+begin
+  Definition := self.Definition;
+  Result := Definition.CachedModel;
+  Definition.Free;
+end;
 
+Function RSPlayer.AnimatedModel: RSAnimatedModel;
+var
+  AnimationId, AnimationDelay: Int32;
+  AnimationFrame, MovementId: Int32;
+  MovementFrame: Int32;
+  Model: RSModel;
+  IdleSequence: RSAnimationSequence;
+  MovementSequence: RSAnimationSequence;
+
+  AnimationCache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  Model := self.Model;
+
+  if Model.ref <> nil then
+  begin
+    AnimationId := self.AnimationId;
+    AnimationDelay := 0;
+    AnimationFrame := self.AnimationFrame;
+    MovementId := self.MovementSequenceId;
+    MovementFrame := self.MovementFrame;
+
+    if (AnimationId <> -1) and (AnimationDelay = 0) then
+    begin
+      AnimationCache := RSAnimationSequence.AnimationSequenceCache;
+      HashTable := AnimationCache.HashTable;
+
+      IdleSequence.ref := HashTable.GetObject(AnimationId).ref;
+
+      Garbage += [HashTable, AnimationCache];
+    end;
+
+    if (MovementId = -1) or self.isIdle or ((self.CurrentSequenceId = MovementId) and (IdleSequence.ref = nil)) then
+    begin
+      AnimationCache := RSAnimationSequence.AnimationSequenceCache;
+      HashTable := AnimationCache.HashTable;
+
+      MovementSequence.ref := HashTable.GetObject(MovementId).ref;
+
+      Garbage += [HashTable, AnimationCache];
+    end;
+
+    Exit(RSPlayerDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
+  end
+
+  Result.ref := Model.ref;
+  Result.vertices := Model.Vertices;
+  Result.triangles := Model.TriangleFaces;
+
+  Garbage.Free;
+end;

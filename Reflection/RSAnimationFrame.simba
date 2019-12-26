@@ -1,0 +1,27 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+{$include_once RSCache.simba}
+{$include_once RSHashTable.simba}
+
+Function RSAnimationFrame.Frames: RSAnimation;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, ANIMATIONFRAMES_FRAMES);
+end;
+
+Function RSAnimationFrame.GetFrame(FrameID: Int64): RSAnimationFrame; static;
+var
+  FrameCache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  FrameCache := RSClient.AnimationFrameCache;
+  HashTable := FrameCache.HashTable;
+  if HashTable.ref <> nil then
+  begin
+    Result.ref := HashTable.GetObject(FrameID).ref;
+  end;
+
+  Garbage := [HashTable, FrameCache];
+  Garbage.Free;
+end;

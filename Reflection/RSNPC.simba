@@ -1,0 +1,32 @@
+{$include_once RSStructures.simba}
+{$include_once Static.simba}
+{$include_once RSClient.simba}
+
+Function RSNPC.Definition: RSNPCDefinition;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, NPC_DEFINITION);
+end;
+
+Function RSNPC.AllNPCs: Array of RSNPC; static;
+var
+  NPCs: Pointer;
+  NPCsArray: Array of Pointer;
+  Indices: Array of Int32;
+  I, NPCsSize: SizeUInt;
+begin
+  Indices := RSClient.NPCIndices;
+  if Length(Indices) < 1 then
+    Exit;
+
+  NPCsSize := 0;
+  NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCS);
+  NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
+  RFreeObject(R_EIOS, NPCs);
+
+  SetLength(Result, Length(Indices));
+
+  for I := 0 to High(Indices) do
+  begin
+    Result[I].ref := NPCsArray[Indices[I]];
+  end;
+end;

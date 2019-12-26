@@ -1,0 +1,91 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$include_once RSModel.simba}
+{$include_once RSAnimatedModel.simba}
+{$include_once RSHashTable.simba}
+{$include_once RSCache.simba}
+{$include_once RSAnimationFrame.simba}
+
+
+Function RSAnimationSequence.Frame(Index: Int32): Int32;
+var
+  Frames: Pointer;
+  FramesSize: SizeUInt;
+begin
+  FramesSize := 0;
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONSEQUENCE_FRAMES);
+  Result := RGetIntArray(R_EIOS, Frames, Index);
+  RFreeObject(R_EIOS, Frames);
+end;
+
+Function RSAnimationSequence.Frames: Array of Int32;
+var
+  Frames: Pointer;
+  FramesSize: SizeUInt;
+begin
+  FramesSize := 0;
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONSEQUENCE_FRAMES);
+  Result := RGetIntArray(R_EIOS, Frames, 0, FramesSize);
+  RFreeObject(R_EIOS, Frames);
+end;
+
+Function RSAnimationSequence.AnimationSequenceCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, ANIMATIONSEQUENCE_SEQUENCECACHE);
+end;
+
+Function RSAnimationSequence.FrameCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, ANIMATIONSEQUENCE_FRAMECACHE);
+end;
+
+
+
+Function RSAnimationSequence.TransformActorModel(Model: RSModel; FrameID: Int32): RSAnimatedModel;
+var
+  Frames: RSAnimationFrame;
+begin
+  FrameID := self.Frame(FrameID);
+  Frames := RSAnimationFrame.GetFrame(FrameID);
+  FrameID := FrameID and 65535;
+
+  Result.ref := Model.ref;
+  Result.vertices := Model.Vertices;
+  Result.triangles := Model.TriangleFaces;
+
+  if Frames.ref = nil then
+  begin
+    Exit(Result);
+  end;
+
+  Exit(Result.Animate(Frames, FrameID));
+end;
+
+Function RSAnimationSequence.ApplyTransformations(Model: RSModel; IdleFrameID: Int32; AnimationSequence: RSAnimationSequence; MovementFrameID: Int32): RSAnimatedModel;
+var
+  Frames, Frames2: RSAnimationFrame;
+begin
+  IdleFrameID := self.Frame(IdleFrameID);
+  Frames := RSAnimationFrame.GetFrame(Sar(IdleFrameID, 16));
+  IdleFrameID := IdleFrameID and 65535;
+
+  if Frames.ref = nil then
+  begin
+    Exit(AnimationSequence.TransformActorModel(Model, MovementFrameID));
+  end;
+
+  MovementFrameID := AnimationSequence.Frame(MovementFrameID);
+  Frames2 := RSAnimationFrame.GetFrame(Sar(MovementFrameID, 16));
+  MovementFrameID := MovementFrameID and 65535;
+
+  Result.ref := Model.ref;
+  Result.vertices := Model.Vertices;
+  //Result.triangles := Model.TriangleFaces;
+
+  if Frames2.ref = nil then
+  begin
+    Exit(Result.Animate(Frames2, IdleFrameID));
+  end;
+
+  Exit(Result.Animate(Frames, IdleFrameID, Frames2, MovementFrameID, [])); //TODO: Get Last Parameter Hook..
+end;

@@ -1,4 +1,6 @@
 {$include_once Hooks.simba}
+{$IFNDEF FUNCTIONS}
+{$DEFINE FUNCTIONS}
 
 // MARK: - OBJECT
 
@@ -140,9 +142,18 @@ begin
   Result := PDouble(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, index, 1))^;
 end;
 
-Function RGetObjectArray(eios: Pointer; instance: Pointer; index: SizeUInt): Pointer;
+Function RGetStringArray(eios: Pointer; instance: Pointer; index: SizeUInt): String;
+type
+  PString = ^String;
 begin
-  Result := RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, index, 1);
+  Result := PString(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, index, 1))^;
+end;
+
+Function RGetObjectArray(eios: Pointer; instance: Pointer; index: SizeUInt): Pointer;
+type
+  PPointer = ^Pointer;
+begin
+  Result := PPointer(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, index, 1))^;
 end;
 
 Function RGetBoolArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Boolean; overload;
@@ -199,6 +210,13 @@ type
   TDoubleArray = array of Double;
 begin
   Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, index, count));
+end;
+
+Function RGetStringArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, index, count));
 end;
 
 Function RGetObjectArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Pointer; overload;
@@ -265,9 +283,18 @@ begin
   Result := PDouble(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, 1, x, y))^;
 end;
 
-Function RGetObjectArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Pointer;
+Function RGetStringArray2D(eios: Pointer; instance: Pointer; x, y: Int32): String;
+type
+  PString = ^String;
 begin
-  Result := RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, 1, x, y);
+  Result := PString(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, 1, x, y))^;
+end;
+
+Function RGetObjectArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Pointer;
+type
+  PPointer = ^Pointer;
+begin
+  Result := PPointer(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, 1, x, y))^;
 end;
 
 Function RGetBoolArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Boolean; overload;
@@ -324,6 +351,13 @@ type
   TDoubleArray = array of Double;
 begin
   Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, count, x, y));
+end;
+
+Function RGetStringArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, count, x, y));
 end;
 
 Function RGetObjectArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Pointer; overload;
@@ -390,9 +424,18 @@ begin
   Result := PDouble(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, 1, x, y, z))^;
 end;
 
-Function RGetObjectArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Pointer;
+Function RGetStringArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): String;
+type
+  PString = ^String;
 begin
-  Result := RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, 1, x, y, z);
+  Result := PString(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, 1, x, y, z))^;
+end;
+
+Function RGetObjectArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Pointer;
+type
+  PPointer = ^Pointer;
+begin
+  Result := PPointer(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, 1, x, y, z))^;
 end;
 
 Function RGetBoolArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Boolean; overload;
@@ -449,6 +492,13 @@ type
   TDoubleArray = array of Double;
 begin
   Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, count, x, y, z));
+end;
+
+Function RGetStringArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, count, x, y, z));
 end;
 
 Function RGetObjectArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Pointer; overload;
@@ -515,9 +565,18 @@ begin
   Result := PDouble(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, 1, x, y, z, w))^;
 end;
 
-Function RGetObjectArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Pointer;
+Function RGetStringArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): String;
+type
+  PString = ^String;
 begin
-  Result := RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, 1, x, y, z, w);
+  Result := PString(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, 1, x, y, z, w))^;
+end;
+
+Function RGetObjectArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Pointer;
+type
+  PPointer = ^Pointer;
+begin
+  Result := PPointer(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, 1, x, y, z, w))^;
 end;
 
 Function RGetBoolArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Boolean; overload;
@@ -576,9 +635,17 @@ begin
   Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, count, x, y, z, w));
 end;
 
+Function RGetStringArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, count, x, y, z, w));
+end;
+
 Function RGetObjectArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Pointer; overload;
 type
   TObjectArray = array of Pointer;
 begin
   Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y, z, w));
 end;
+{$ENDIF}

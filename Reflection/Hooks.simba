@@ -1,7 +1,11 @@
 {$IFNDEF REMOTEINPUT}
 {$DEFINE REMOTEINPUT}
+
+{$ifdef WINDOWS}
 {$loadlib RemoteInput}
-{$ENDIF}
+{$else}
+{$loadlib LibRemoteInput}
+{$endif}
 
 type
   PRIField = ^RIField;
@@ -217,7 +221,7 @@ AnimationSkeleton_Transformations: THook =        ['ek', 'w', '[[I', 1];
 {Animation: dj}
 Animation_FrameCount: THook =                     ['dj', 'b', 'I', 1];
 Animation_Frames: THook =                         ['dj', 'e', '[I', 1];
-Animation_TranformX: THook =                      ['dj', 'x', '[I', 1];
+Animation_TransformX: THook =                     ['dj', 'x', '[I', 1];
 Animation_TransformY: THook =                     ['dj', 'a', '[I', 1];
 Animation_TransformZ: THook =                     ['dj', 'd', '[I', 1];
 Animation_Skeleton: THook =                       ['dj', 'p', 'Lek;', 1];
@@ -240,10 +244,10 @@ CombatInfoHolder_CombatInfo2: THook =             ['co', 'y', 'Lio;', 1];
 {Actor: bv}
 Actor_Animation: THook =                          ['bv', 'bo', 'I', 382239063];
 Actor_AnimationDelay: THook =                     ['bv', 'bn', 'I', 62784213];
-Entity_AnimationFrame: THook =                    ['bv', 'bs', 'I', -226786267];
-Entity_MovementSequence: THook =                  ['bv', 'by', 'I', -1753452087];
-Entity_MovementFrame: THook =                     ['bv', 'bz', 'I', 25834883];
-Entity_CurrentSequence: THook =                   ['bv', 'an', 'I', -1378068741];
+Actor_AnimationFrame: THook =                     ['bv', 'bs', 'I', -226786267];
+Actor_MovementSequence: THook =                   ['bv', 'by', 'I', -1753452087];
+Actor_MovementFrame: THook =                      ['bv', 'bz', 'I', 25834883];
+Actor_CurrentSequence: THook =                    ['bv', 'an', 'I', -1378068741];
 Actor_SpokenText: THook =                         ['bv', 'ad', 'Ljava/lang/String;', 1];
 Actor_HitDamages: THook =                         ['bv', 'ab', '[I', 1];
 Actor_HitTypes: THook =                           ['bv', 'bj', '[I', 1];
@@ -252,15 +256,14 @@ Actor_QueueX: THook =                             ['bv', 'ch', '[I', 1];
 Actor_QueueY: THook =                             ['bv', 'ca', '[I', 1];
 Actor_QueueTraversed: THook =                     ['bv', 'cn', '[B', 1];
 Actor_QueueSize: THook =                          ['bv', 'cs', 'I', 905332161];
-Actor_WorldX: THook =                             ['bv', 'as', 'I', 274195699];
-Actor_WorldY: THook =                             ['bv', 'ak', 'I', 1601699261];
+Actor_LocalX: THook =                             ['bv', 'as', 'I', 274195699];
+Actor_LocalY: THook =                             ['bv', 'ak', 'I', 1601699261];
 Actor_IsAnimating: THook =                        ['bv', 'ax', 'Z', 1];
 Actor_CombatCycle: THook =                        ['bv', 'N/A', 'N/A', 1];
 Actor_InteractingIndex: THook =                   ['bv', 'bq', 'I', -842697287];
-Entity_Rotation: THook =                          ['bv', 'cq', 'I', -839837513];
 Actor_Orientation: THook =                        ['bv', 'cq', 'I', -839837513];
-Entity_IsWalking: THook =                         ['bv', 'ah', 'Z', 1];
-Entity_TargetIndex: THook =                       ['bv', 'bq', 'I', -842697287];
+Actor_IsWalking: THook =                          ['bv', 'ah', 'Z', 1];
+Actor_TargetIndex: THook =                        ['bv', 'bq', 'I', -842697287];
 Actor_CombatInfoList: THook =                     ['bv', 'bl', 'Ljl;', 1];
 Actor_Height: THook =                             ['bv', 'cj', 'I', -958995757];
 
@@ -340,7 +343,7 @@ Client_LoopCycle: THook =                         ['client', 'cs', 'I', 19428371
 Client_LoginState: THook =                        ['client', 'bn', 'I', 513077141];
 Client_GameState: THook =                         ['cs', 'ar', 'I', -996897081];
 Client_CrossHairColor: THook =                    ['client', 'jo', 'I', -557514861];
-Client_AnimationCache: THook =                    ['iv', 'p', 'Leb;', 1];
+Client_AnimationFrameCache: THook =               ['iv', 'p', 'Leb;', 1];
 Client_GroundItems: THook =                       ['client', 'kq', '[[[Ljs;', 1];
 Client_CollisionMap: THook =                      ['client', 'w', '[Lfp;', 1];
 Client_TradingPostOffers: THook =                 ['client', 'si', '[Ld;', 1];
@@ -386,3 +389,6 @@ Client_Experiences: THook =                       ['client', 'kw', '[I', 1];
 Client_CurrentWorld: THook =                      ['client', 'bj', 'I', 860985583];
 Client_Energy: THook =                            ['client', 'mi', 'I', -883981411];
 Client_Weight: THook =                            ['client', 'mq', 'I', 601999387];
+
+
+{$ENDIF}

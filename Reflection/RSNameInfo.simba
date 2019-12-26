@@ -7,5 +7,6 @@ end;
 
 Function RSNameInfo.DecodedName: String;
 begin
+  writeln(ref);
   Result := RGetString(R_EIOS, ref, NAMEINFO_DECODEDNAME);
 end;

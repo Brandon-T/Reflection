@@ -1,5 +1,6 @@
 {$include_once Static.simba}
 {$include_once Functions.simba}
+{$include_once Structures.simba}
 
 type
   RSType = packed record
@@ -18,6 +19,8 @@ type
 
   RSNode = type RSType;
 
+  RSCache = type RSType;
+
   RSHashTable = type RSType;
 
   RSQueue = type RSType;
@@ -26,13 +29,36 @@ type
 
   RSPlayerDefinition = type RSType;
 
+  RSNPCDefinition = type RSType;
+
   RSActor = type RSType;
+
+  RSNPC = type RSActor;
 
   RSPlayer = type RSActor;
 
   RSLocalPlayer = type RSPlayer;
 
   RSNameInfo = type RSType;
+
+  RSCombatInfoList = type RSType;
+  RSCombatInfo = type RSType;
+
+  RSAnimationSequence = type RSType;
+
+  RSAnimation = type RSType;
+
+  RSAnimationFrame = type RSType;
+
+  RSAnimationSkeleton = type RSType;
+
+  RSAnimatedModel = record(RSType)
+    vertices: Array of TVector;
+    triangles: Array of TTriangle;
+    skins: Array of Array of Int32;
+
+    modifierX, modifierY, modifierZ: Int32;
+  end;
 
 
 Procedure RSType.Free;
