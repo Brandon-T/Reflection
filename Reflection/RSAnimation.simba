@@ -24,7 +24,7 @@ var
   FramesSize: SizeUInt;
 begin
   FramesSize := 0;
-  Frames := RGetArray(R_EIOS, ref, ANIMATION_FRAMES);
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATION_FRAMES);
   Result := RGetIntArray(R_EIOS, Frames, 0, FramesSize);
   RFreeObject(R_EIOS, Frames);
 end;
@@ -46,7 +46,7 @@ var
   TransformSize: SizeUInt;
 begin
   TransformSize := 0;
-  Transform := RGetArray(R_EIOS, ref, ANIMATION_TRANSFORMY);
+  Transform := RGetArray(R_EIOS, ref, TransformSize, ANIMATION_TRANSFORMY);
   Result := RGetIntArray(R_EIOS, Transform, 0, TransformSize);
   RFreeObject(R_EIOS, Transform);
 end;
@@ -57,7 +57,7 @@ var
   TransformSize: SizeUInt;
 begin
   TransformSize := 0;
-  Transform := RGetArray(R_EIOS, ref, ANIMATION_TRANSFORMZ);
+  Transform := RGetArray(R_EIOS, ref, TransformSize, ANIMATION_TRANSFORMZ);
   Result := RGetIntArray(R_EIOS, Transform, 0, TransformSize);
   RFreeObject(R_EIOS, Transform);
 end;

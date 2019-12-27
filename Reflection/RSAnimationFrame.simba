@@ -4,9 +4,35 @@
 {$include_once RSCache.simba}
 {$include_once RSHashTable.simba}
 
-Function RSAnimationFrame.Frames: RSAnimation;
+
+Function RSAnimationFrame.Animation(Index: Int32): RSAnimation;
+var
+  Frames: Pointer;
+  FramesSize: SizeUInt;
 begin
-  Result.ref := RGetObject(R_EIOS, ref, ANIMATIONFRAMES_FRAMES);
+  FramesSize := 0;
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONFRAMES_FRAMES);
+  Result.ref := RGetObjectArray(R_EIOS, Frames, Index);
+  RFreeObject(R_EIOS, Frames);
+end;
+
+Function RSAnimationFrame.Animations: Array of RSAnimation;
+var
+  Frames: Pointer;
+  I, FramesSize: SizeUInt;
+  FramesArray: Array of Pointer;
+begin
+  FramesSize := 0;
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONFRAMES_FRAMES);
+  FramesArray := RGetObjectArray(R_EIOS, Frames, 0, FramesSize);
+  RFreeObject(R_EIOS, Frames);
+
+  SetLength(Result, FramesSize);
+
+  for I := 0 to FramesSize - 1 do
+  begin
+    Result[I].ref := FramesArray[I];
+  end;
 end;
 
 Function RSAnimationFrame.GetFrame(FrameID: Int64): RSAnimationFrame; static;

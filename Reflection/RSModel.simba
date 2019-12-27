@@ -110,8 +110,9 @@ var
 begin
   Skins := RGetArray(R_EIOS, ref, SkinsSize, MODEL_SKINS);
   SkinsArray := RGetObjectArray(R_EIOS, Skins, 0, SkinsSize);
-  SetLength(Result, SkinsSize);
   RFreeObject(R_EIOS, Skins);
+
+  SetLength(Result, SkinsSize);
 
   for I := 0 to SkinsSize - 1 do
   begin

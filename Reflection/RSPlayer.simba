@@ -86,10 +86,10 @@ begin
 
   if Model.ref <> nil then
   begin
-    AnimationId := self.AnimationId;
     AnimationDelay := 0;
-    AnimationFrame := self.AnimationFrame;
+    AnimationId := self.AnimationId;
     MovementId := self.MovementSequenceId;
+    AnimationFrame := self.AnimationFrame;
     MovementFrame := self.MovementFrame;
 
     if (AnimationId <> -1) and (AnimationDelay = 0) then
@@ -102,7 +102,7 @@ begin
       Garbage += [HashTable, AnimationCache];
     end;
 
-    if (MovementId = -1) or self.isIdle or ((self.CurrentSequenceId = MovementId) and (IdleSequence.ref = nil)) then
+    if (MovementId <> -1) and (not self.isIdle) and ((MovementId <> self.CurrentSequenceId) or (IdleSequence.ref = nil)) then
     begin
       AnimationCache := RSAnimationSequence.AnimationSequenceCache;
       HashTable := AnimationCache.HashTable;

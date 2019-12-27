@@ -18,11 +18,7 @@ var
   BucketsSize: SizeUInt;
 begin
   Buckets := RGetArray(R_EIOS, ref, BucketsSize, HASHTABLE_BUCKETS);
-  if Index < BucketsSize then
-  begin
-    Result.ref := RGetObjectArray(R_EIOS, Buckets, Index);
-  end;
-
+  Result.ref := RGetObjectArray(R_EIOS, Buckets, Index);
   RFreeObject(R_EIOS, Buckets);
 end;
 

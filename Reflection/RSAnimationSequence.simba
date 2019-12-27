@@ -46,15 +46,15 @@ var
   Frames: RSAnimationFrame;
 begin
   FrameID := self.Frame(FrameID);
-  Frames := RSAnimationFrame.GetFrame(FrameID);
+  Frames := RSAnimationFrame.GetFrame(Sar(FrameID, 16));
   FrameID := FrameID and 65535;
 
   Result.ref := Model.ref;
-  Result.vertices := Model.Vertices;
-  Result.triangles := Model.TriangleFaces;
 
   if Frames.ref = nil then
   begin
+    Result.vertices := Model.Vertices;
+    Result.triangles := Result.TriangleFaces;
     Exit(Result);
   end;
 
@@ -79,12 +79,10 @@ begin
   MovementFrameID := MovementFrameID and 65535;
 
   Result.ref := Model.ref;
-  Result.vertices := Model.Vertices;
-  //Result.triangles := Model.TriangleFaces;
 
   if Frames2.ref = nil then
   begin
-    Exit(Result.Animate(Frames2, IdleFrameID));
+    Exit(Result.Animate(Frames, IdleFrameID));
   end;
 
   Exit(Result.Animate(Frames, IdleFrameID, Frames2, MovementFrameID, [])); //TODO: Get Last Parameter Hook..

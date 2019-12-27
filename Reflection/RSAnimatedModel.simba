@@ -6,6 +6,27 @@
 {$include_once RSAnimationSkeleton.simba}
 {$include_once RSAnimation.simba}
 
+
+Function RSAnimatedModel.TriangleFaces: Array of TTriangle;
+var
+  I, IndicesSize: SizeUInt;
+  Indices: Array[0..3] of Array of Int32;
+  Model: RSModel;
+begin
+  Model.ref := self.ref;
+  Indices := Model.RawIndices;
+
+  IndicesSize := Length(Indices[0]);
+  SetLength(Result, IndicesSize);
+
+  for I := 0 to IndicesSize - 1 do
+  begin
+    Result[I].A := Vertices[Indices[0][I]];
+    Result[I].B := Vertices[Indices[1][I]];
+    Result[I].C := Vertices[Indices[2][I]];
+  end;
+end;
+
 Function RSAnimatedModel.Animate(Frame: RSAnimationFrame; FrameID: Int32): RSAnimatedModel;
 var
   Model: RSModel;
@@ -20,14 +41,19 @@ var
 begin
   Model.ref := self.ref;
   self.skins := Model.Skins;
+  self.vertices := Model.Vertices;
 
   if Length(self.skins) > 0 then
   begin
     if FrameID <> -1 then
     begin
-      Animation := Frame.GetFrame(FrameId);
+      Animation := Frame.Animation(FrameId);
       Skeleton := Animation.Skeleton;
       FrameIDs := Animation.Frames;
+
+      self.ModifierX := 0;
+      self.ModifierY := 0;
+      self.ModifierZ := 0;
 
       TransformationTypes := Skeleton.TransformationTypes;
       Transformations := Skeleton.Transformations;
@@ -36,10 +62,10 @@ begin
       TransformY := Animation.TransformY;
       TransformZ := Animation.TransformZ;
 
-      for I := 0 to Skeleton.TransformCount - 1 do
+      for I := 0 to Animation.FrameCount - 1 do
       begin
         TransformType := FrameIDs[I];
-        self.Transform(self, TransformationTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
+        self.Transform(TransformationTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
       end;
     end;
 	end;
@@ -47,6 +73,7 @@ begin
   Garbage := [Skeleton, Animation, Frame];
   Garbage.Free;
 
+  self.triangles := self.TriangleFaces;
   Result := self;
 end;
 
@@ -64,20 +91,22 @@ var
   Garbage: RSTypeArray;
 begin
   Model.ref := self.ref;
-  Result.skins := Model.Skins;
+  self.skins := Model.Skins;
 
   if IdleFrameID <> -1 then
   begin
     if (MovementFrameID <> -1) and (Length(TransformationTypes) > 0) then
     begin
-      IdleAnimation := IdleFrame.GetFrame(IdleFrameID);
-      MovementAnimation := MovementFrame.GetFrame(MovementFrameID);
+      self.vertices := Model.Vertices;
+      self.triangles := self.TriangleFaces;
+      IdleAnimation := IdleFrame.Animation(IdleFrameID);
+      MovementAnimation := MovementFrame.Animation(MovementFrameID);
       Skeleton := IdleAnimation.Skeleton;
 
       //Idle Animation
-      Result.ModifierX := 0;
-      Result.ModifierY := 0;
-      Result.ModifierZ := 0;
+      self.ModifierX := 0;
+      self.ModifierY := 0;
+      self.ModifierZ := 0;
 
       FrameIDs := IdleAnimation.Frames;
       TransformTypes := Skeleton.TransformationTypes;
@@ -101,14 +130,14 @@ begin
 
         if (TransformType <> CurrentTransformType) or (TransformTypes[TransformType] = 0) then
         begin
-			    self.Transform(Result, TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
+			    self.Transform(TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
 		    end;
       end;
 
       //Movement Animation
-      Result.ModifierX := 0;
-      Result.ModifierY := 0;
-      Result.ModifierZ := 0;
+      self.ModifierX := 0;
+      self.ModifierY := 0;
+      self.ModifierZ := 0;
 
       FrameIDs := MovementAnimation.Frames;
 
@@ -130,7 +159,7 @@ begin
 
         if (TransformType <> CurrentTransformType) or (TransformTypes[TransformType] = 0) then
         begin
-			    self.Transform(Result, TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
+			    self.Transform(TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
 		    end;
       end;
 
@@ -149,7 +178,7 @@ begin
   Result := self;
 end;
 
-Procedure RSAnimatedModel.Transform(var Model: RSAnimatedModel; TransformType: Int32; SkinIDs: Array of Int32; TransformationX, TransformationY, TransformationZ: Int32);
+Procedure RSAnimatedModel.Transform(TransformType: Int32; SkinIDs: Array of Int32; TransformationX, TransformationY, TransformationZ: Int32);
 var
   I, J, SkinID, AffectedSkins: Int32;
   TransformCount: Int32;
@@ -160,26 +189,27 @@ var
   SineAngle: Int32;
   CosineAngle: Int32;
 begin
-  TransformCount := Length(Skins);
+  AffectedSkins := 0;
+  TransformCount := Length(SkinIDs);
 
   if TransformType = 0 then
   begin
-    Model.ModifierX := 0;
-    Model.ModifierY := 0;
-    Model.ModifierZ := 0;
+    self.ModifierX := 0;
+    self.ModifierY := 0;
+    self.ModifierZ := 0;
 
     for I := 0 to TransformCount - 1 do
     begin
       SkinID := SkinIDs[I];
-      if SkinID < Length(Model.skins) then
+      if SkinID < Length(self.skins) then
       begin
-        Skins := Model.skins[SkinID];
+        Skins := self.skins[SkinID];
         for J := 0 to High(Skins) do
         begin
-          Vertex := Model.vertices[Skins[J]];
-          Model.ModifierX += Vertex.X;
-          Model.ModifierY += Vertex.Y;
-          Model.ModifierZ += Vertex.Z;
+          Vertex := self.vertices[Skins[J]];
+          self.ModifierX += Vertex.X;
+          self.ModifierY += Vertex.Y;
+          self.ModifierZ += Vertex.Z;
           Inc(AffectedSkins);
         end;
       end;
@@ -187,14 +217,14 @@ begin
 
     if AffectedSkins > 0 then
     begin
-      Model.ModifierX := (Model.ModifierX div AffectedSkins) + TransformationX;
-      Model.ModifierY := (Model.ModifierY div AffectedSkins) + TransformationY;
-      Model.ModifierZ := (Model.ModifierZ div AffectedSkins) + TransformationZ;
+      self.ModifierX := (self.ModifierX div AffectedSkins) + TransformationX;
+      self.ModifierY := (self.ModifierY div AffectedSkins) + TransformationY;
+      self.ModifierZ := (self.ModifierZ div AffectedSkins) + TransformationZ;
     end else
       begin
-        Model.ModifierX := TransformationX;
-        Model.ModifierY := TransformationY;
-        Model.ModifierZ := TransformationZ;
+        self.ModifierX := TransformationX;
+        self.ModifierY := TransformationY;
+        self.ModifierZ := TransformationZ;
       end;
 
     Exit;
@@ -206,16 +236,16 @@ begin
     for I := 0 to TransformCount - 1 do
     begin
       SkinID := SkinIDs[I];
-      if SkinID < Length(Model.skins) then
+      if SkinID < Length(self.skins) then
       begin
-        Skins := Model.skins[SkinID];
+        Skins := self.skins[SkinID];
         for J := 0 to High(Skins) do
         begin
-          Vertex := Model.vertices[Skins[J]];
+          Vertex := self.vertices[Skins[J]];
           Vertex.x += TransformationX;
           Vertex.y += TransformationY;
           Vertex.z += TransformationZ;
-          Model.vertices[Skins[J]] := Vertex;
+          self.vertices[Skins[J]] := Vertex;
         end;
       end;
     end;
@@ -229,54 +259,54 @@ begin
     for I := 0 to TransformCount - 1 do
     begin
       SkinID := SkinIDs[I];
-      if SkinID < Length(Model.skins) then
+      if SkinID < Length(self.skins) then
       begin
-        Skins := Model.skins[SkinID];
+        Skins := self.skins[SkinID];
         for J := 0 to High(Skins) do
         begin
-          Vertex := Model.vertices[Skins[J]];
-          Vertex.x -= TransformationX;
-          Vertex.y -= TransformationY;
-          Vertex.z -= TransformationZ;
+          Vertex := self.vertices[Skins[J]];
+          Vertex.x -= self.ModifierX;
+          Vertex.y -= self.ModifierY;
+          Vertex.z -= self.ModifierZ;
 
-          RotationX = (TransformationX and $FF) * 8;
-          RotationY = (TransformationY and $FF) * 8;
-          RotationZ = (TransformationZ and $FF) * 8;
+          RotationX := (TransformationX and $FF) * 8;
+          RotationY := (TransformationY and $FF) * 8;
+          RotationZ := (TransformationZ and $FF) * 8;
 
           if RotationZ <> 0 then
           begin
-            SineAngle = SINE[RotationZ];
-            CosineAngle = COSINE[RotationZ];
+            SineAngle := SINE[RotationZ];
+            CosineAngle := COSINE[RotationZ];
 
-            NewVertexX = Sar((Vertex.x * CosineAngle) + (Vertex.y * SineAngle), 16);
+            NewVertexX := Sar((Vertex.x * CosineAngle) + (Vertex.y * SineAngle), 16);
             Vertex.Y := Sar((Vertex.y * CosineAngle) - (Vertex.x * SineAngle), 16);
             Vertex.X := NewVertexX;
           end;
 
           if RotationX <> 0 then
           begin
-            SineAngle = SINE[RotationX];
-            CosineAngle = COSINE[RotationX];
+            SineAngle := SINE[RotationX];
+            CosineAngle := COSINE[RotationX];
 
-            NewVertexY = Sar((Vertex.y * CosineAngle) - (Vertex.z * SineAngle), 16);
+            NewVertexY := Sar((Vertex.y * CosineAngle) - (Vertex.z * SineAngle), 16);
             Vertex.Z := Sar((Vertex.z * CosineAngle) + (Vertex.y * SineAngle), 16);
             Vertex.Y := NewVertexY;
           end;
 
           if RotationY <> 0 then
           begin
-            SineAngle = SINE[RotationY];
-            CosineAngle = COSINE[RotationY];
+            SineAngle := SINE[RotationY];
+            CosineAngle := COSINE[RotationY];
 
-            NewVertexZ = Sar((Vertex.x * CosineAngle) + (Vertex.z * SineAngle), 16);
+            NewVertexZ := Sar((Vertex.x * CosineAngle) + (Vertex.z * SineAngle), 16);
             Vertex.Z := Sar((Vertex.z * CosineAngle) - (Vertex.x * SineAngle), 16);
             Vertex.X := NewVertexZ;
           end;
 
-          Vertex.X += TransformationX;
-          Vertex.Y += TransformationY;
-          Vertex.Z += TransformationZ;
-          Model.vertices[Skins[J]] := Vertex;
+          Vertex.X += self.ModifierX;
+          Vertex.Y += self.ModifierY;
+          Vertex.Z += self.ModifierZ;
+          self.vertices[Skins[J]] := Vertex;
         end;
       end;
     end;
@@ -290,51 +320,30 @@ begin
     for I := 0 to TransformCount - 1 do
     begin
       SkinID := SkinIDs[I];
-      if SkinID < Length(Model.skins) then
+      if SkinID < Length(self.skins) then
       begin
-        Skins := Model.skins[SkinID];
+        Skins := self.skins[SkinID];
         for J := 0 to High(Skins) do
         begin
-          Vertex := Model.vertices[Skins[J]];
+          Vertex := self.vertices[Skins[J]];
 
-          Vertex.X -= TransformationX;
-          Vertex.Y -= TransformationY;
-          Vertex.Z -= TransformationZ;
+          Vertex.X -= self.ModifierX;
+          Vertex.Y -= self.ModifierY;
+          Vertex.Z -= self.ModifierZ;
 
           Vertex.X := (Vertex.X * TransformationX) div 128;
           Vertex.Y := (Vertex.Y * TransformationY) div 128;
           Vertex.Z := (Vertex.Z * TransformationZ) div 128;
 
-          Vertex.X += TransformationX;
-          Vertex.Y += TransformationY;
-          Vertex.Z += TransformationZ;
+          Vertex.X += self.ModifierX;
+          Vertex.Y += self.ModifierY;
+          Vertex.Z += self.ModifierZ;
 
-          Model.vertices[Skins[J]] := Vertex;
+          self.vertices[Skins[J]] := Vertex;
         end;
       end;
     end;
 
     Exit;
-  end;
-end;
-
-
-Function RSAnimatedModel.TriangleFaces: Array of TTriangle;
-var
-  I, IndicesSize: SizeUInt;
-  Indices: Array[0..3] of Array of Int32;
-  Model: RSModel;
-begin
-  Model.ref := self.ref;
-  Indices := Model.RawIndices;
-
-  IndicesSize := Length(Indices[0]);
-  SetLength(Result, IndicesSize);
-
-  for I := 0 to IndicesSize - 1 do
-  begin
-    Result[I].A := Vertices[Indices[0][I]];
-    Result[I].B := Vertices[Indices[1][I]];
-    Result[I].C := Vertices[Indices[2][I]];
   end;
 end;
