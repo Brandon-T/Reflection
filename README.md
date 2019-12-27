@@ -1,5 +1,9 @@
 # Reflection
 
+- Includes Player Functions
+- Includes NPC Functions
+- Includes Model Rendering & Animations
+
 Work In Progress..
 
 Example Usage:
