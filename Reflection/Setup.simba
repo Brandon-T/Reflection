@@ -1,13 +1,28 @@
 {$include_once Static.simba}
 
-Procedure RSetup(pid: Int32);
+Procedure RSetup;
+var
+  PID: Int32;
+  I, ClientCount: SizeUInt;
 begin
-  SetEIOSTarget('LibRemoteInput', IntToStr(pid));
+  PID := -1;
+  ClientCount := EIOS_GetClients(true);
+  for I := 0 to ClientCount - 1 do
+  begin
+    PID := EIOS_GetClientPID(I);
+    if PID <> -1 then
+    begin
+      SetEIOSTarget('LibRemoteInput', IntToStr(PID));
+      break;
+    end;
+  end;
 
-  R_EIOS := RIGetEIOS(pid);
-  if R_EIOS = nil then
+  if PID = -1 then
     RaiseException(erCustomError, 'Reflection Not Setup - No EIOS Target');
 
+  R_EIOS := EIOS_PairClient(PID);
+  if R_EIOS = nil then
+    RaiseException(erCustomError, 'Reflection Not Setup - No EIOS Target');
 
   RInitializeConstants;
   RInitializeTileSettings(R_EIOS);
