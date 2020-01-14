@@ -2,27 +2,30 @@
 {$include_once RSStructures.simba}
 
 
-Function RSHashTable.Head: RSNode;
+Function RSHashTable.Head: RSNode; constref;
 begin
   Result.ref := RGetObject(R_EIOS, ref, HASHTABLE_HEAD);
 end;
 
-Function RSHashTable.Tail: RSNode;
+Function RSHashTable.Tail: RSNode; constref;
 begin
   Result.ref := RGetObject(R_EIOS, ref, HASHTABLE_TAIL);
 end;
 
-Function RSHashTable.Bucket(Index: SizeUInt): RSNode;
+Function RSHashTable.Bucket(Index: SizeUInt): RSNode; constref;
 var
   Buckets: Pointer;
   BucketsSize: SizeUInt;
 begin
   Buckets := RGetArray(R_EIOS, ref, BucketsSize, HASHTABLE_BUCKETS);
+  if Buckets = nil then
+    Exit;
+
   Result.ref := RGetObjectArray(R_EIOS, Buckets, Index);
   RFreeObject(R_EIOS, Buckets);
 end;
 
-Function RSHashTable.Buckets: Array of RSNode;
+Function RSHashTable.Buckets: Array of RSNode; constref;
 var
   Buckets: Pointer;
   Nodes: Array of Pointer;
@@ -30,6 +33,9 @@ var
 begin
   BucketsSize := 0;
   Buckets := RGetArray(R_EIOS, ref, BucketsSize, HASHTABLE_BUCKETS);
+  if Buckets = nil then
+    Exit;
+
   Nodes := RGetObjectArray(R_EIOS, Buckets, 0, BucketsSize);
   RFreeObject(R_EIOS, Buckets);
 
@@ -41,17 +47,17 @@ begin
   end;
 end;
 
-Function RSHashTable.Index: Int32;
+Function RSHashTable.Index: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, HASHTABLE_INDEX);
 end;
 
-Function RSHashTable.Size: Int32;
+Function RSHashTable.Size: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, HASHTABLE_SIZE);
 end;
 
-Function RSHashTable.GetObject(ID: Int64): RSNode;
+Function RSHashTable.GetObject(ID: Int64): RSNode; constref;
 var
   Index, CurrentUID: Int64;
   Head, Current: RSNode;

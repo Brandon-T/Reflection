@@ -24,3 +24,4 @@
 {$include_once RSAnimationSkeleton.simba}
 {$include_once RSAnimationSequence.simba}
 {$include_once RSAnimatedModel.simba}
+{$include_once RSTile.simba}

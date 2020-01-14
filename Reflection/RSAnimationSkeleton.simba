@@ -1,43 +1,50 @@
 {$include_once RSStructures.simba}
 
 
-Function RSAnimationSkeleton.ID: Int32;
+Function RSAnimationSkeleton.ID: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ANIMATIONSKELETON_ID);
 end;
 
-Function RSAnimationSkeleton.TransformCount: Int32;
+Function RSAnimationSkeleton.TransformCount: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ANIMATIONSKELETON_TRANSFORMATIONCOUNT);
 end;
 
-Function RSAnimationSkeleton.TransformationTypes: Array of Int32;
+Function RSAnimationSkeleton.TransformationTypes: Array of Int32; constref;
 var
   Types: Pointer;
   TypesSize: SizeUInt;
 begin
   TypesSize := 0;
   Types := RGetArray(R_EIOS, ref, TypesSize, ANIMATIONSKELETON_TRANSFORMATIONTYPES);
+  if Types = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Types, 0, TypesSize);
   RFreeObject(R_EIOS, Types);
 end;
 
-Function RSAnimationSkeleton.Transformations: Array of Array of Int32;
+Function RSAnimationSkeleton.Transformations: Array of Array of Int32; constref;
 var
-  Types: Pointer;
+  Transforms: Pointer;
   Transformations: Array of Pointer;
-  I, TypesSize: SizeUInt;
+  I, TransformsSize: SizeUInt;
 begin
-  TypesSize := 0;
-  Types := RGetArray(R_EIOS, ref, TypesSize, ANIMATIONSKELETON_TRANSFORMATIONS);
-  Transformations := RGetObjectArray(R_EIOS, Types, 0, TypesSize);
-  RFreeObject(R_EIOS, Types);
+  TransformsSize := 0;
+  Transforms := RGetArray(R_EIOS, ref, TransformsSize, ANIMATIONSKELETON_TRANSFORMATIONS);
+  if Transforms = nil then
+    Exit;
 
-  SetLength(Result, TypesSize);
+  Transformations := RGetObjectArray(R_EIOS, Transforms, 0, TransformsSize);
+  RFreeObject(R_EIOS, Transforms);
 
-  for I := 0 to TypesSize - 1 do
+  SetLength(Result, TransformsSize);
+
+  for I := 0 to TransformsSize - 1 do
   begin
-    Result[I] := RGetIntArray(R_EIOS, Transformations[I], 0, RGetArraySize(R_EIOS, Transformations[I]));
+    if Transformations[I] <> nil then
+      Result[I] := RGetIntArray(R_EIOS, Transformations[I], 0, RGetArraySize(R_EIOS, Transformations[I]));
   end;
 
   RSTypeArray(Transformations).Free;

@@ -6,7 +6,7 @@
 {$include_once RSAnimation.simba}
 
 
-Function RSModel.RawVertices: Array[0..3] of Array of Int32;
+Function RSModel.RawVertices: Array[0..3] of Array of Int32; constref;
 var
   VerticesSize: SizeUInt;
   VerticesX, VerticesY, VerticesZ: Pointer;
@@ -16,14 +16,17 @@ begin
   VerticesY := RGetArray(R_EIOS, ref, MODEL_VERTICESY);
   VerticesZ := RGetArray(R_EIOS, ref, MODEL_VERTICESZ);
 
-  Result[0] := RGetIntArray(R_EIOS, VerticesX, 0, VerticesSize);
-  Result[1] := RGetIntArray(R_EIOS, VerticesY, 0, VerticesSize);
-  Result[2] := RGetIntArray(R_EIOS, VerticesZ, 0, VerticesSize);
+  if (VerticesX <> nil) and (VerticesY <> nil) and (VerticesZ <> nil) then
+  begin
+    Result[0] := RGetIntArray(R_EIOS, VerticesX, 0, VerticesSize);
+    Result[1] := RGetIntArray(R_EIOS, VerticesY, 0, VerticesSize);
+    Result[2] := RGetIntArray(R_EIOS, VerticesZ, 0, VerticesSize);
+  end;
 
   RFreeObjects(R_EIOS, [VerticesX, VerticesY, VerticesZ]);
 end;
 
-Function RSModel.RawIndices: Array[0..3] of Array of Int32;
+Function RSModel.RawIndices: Array[0..3] of Array of Int32; constref;
 var
   IndicesSize: SizeUInt;
   IndicesX, IndicesY, IndicesZ: Pointer;
@@ -33,14 +36,17 @@ begin
   IndicesY := RGetArray(R_EIOS, ref, MODEL_INDICESY);
   IndicesZ := RGetArray(R_EIOS, ref, MODEL_INDICESZ);
 
-  Result[0] := RGetIntArray(R_EIOS, IndicesX, 0, IndicesSize);
-  Result[1] := RGetIntArray(R_EIOS, IndicesY, 0, IndicesSize);
-  Result[2] := RGetIntArray(R_EIOS, IndicesZ, 0, IndicesSize);
+  if (IndicesX <> nil) and (IndicesY <> nil) and (IndicesZ <> nil) then
+  begin
+    Result[0] := RGetIntArray(R_EIOS, IndicesX, 0, IndicesSize);
+    Result[1] := RGetIntArray(R_EIOS, IndicesY, 0, IndicesSize);
+    Result[2] := RGetIntArray(R_EIOS, IndicesZ, 0, IndicesSize);
+  end;
 
   RFreeObjects(R_EIOS, [IndicesX, IndicesY, IndicesZ]);
 end;
 
-Function RSModel.Vertices: Array of TVector;
+Function RSModel.Vertices: Array of TVector; constref;
 var
   I, VerticesSize: SizeUInt;
   Vertices: Array[0..3] of Array of Int32;
@@ -57,7 +63,7 @@ begin
   end;
 end;
 
-Function RSModel.Indices: Array of TVector;
+Function RSModel.Indices: Array of TVector; constref;
 var
   I, IndicesSize: SizeUInt;
   Indices: Array[0..3] of Array of Int32;
@@ -74,7 +80,7 @@ begin
   end;
 end;
 
-Function RSModel.TriangleFaces: Array of TTriangle;
+Function RSModel.TriangleFaces: Array of TTriangle; constref;
 var
   I, IndicesSize: SizeUInt;
   Indices: Array[0..3] of Array of Int32;
@@ -102,13 +108,16 @@ begin
   end;
 end;
 
-Function RSModel.Skins: Array of Array of Int32;
+Function RSModel.Skins: Array of Array of Int32; constref;
 var
   Skins: Pointer;
   I, SkinsSize: SizeUInt;
   SkinsArray: Array of Pointer;
 begin
   Skins := RGetArray(R_EIOS, ref, SkinsSize, MODEL_SKINS);
+  if Skins = nil then
+    Exit;
+
   SkinsArray := RGetObjectArray(R_EIOS, Skins, 0, SkinsSize);
   RFreeObject(R_EIOS, Skins);
 

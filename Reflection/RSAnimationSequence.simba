@@ -7,24 +7,30 @@
 {$include_once RSAnimationFrame.simba}
 
 
-Function RSAnimationSequence.Frame(Index: Int32): Int32;
+Function RSAnimationSequence.Frame(Index: Int32): Int32; constref;
 var
   Frames: Pointer;
   FramesSize: SizeUInt;
 begin
   FramesSize := 0;
   Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONSEQUENCE_FRAMES);
+  if Frames = nil then
+    Exit(-1);
+
   Result := RGetIntArray(R_EIOS, Frames, Index);
   RFreeObject(R_EIOS, Frames);
 end;
 
-Function RSAnimationSequence.Frames: Array of Int32;
+Function RSAnimationSequence.Frames: Array of Int32; constref;
 var
   Frames: Pointer;
   FramesSize: SizeUInt;
 begin
   FramesSize := 0;
   Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONSEQUENCE_FRAMES);
+  if Frames = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Frames, 0, FramesSize);
   RFreeObject(R_EIOS, Frames);
 end;
@@ -39,9 +45,7 @@ begin
   Result.ref := RGetObject(R_EIOS, nil, ANIMATIONSEQUENCE_FRAMECACHE);
 end;
 
-
-
-Function RSAnimationSequence.TransformActorModel(Model: RSModel; FrameID: Int32): RSAnimatedModel;
+Function RSAnimationSequence.TransformActorModel(constref Model: RSModel; FrameID: Int32): RSAnimatedModel; constref;
 var
   Frames: RSAnimationFrame;
 begin
@@ -54,14 +58,16 @@ begin
   if Frames.ref = nil then
   begin
     Result.vertices := Model.Vertices;
+    {$IFDEF MODEL_TRIANGLES}
     Result.triangles := Result.TriangleFaces;
+    {$ENDIF}
     Exit(Result);
   end;
 
   Exit(Result.Animate(Frames, FrameID));
 end;
 
-Function RSAnimationSequence.ApplyTransformations(Model: RSModel; IdleFrameID: Int32; AnimationSequence: RSAnimationSequence; MovementFrameID: Int32): RSAnimatedModel;
+Function RSAnimationSequence.ApplyTransformations(constref Model: RSModel; IdleFrameID: Int32; constref AnimationSequence: RSAnimationSequence; MovementFrameID: Int32): RSAnimatedModel; constref;
 var
   Frames, Frames2: RSAnimationFrame;
 begin

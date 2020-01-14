@@ -4,97 +4,116 @@
 {$include_once RSCombatInfo.simba}
 
 
-Function RSActor.SpokenText: String;
+Function RSActor.SpokenText: String; constref;
 begin
   Result := RGetString(R_EIOS, ref, ACTOR_SPOKENTEXT);
 end;
 
-Function RSActor.Orientation: Int32;
+Function RSActor.Orientation: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_ORIENTATION);
 end;
 
-Function RSActor.LocalX: Int32;
+Function RSActor.LocalX: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_LOCALX);
 end;
 
-Function RSActor.LocalY: Int32;
+Function RSActor.LocalY: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_LOCALY);
 end;
 
-Function RSActor.Tile: RSTile;
+Function RSActor.LocalTile: RSTile; constref;
 begin
-  Result.X := RSClient.BaseX + self.LocalX div 128;
-  Result.Y:= RSClient.BaseY + self.LocalY div 128;
+  Result.X := RGetInt(R_EIOS, ref, ACTOR_LOCALX);
+  Result.Y := RGetInt(R_EIOS, ref, ACTOR_LOCALY)
 end;
 
-Function RSActor.AnimationId: Int32;
+Function RSActor.Tile: RSTile; constref;
+begin
+  Result.X := RSClient.BaseX + self.LocalX div 128;
+  Result.Y := RSClient.BaseY + self.LocalY div 128;
+end;
+
+Function RSActor.AnimationId: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATION);
 end;
 
-Function RSActor.IsAnimating: Boolean;
+Function RSActor.IsAnimating: Boolean; constref;
 begin
   Result := self.AnimationId > -1;
 end;
 
-Function RSActor.AnimationFrame: Int32;
+Function RSActor.AnimationFrame: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATIONFRAME);
 end;
 
-Function RSActor.MovementSequenceId: Int32;
+Function RSActor.MovementSequenceId: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_MOVEMENTSEQUENCE);
 end;
 
-Function RSActor.MovementFrame: Int32;
+Function RSActor.MovementFrame: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_MOVEMENTFRAME);
 end;
 
-Function RSActor.CurrentSequenceId: Int32;
+Function RSActor.CurrentSequenceId: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_CURRENTSEQUENCE);
 end;
 
-Function RSActor.IsIdle: Boolean;
+Function RSActor.IsIdle: Boolean; constref;
 begin
   Result := RGetBool(R_EIOS, ref, ACTOR_ISANIMATING);
 end;
 
-Function RSActor.InteractingIndex: Int32;
+Function RSActor.InteractingIndex: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_INTERACTINGINDEX);
 end;
 
-Function RSActor.CombatCycle: Int32;
+Function RSActor.CombatCycle: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_COMBATCYCLE);
 end;
 
-Function RSActor.IsInCombat: Boolean;
+Function RSActor.IsInCombat: Boolean; constref;
 begin
   Result := self.CombatCycle > RSClient.LoopCycle;
 end;
 
-Function RSActor.Health: Int32;
+Function RSActor.Health: Int32; constref;
 var
   CombatInfoList, CombatInfoHolder: RSCombatInfoList;
   Head, HolderHead, Next, HolderNext: RSNode;
   Garbage: RSTypeArray;
+  label Cleanup;
 begin
   Result := -1;
   CombatInfoList.ref := RGetObject(R_EIOS, ref, ACTOR_COMBATINFOLIST);
+  if CombatInfoList.ref = nil then
+    goto Cleanup;
+
   Head := CombatInfoList.Head;
+  if Head.ref = nil then
+    goto Cleanup;
+
   Next := Head.Next;
 
   if Next.ref <> nil then
   begin
     CombatInfoHolder.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST);
+    if CombatInfoHolder.ref = nil then
+      goto Cleanup;
+
     HolderHead := CombatInfoHolder.Head;
+    if HolderHead.ref = nil then
+      goto Cleanup;
+
     HolderNext := HolderHead.Next;
 
     if HolderNext.ref <> nil then
@@ -103,25 +122,39 @@ begin
     end;
   end;
 
-  Garbage := [HolderNext, HolderHead, CombatInfoHolder, Next, Head, CombatInfoList];
-  Garbage.Free;
+  Cleanup:
+    Garbage := [HolderNext, HolderHead, CombatInfoHolder, Next, Head, CombatInfoList];
+    Garbage.Free;
 end;
 
-Function RSActor.HealthRatio: Int32;
+Function RSActor.HealthRatio: Int32; constref;
 var
   CombatInfoList, CombatInfoHolder: RSCombatInfoList;
   Head, HolderHead, Next, HolderNext: RSNode;
   Garbage: RSTypeArray;
+  label Cleanup;
 begin
   Result := -1;
   CombatInfoList.ref := RGetObject(R_EIOS, ref, ACTOR_COMBATINFOLIST);
+  if CombatInfoList.ref = nil then
+    goto Cleanup;
+
   Head := CombatInfoList.Head;
+  if Head.ref = nil then
+    goto Cleanup;
+
   Next := Head.Next;
 
   if Next.ref <> nil then
   begin
     CombatInfoHolder.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST);
+    if CombatInfoHolder.ref = nil then
+      goto Cleanup;
+
     HolderHead := CombatInfoHolder.Head;
+    if HolderHead.ref = nil then
+      goto Cleanup;
+
     HolderNext := HolderHead.Next;
 
     if HolderNext.ref <> nil then
@@ -130,20 +163,28 @@ begin
     end;
   end;
 
-  Garbage := [HolderNext, HolderHead, CombatInfoHolder, Next, Head, CombatInfoList];
-  Garbage.Free;
+  Cleanup:
+    Garbage := [HolderNext, HolderHead, CombatInfoHolder, Next, Head, CombatInfoList];
+    Garbage.Free;
 end;
 
-Function RSActor.HealthScale: Int32;
+Function RSActor.HealthScale: Int32; constref;
 var
   CombatInfoList: RSCombatInfoList;
   CombatInfo: RSCombatInfo;
   Head, Next: RSNode;
   Garbage: RSTypeArray;
+  label Cleanup;
 begin
   Result := -1;
   CombatInfoList.ref := RGetObject(R_EIOS, ref, ACTOR_COMBATINFOLIST);
+  if CombatInfoList.ref = nil then
+    goto Cleanup;
+
   Head := CombatInfoList.Head;
+  if Head.ref = nil then
+    goto Cleanup;
+
   Next := Head.Next;
 
   if Next.ref <> nil then
@@ -155,11 +196,12 @@ begin
     end;
   end;
 
-  Garbage := [CombatInfo, Next, Head, CombatInfoList];
-  Garbage.Free;
+  Cleanup:
+    Garbage := [CombatInfo, Next, Head, CombatInfoList];
+    Garbage.Free;
 end;
 
-Function RSActor.HealthPercentage: Single;
+Function RSActor.HealthPercentage: Single; constref;
 begin
   Result := (self.Health / self.HealthScale) * 100.0;
 end;

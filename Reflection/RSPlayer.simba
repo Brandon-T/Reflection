@@ -25,6 +25,9 @@ begin
 
   PlayersSize := 0;
   Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  if Players = nil then
+    Exit;
+
   PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
   RFreeObject(R_EIOS, Players);
 
@@ -36,40 +39,46 @@ begin
   end;
 end;
 
-Function RSPlayer.Name: String;
+Function RSPlayer.Name: String; constref;
 var
   NameInfo: RSNameInfo;
 begin
   NameInfo.ref := RGetObject(R_EIOS, ref, PLAYER_NAME);
+  if NameInfo.ref = nil then
+    Exit;
+
   Result := NameInfo.Name;
   NameInfo.Free;
 end;
 
-Function RSPlayer.IsVisible: Boolean;
+Function RSPlayer.IsVisible: Boolean; constref;
 begin
   Result := RGetBool(R_EIOS, ref, PLAYER_VISIBLE);
 end;
 
-Function RSPlayer.Definition: RSPlayerDefinition;
+Function RSPlayer.Definition: RSPlayerDefinition; constref;
 begin
   Result.ref := RGetObject(R_EIOS, ref, PLAYER_DEFINITION);
 end;
 
-Function RSPlayer.CombatLevel: Int32;
+Function RSPlayer.CombatLevel: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
 end;
 
-Function RSPlayer.Model: RSModel;
+Function RSPlayer.Model: RSModel; constref;
 var
   Definition: RSPlayerDefinition;
 begin
   Definition := self.Definition;
+  if Definition.ref = nil then
+    Exit;
+
   Result := Definition.CachedModel;
   Definition.Free;
 end;
 
-Function RSPlayer.AnimatedModel: RSAnimatedModel;
+Function RSPlayer.AnimatedModel: RSAnimatedModel; constref;
 var
   AnimationId, AnimationDelay: Int32;
   AnimationFrame, MovementId: Int32;
@@ -95,9 +104,14 @@ begin
     if (AnimationId <> -1) and (AnimationDelay = 0) then
     begin
       AnimationCache := RSAnimationSequence.AnimationSequenceCache;
-      HashTable := AnimationCache.HashTable;
-
-      IdleSequence.ref := HashTable.GetObject(AnimationId).ref;
+      if AnimationCache.ref <> nil then
+      begin
+        HashTable := AnimationCache.HashTable;
+        if HashTable.ref <> nil then
+        begin
+          IdleSequence.ref := HashTable.GetObject(AnimationId).ref;
+        end;
+      end;
 
       Garbage += [HashTable, AnimationCache];
     end;
@@ -105,19 +119,27 @@ begin
     if (MovementId <> -1) and (not self.isIdle) and ((MovementId <> self.CurrentSequenceId) or (IdleSequence.ref = nil)) then
     begin
       AnimationCache := RSAnimationSequence.AnimationSequenceCache;
-      HashTable := AnimationCache.HashTable;
-
-      MovementSequence.ref := HashTable.GetObject(MovementId).ref;
+      if AnimationCache.ref <> nil then
+      begin
+        HashTable := AnimationCache.HashTable;
+        if HashTable.ref <> nil then
+        begin
+          MovementSequence.ref := HashTable.GetObject(MovementId).ref;
+        end;
+      end;
 
       Garbage += [HashTable, AnimationCache];
     end;
 
+    Garbage.Free;
     Exit(RSPlayerDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
   end
 
   Result.ref := Model.ref;
-  Result.vertices := Model.Vertices;
-  Result.triangles := Model.TriangleFaces;
+  Result.vertices := [];
+  {$IFDEF MODEL_TRIANGLES}
+  Result.triangles := [];
+  {$ENDIF}
 
   Garbage.Free;
 end;

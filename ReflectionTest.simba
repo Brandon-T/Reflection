@@ -7,7 +7,7 @@ type
     NPoints: Int32;
   end;
 
-Procedure DrawPolygons(XPoints, YPoints: Array of Int32; nPoints: Int32; bmp: TMufasaBitmap; Colour: TColor);
+Procedure DrawPolygons(constref XPoints, YPoints: Array of Int32; nPoints: Int32; bmp: TMufasaBitmap; Colour: TColor);
 var
   i: Integer;
   size: Int32;
@@ -24,79 +24,51 @@ begin
   bmp.LineTo(Point(XPoints[size + 1], YPoints[size + 1]), Point(XPoints[0], YPoints[0]), Colour);
 end;
 
-Function GetTileHeight(x, y, plane: Int32): Int32;
+Procedure DrawPolygons(constref Vertices: Array of TPoint; constref Indices: Array of TVector; bmp: TMufasaBitmap; Colour: TColor); overload;
 var
-  xSize, ySize: Int32;
-  var1, var2, var3, var4: Int32;
+  i: Integer;
+  A, B, C: TPoint;
 begin
-  xSize := Sar(x, 7);
-  ySize := Sar(y, 7);
-
-  if (xSize >= 0) and (ySize >= 0) and (xSize < 104) and (ySize < 104) then
+  for i := 0 to Length(indices) - 1 do
   begin
-    if (plane < 3) and ((CACHED_TILE_SETTINGS[1][xSize][ySize] and 2) = 2) then
-    begin
-      Inc(plane);
-    end;
+    A.x := Vertices[Indices[I].x].x;
+    A.y := Vertices[Indices[I].x].y;
 
-    var1 := x and 127;
-    var2 := y and 127;
-    var3 := Sar(((var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize]) + ((128 - var1) * CACHED_TILE_HEIGHTS[plane][xSize][ySize])), 7);
-    var4 := Sar(((CACHED_TILE_HEIGHTS[plane][xSize][ySize + 1] * (128 - var1)) + (var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize + 1])), 7);
+    B.x := Vertices[Indices[I].y].x;
+    B.y := Vertices[Indices[I].y].y;
 
-    Result := Sar(((128 - var2) * var3 + var2 * var4), 7);
-    Exit;
+    C.x := Vertices[Indices[I].z].x;
+    C.y := Vertices[Indices[I].z].y;
+
+    bmp.LineTo(A, B, Colour);
+    bmp.LineTo(B, C, Colour);
+    bmp.LineTo(C, A, Colour);
   end;
-
-  Exit(0);
 end;
 
-Function ProjectPoint(point: TVector; localX, localY, localZ, orientation, cameraX, cameraY, cameraZ, sinYaw, cosYaw, sinPitch, cosPitch, viewPortWidth, viewPortHeight, viewPortScale: Int32): TPoint;
+Procedure DrawPolygons(constref Vertices: Array of TPoint; constref Indices: Array[0..3] of Array of Int32; bmp: TMufasaBitmap; Colour: TColor); overload;
 var
-  p: TVector;
-  x, y, z, calculation: Int32;
+  i: Integer;
+  A, B, C: TPoint;
 begin
-  p := [point.x, point.z, point.y];
-
-  // Rotate based on orientation
-  p := [Sar(((p.x * COSINE[orientation]) + (p.y * SINE[orientation])), 16),
-        Sar(((p.y * COSINE[orientation]) - (p.x * SINE[orientation])), 16),
-        p.z];
-
-  // Translate to local coords
-  p.x += localX;
-  p.y += localY;
-  p.z += localZ;
-
-  // Translate to camera
-  p.x -= cameraX;
-  p.y -= cameraY;
-  p.z -= cameraZ;
-
-  // Project to canvas
-  x := p.x;
-  y := p.y;
-  z := p.z;
-
-  calculation := Sar(((x * cosYaw) + (y * sinYaw)), 16);
-  y := Sar(((y * cosYaw) - (x * sinYaw)), 16);
-  x := calculation;
-  calculation := Sar(((z * cosPitch) - (y * sinPitch)), 16);
-  z := Sar(((y * cosPitch) + (z * sinPitch)), 16);
-  y := calculation;
-
-  if (z >= 50) then
+  for i := 0 to Length(indices[0]) - 1 do
   begin
-    Result.X := (x * viewPortScale div z) + (viewPortWidth div 2);
-    Result.Y := (y * viewPortScale div z) + (viewPortHeight div 2);
-    Exit;
-  end
+    A.x := Vertices[Indices[0][I]].x;
+    A.y := Vertices[Indices[0][I]].y;
 
-  Result.X := -1;
-  Result.Y := -1;
+    B.x := Vertices[Indices[1][I]].x;
+    B.y := Vertices[Indices[1][I]].y;
+
+    C.x := Vertices[Indices[2][I]].x;
+    C.y := Vertices[Indices[2][I]].y;
+
+    bmp.LineTo(A, B, Colour);
+    bmp.LineTo(B, C, Colour);
+    bmp.LineTo(C, A, Colour);
+  end;
 end;
 
-Function ProjectTriangles(model: RSModel; localX, localY, localZ, orientation: Int32): Array of Polygon;
+Function ProjectTriangles(constref model: RSModel; localX, localY, localZ, orientation: Int32): Array of Polygon;
 var
   i: Int32;
   cameraX, cameraY, cameraZ, cameraYaw, cameraPitch: Int32;
@@ -130,20 +102,20 @@ begin
 
   for i := 0 to high(triangles) do
   begin
-    A := ProjectPoint(triangles[i].a, localX, localY, localZ,
-                      orientation, cameraX, cameraY, cameraZ,
-                      sinYaw, cosYaw, sinPitch, cosPitch,
-                      viewPortWidth, viewPortHeight, viewPortScale);
+    A := triangles[i].a.ProjectToScreen(localX, localY, localZ,
+                                        orientation, cameraX, cameraY, cameraZ,
+                                        sinYaw, cosYaw, sinPitch, cosPitch,
+                                        viewPortWidth, viewPortHeight, viewPortScale);
 
-    B := ProjectPoint(triangles[i].b, localX, localY, localZ,
-                      orientation, cameraX, cameraY, cameraZ,
-                      sinYaw, cosYaw, sinPitch, cosPitch,
-                      viewPortWidth, viewPortHeight, viewPortScale);
+    B := triangles[i].b.ProjectToScreen(localX, localY, localZ,
+                                        orientation, cameraX, cameraY, cameraZ,
+                                        sinYaw, cosYaw, sinPitch, cosPitch,
+                                        viewPortWidth, viewPortHeight, viewPortScale);
 
-    C := ProjectPoint(triangles[i].c, localX, localY, localZ,
-                      orientation, cameraX, cameraY, cameraZ,
-                      sinYaw, cosYaw, sinPitch, cosPitch,
-                      viewPortWidth, viewPortHeight, viewPortScale);
+    C := triangles[i].c.ProjectToScreen(localX, localY, localZ,
+                                        orientation, cameraX, cameraY, cameraZ,
+                                        sinYaw, cosYaw, sinPitch, cosPitch,
+                                        viewPortWidth, viewPortHeight, viewPortScale);
 
     if isValidPoint(A) and isValidPoint(b) and isValidPoint(c) then
     begin
@@ -153,7 +125,7 @@ begin
   end;
 end;
 
-Function ProjectTriangles(model: RSAnimatedModel; localX, localY, localZ, orientation: Int32): Array of Polygon; overload;
+Function ProjectTriangles(constref model: RSAnimatedModel; localX, localY, localZ, orientation: Int32): Array of Polygon; overload;
 var
   i: Int32;
   cameraX, cameraY, cameraZ, cameraYaw, cameraPitch: Int32;
@@ -187,20 +159,20 @@ begin
 
   for i := 0 to high(triangles) do
   begin
-    A := ProjectPoint(triangles[i].a, localX, localY, localZ,
-                      orientation, cameraX, cameraY, cameraZ,
-                      sinYaw, cosYaw, sinPitch, cosPitch,
-                      viewPortWidth, viewPortHeight, viewPortScale);
+    A := triangles[i].a.ProjectToScreen(localX, localY, localZ,
+                                        orientation, cameraX, cameraY, cameraZ,
+                                        sinYaw, cosYaw, sinPitch, cosPitch,
+                                        viewPortWidth, viewPortHeight, viewPortScale);
 
-    B := ProjectPoint(triangles[i].b, localX, localY, localZ,
-                      orientation, cameraX, cameraY, cameraZ,
-                      sinYaw, cosYaw, sinPitch, cosPitch,
-                      viewPortWidth, viewPortHeight, viewPortScale);
+    B := triangles[i].b.ProjectToScreen(localX, localY, localZ,
+                                        orientation, cameraX, cameraY, cameraZ,
+                                        sinYaw, cosYaw, sinPitch, cosPitch,
+                                        viewPortWidth, viewPortHeight, viewPortScale);
 
-    C := ProjectPoint(triangles[i].c, localX, localY, localZ,
-                      orientation, cameraX, cameraY, cameraZ,
-                      sinYaw, cosYaw, sinPitch, cosPitch,
-                      viewPortWidth, viewPortHeight, viewPortScale);
+    C := triangles[i].c.ProjectToScreen(localX, localY, localZ,
+                                        orientation, cameraX, cameraY, cameraZ,
+                                        sinYaw, cosYaw, sinPitch, cosPitch,
+                                        viewPortWidth, viewPortHeight, viewPortScale);
 
     if isValidPoint(A) and isValidPoint(b) and isValidPoint(c) then
     begin
@@ -210,22 +182,63 @@ begin
   end;
 end;
 
-Procedure DrawPlayer(player: RSPlayer; Bmp: TMufasaBitmap; Colour: TColor);
+Function ProjectVertices(constref model: RSAnimatedModel; localX, localY, localZ, orientation: Int32): Array of TPoint; overload;
+var
+  i: Int32;
+  cameraX, cameraY, cameraZ, cameraYaw, cameraPitch: Int32;
+  viewPortScale, viewPortHeight, viewPortWidth: Int32;
+  sinPitch, cosPitch, sinYaw, cosYaw: Int32;
+  vertices: Array of TVector;
+  p: TPoint;
+
+  Function isValidPoint(point: TPoint): Boolean;
+  begin
+    Result := (point.x <> -1) and (point.y <> -1);
+  end;
+begin
+  cameraX := RSCamera.X;
+  cameraY := RSCamera.Y;
+  cameraZ := RSCamera.Z;
+  cameraYaw := RSCamera.Yaw;
+  cameraPitch := RSCamera.Pitch;
+
+  viewPortScale := RSClient.ViewPortScale;
+  viewPortWidth := RSClient.ViewPortWidth;
+  viewPortHeight := RSClient.ViewPortHeight;
+
+  sinPitch := SINE[cameraPitch];
+  cosPitch := COSINE[cameraPitch];
+  sinYaw := SINE[cameraYaw];
+  cosYaw := COSINE[cameraYaw];
+
+  vertices := model.vertices;
+
+  for i := 0 to high(vertices) do
+  begin
+    P := vertices[i].ProjectToScreen(localX, localY, localZ,
+                                     orientation, cameraX, cameraY, cameraZ,
+                                     sinYaw, cosYaw, sinPitch, cosPitch,
+                                     viewPortWidth, viewPortHeight, viewPortScale);
+    if isValidPoint(P) then
+    begin
+      Result += P;
+    end;
+  end;
+end;
+
+Procedure DrawPlayer(constref player: RSPlayer; Bmp: TMufasaBitmap; Colour: TColor);
 var
   i: Int32;
   orientation: Int32;
-  localX, localY, localZ: Int32;
+  localTile: RSTile;
   model: RSAnimatedModel;
   triangles: Array of Polygon;
 begin
   orientation := player.Orientation;
-
-  localX := player.LocalX;
-  localY := player.LocalY;
-  localZ := GetTileHeight(localX, localY, RSClient.plane);
+  localTile := player.LocalTile;
 
   model := Player.AnimatedModel;
-  triangles := ProjectTriangles(model, localX, localY, localZ, orientation);
+  triangles := ProjectTriangles(model, localTile.X, localTile.Y, localTile.GetHeight(), orientation);
   model.Free;
 
   for i := 0 to high(triangles) do
@@ -234,38 +247,157 @@ begin
   end;
 end;
 
+Procedure DrawPlayer2(constref player: RSPlayer; Bmp: TMufasaBitmap; Colour: TColor);
 var
-  i, j, w, h: Int32;
-  players: array of RSPlayer;
-  debugBuffer: ^UInt8;
-  bmp: TMufasaBitmap;
+  orientation: Int32;
+  localTile: RSTile;
+  model: RSModel;
+  animatedModel: RSAnimatedModel;
+  vertices: Array of TPoint;
+  indices: Array[0..3] of Array of Int32;
 begin
-  RSetup(736);
+  orientation := player.Orientation;
+  localTile := player.LocalTile;
 
-  GetClientDimensions(w, h);
-  DebugBuffer := EIOS_GetDebugImageBuffer(R_EIOS);
-
-  Bmp.Init;
-  Bmp.SetPersistentMemory(PtrUInt(debugBuffer), w, h);
-  Bmp.Rectangle([0, 0, w - 1, h - 1], $00);
-
-  players := [RSPlayer.Me];
-
-  for i := 0 to high(players) do
+  animatedModel := Player.AnimatedModel;
+  if animatedModel.ref <> nil then
   begin
-    if (players[i].ref <> nil) then
-    begin
-      for j := 0 to 1000 do
-      begin
-        DrawPlayer(players[i], bmp, $FFFFFF);
+    model.ref := animatedModel.ref;
+    vertices := ProjectVertices(animatedModel, localTile.X, localTile.Y, localTile.GetHeight(), orientation);
+    indices := model.RawIndices;
+    model.Free;
 
-        //if j mod 2 = 0 then
-          Bmp.Rectangle([0, 0, w - 1, h - 1], $00);
-      end;
+    DrawPolygons(vertices, indices, Bmp, Colour);
+  end;
+end;
+
+Procedure DrawNPC(constref npc: RSNPC; Bmp: TMufasaBitmap; Colour: TColor);
+var
+  i: Int32;
+  orientation: Int32;
+  localTile: RSTile;
+  model: RSAnimatedModel;
+  triangles: Array of Polygon;
+begin
+  orientation := npc.Orientation;
+  localTile := npc.LocalTile;
+
+  model := npc.AnimatedModel;
+  if model.ref <> nil then
+  begin
+    triangles := ProjectTriangles(model, localTile.X, localTile.Y, localTile.GetHeight(), orientation);
+    model.Free;
+
+    for i := 0 to high(triangles) do
+    begin
+      DrawPolygons(Triangles[I].XPoints, Triangles[I].YPoints, Triangles[I].NPoints, Bmp, Colour);
+    end;
+  end;
+end;
+
+procedure DebugClient;
+var
+  w,h, bmp: Integer;
+begin
+  GetClientDimensions(w, h);
+  bmp := BitmapFromClient(0, 0, w - 1, h - 1);
+  DisplayDebugImgWindow(w, h);
+  DrawBitmapDebugImg(bmp);
+  FreeBitmap(bmp);
+end;
+
+procedure DebugMe(bmp: TMufasaBitmap; w, h: Int32);
+var
+  i: Integer;
+  me: RSPlayer;
+begin
+  me := RSPlayer.Me;
+
+  if me.ref <> nil then
+  begin
+    for i := 0 to 1000 do
+    begin
+      DrawPlayer2(me, bmp, $FFFFFF);
+
+      if i mod 2 = 0 then
+        Bmp.Rectangle([0, 0, w - 1, h - 1], $00);
     end;
   end;
 
-  RSTypeArray(players).Free;
+  me.Free;
+end;
+
+procedure DebugPlayers(bmp: TMufasaBitmap; w, h: Int32);
+var
+  i: Integer;
+  players: array of RSPlayer;
+  def: RSPlayerDefinition;
+begin
+  players := RSClient.AllPlayers;
+
+  for i := 0 to high(players) do
+  begin
+    if players[i].ref <> nil then
+    begin
+      def := players[i].Definition;
+      if def.ref <> nil then
+      begin
+        try
+          DrawPlayer2(players[i], bmp, $FFFFFF);
+        except
+        end;
+      end;
+    end;
+  end;
+end;
+
+procedure DebugNPCs(bmp: TMufasaBitmap; w, h: Int32);
+var
+  i, j: Integer;
+  npcs: array of RSNPC;
+  def: RSNPCDefinition;
+begin
+  npcs := RSClient.AllNPCs;
+
+  for i := 0 to high(npcs) do
+  begin
+    if npcs[i].ref <> nil then
+    begin
+      def := npcs[i].Definition;
+      if def.ref <> nil then
+      begin
+        try
+          DrawNPC(npcs[i], bmp, $FFFFFF);
+        except
+        end
+      end;
+      def.Free;
+    end;
+  end;
+
+  RSTypeArray(npcs).Free;
+end;
+
+var
+  i, j, w, h: Int32;
+  debugBuffer: ^UInt8;
+  bmp: TMufasaBitmap;
+begin
+  RSetup;
+
+  GetClientDimensions(w, h);
+  DebugBuffer := EIOS_GetDebugImageBuffer(R_EIOS);
+  EIOS_SetGraphicsDebugging(R_EIOS, false);
+
+  Bmp.Init;
+  Bmp.SetPersistentMemory(PtrUInt(debugBuffer), w, h);
+
+  Bmp.Rectangle([0, 0, w - 1, h - 1], $00);
+  //DebugPlayers(bmp, w, h);
+  //DebugNPCs(bmp, w, h);
+
+
+
 
   Bmp.ResetPersistentMemory;
   Bmp.Free;

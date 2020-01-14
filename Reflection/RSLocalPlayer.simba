@@ -2,49 +2,61 @@
 {$include_once Static.simba}
 
 
-Function RSLocalPlayer.Index: Integer;
+Function RSLocalPlayer.Index: Integer; constref;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_PLAYERINDEX) + 32768;
 end;
 
-Function RSLocalPlayer.SkillLevel(index: Int32): Int32;
+Function RSLocalPlayer.SkillLevel(index: Int32): Int32; constref;
 var
   Skills: Pointer;
 begin
+  Result := -1;
   Skills := RGetArray(R_EIOS, nil, CLIENT_CURRENTLEVELS);
+  if Skills = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Skills, index);
   RFreeObject(R_EIOS, Skills);
 end;
 
-Function RSLocalPlayer.MaxSkillLevel(index: Int32): Int32;
+Function RSLocalPlayer.MaxSkillLevel(index: Int32): Int32; constref;
 var
   Skills: Pointer;
 begin
+  Result := -1;
   Skills := RGetArray(R_EIOS, nil, CLIENT_REALLEVELS);
+  if Skills = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Skills, index);
   RFreeObject(R_EIOS, Skills);
 end;
 
-Function RSLocalPlayer.SkillExperience(index: Int32): Int32;
+Function RSLocalPlayer.SkillExperience(index: Int32): Int32; constref;
 var
   Experiences: Pointer;
 begin
+  Result := -1;
   Experiences := RGetArray(R_EIOS, nil, CLIENT_EXPERIENCES);
+  if Experiences = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Experiences, index);
   RFreeObject(R_EIOS, Experiences);
 end;
 
-Function RSLocalPlayer.CurrentWorld: Integer;
+Function RSLocalPlayer.CurrentWorld: Integer; constref;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_CURRENTWORLD);
 end;
 
-Function RSLocalPlayer.RunEnergy: integer;
+Function RSLocalPlayer.RunEnergy: integer; constref;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_ENERGY);
 end;
 
-Function RSLocalPlayer.Weight: Integer;
+Function RSLocalPlayer.Weight: Integer; constref;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_WEIGHT);
 end;

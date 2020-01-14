@@ -2,7 +2,7 @@
 {$include_once RSStructures.simba}
 
 
-Function RSQueue.Head: RSNode;
+Function RSQueue.Head: RSNode; constref;
 begin
   Result.ref := RGetObject(R_EIOS, ref, QUEUE_HEAD);
 end;

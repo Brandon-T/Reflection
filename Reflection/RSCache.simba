@@ -1,22 +1,22 @@
 {$include_once RSHashTable.simba}
 
 
-Function RSCache.HashTable: RSHashTable;
+Function RSCache.HashTable: RSHashTable; constref;
 begin
   Result.ref := RGetObject(R_EIOS, ref, CACHE_HASHTABLE);
 end;
 
-Function RSCache.Queue: RSQueue;
+Function RSCache.Queue: RSQueue; constref;
 begin
   Result.ref := RGetObject(R_EIOS, ref, CACHE_QUEUE);
 end;
 
-Function RSCache.Remaining: Int32;
+Function RSCache.Remaining: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, CACHE_REMAINING);
 end;
 
-Function RSCache.Capacity: Int32;
+Function RSCache.Capacity: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, CACHE_CAPACITY);
 end;

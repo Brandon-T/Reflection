@@ -5,18 +5,21 @@
 {$include_once RSHashTable.simba}
 
 
-Function RSAnimationFrame.Animation(Index: Int32): RSAnimation;
+Function RSAnimationFrame.Animation(Index: Int32): RSAnimation; constref;
 var
   Frames: Pointer;
   FramesSize: SizeUInt;
 begin
   FramesSize := 0;
   Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONFRAMES_FRAMES);
+  if Frames = nil then
+    Exit;
+
   Result.ref := RGetObjectArray(R_EIOS, Frames, Index);
   RFreeObject(R_EIOS, Frames);
 end;
 
-Function RSAnimationFrame.Animations: Array of RSAnimation;
+Function RSAnimationFrame.Animations: Array of RSAnimation; constref;
 var
   Frames: Pointer;
   I, FramesSize: SizeUInt;
@@ -24,6 +27,9 @@ var
 begin
   FramesSize := 0;
   Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONFRAMES_FRAMES);
+  if Frames = nil then
+    Exit;
+
   FramesArray := RGetObjectArray(R_EIOS, Frames, 0, FramesSize);
   RFreeObject(R_EIOS, Frames);
 
@@ -42,6 +48,9 @@ var
   Garbage: RSTypeArray;
 begin
   FrameCache := RSClient.AnimationFrameCache;
+  if FrameCache.ref = nil then
+    Exit;
+
   HashTable := FrameCache.HashTable;
   if HashTable.ref <> nil then
   begin

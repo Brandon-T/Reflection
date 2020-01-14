@@ -273,6 +273,9 @@ NPCDefinition_Name: THook =                       ['iw', 'b', 'Ljava/lang/String
 NPCDefinition_Actions: THook =                    ['iw', 'z', '[Ljava/lang/String;', 1];
 NPCDefinition_ModelIDs: THook =                   ['iw', 'x', '[I', 1];
 NPCDefinition_CombatLevel: THook =                ['iw', 'm', 'I', -1760974573];
+NPCDefinition_IsVisible: THook =                  ['iw', 'q', 'Z', 1];
+NPCDefinition_ModelCache: THook =                 ['iw', 'w', 'Leb;', 1];
+NPCDefinition_Transformations: THook =            ['iw', 'ak', '[I', 1];
 
 {NPC: cp}
 NPC_Definition: THook =                           ['cp', 'f', 'Liw;', 1];
@@ -372,7 +375,7 @@ Client_WidgetHeights: THook =                     ['client', 'oq', '[I', 1];
 Client_ViewPortWidth: THook =                     ['client', 'rv', 'I', -1637393507];
 Client_ViewPortHeight: THook =                    ['client', 'rg', 'I', 312765867];
 Client_ViewPortScale: THook =                     ['client', 'rk', 'I', -1174260245];
-Client_MapAngle: THook =                          ['client', 'hk', 'I', 1183996551];
+Client_MapAngle: THook =                          ['client', 'hc', 'I', 1782454389];
 Client_MapScale: THook =                          ['client', 'N/A', 'N/A', 1];
 Client_MapOffset: THook =                         ['client', 'N/A', 'N/A', 1];
 Client_MenuCount: THook =                         ['client', 'lf', 'I', -1021045037];

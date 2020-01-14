@@ -78,6 +78,9 @@ var
 begin
   IndicesSize := 0;
   Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_NPCINDICES);
+  if Indices = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
   RFreeObject(R_EIOS, Indices);
 end;
@@ -89,6 +92,9 @@ var
 begin
   IndicesSize := 0;
   Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_PLAYERINDICES);
+  if Indices = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
   RFreeObject(R_EIOS, Indices);
 end;
@@ -101,6 +107,9 @@ var
 begin
   NPCsSize := 0;
   NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCs);
+  if NPCs = nil then
+    Exit;
+
   NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
   RFreeObject(R_EIOS, NPCs);
 
@@ -127,6 +136,9 @@ var
 begin
   PlayersSize := 0;
   Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  if Players = nil then
+    Exit;
+
   PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
   RFreeObject(R_EIOS, Players);
 

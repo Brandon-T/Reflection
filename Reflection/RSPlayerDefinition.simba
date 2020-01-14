@@ -3,33 +3,36 @@
 {$include_once RSAnimationSequence.simba}
 
 
-Function RSPlayerDefinition.ID: Int32;
+Function RSPlayerDefinition.ID: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, PLAYERDEFINITION_ID);
 end;
 
-Function RSPlayerDefinition.IsFemale: Boolean;
+Function RSPlayerDefinition.IsFemale: Boolean; constref;
 begin
   Result := RGetBool(R_EIOS, ref, PLAYERDEFINITION_ISFEMALE);
 end;
 
-Function RSPlayerDefinition.ModelID: Int64;
+Function RSPlayerDefinition.ModelID: Int64; constref;
 begin
   Result := RGetLong(R_EIOS, ref, PLAYERDEFINITION_MODELID);
 end;
 
-Function RSPlayerDefinition.AnimatedModelID: Int64;
+Function RSPlayerDefinition.AnimatedModelID: Int64; constref;
 begin
   Result := RGetLong(R_EIOS, ref, PLAYERDEFINITION_ANIMATEDMODELID);
 end;
 
-Function RSPlayerDefinition.Equipment: Array of Int32;
+Function RSPlayerDefinition.Equipment: Array of Int32; constref;
 var
   Equipment: Pointer;
   EquipmentSize: SizeUInt;
 begin
   EquipmentSize := 0;
   Equipment := RGetArray(R_EIOS, ref, EquipmentSize, PLAYERDEFINITION_EQUIPMENT);
+  if Equipment = nil then
+    Exit;
+
   Result := RGetIntArray(R_EIOS, Equipment, 0, EquipmentSize);
   RFreeObject(R_EIOS, Equipment);
 end;
@@ -39,7 +42,7 @@ begin
   Result.ref := RGetObject(R_EIOS, nil, PLAYERDEFINITION_MODELCACHE);
 end;
 
-Function RSPlayerDefinition.CachedModel: RSModel;
+Function RSPlayerDefinition.CachedModel: RSModel; constref;
 var
   ModelID: Int64;
   Cache: RSCache;
@@ -65,25 +68,36 @@ begin
   Garbage.Free;
 end;
 
-Function RSPlayerDefinition.GetModel(Model: RSModel; IdleSequence: RSAnimationSequence; AnimationFrame: Int32; MovementSequence: RSAnimationSequence; MovementFrame: Int32): RSAnimatedModel; static;
+Function RSPlayerDefinition.GetModel(constref Model: RSModel; constref IdleSequence: RSAnimationSequence; AnimationFrame: Int32; constref MovementSequence: RSAnimationSequence; MovementFrame: Int32): RSAnimatedModel; static;
+var
+  Garbage: RSTypeArray;
 begin
+  Garbage := [IdleSequence, MovementSequence];
+
   if (IdleSequence.ref = nil) and (MovementSequence.ref = nil) then
   begin
     Result.ref := Model.ref;
     Result.vertices := Model.Vertices;
+    {$IFDEF MODEL_TRIANGLES}
     Result.triangles := Model.TriangleFaces;
+    {$ENDIF}
     Exit(Result);
   end;
 
   if (IdleSequence.ref <> nil) and (MovementSequence.ref <> nil) then
   begin
-    Exit(IdleSequence.ApplyTransformations(Model, AnimationFrame, MovementSequence, MovementFrame));
+    Result := IdleSequence.ApplyTransformations(Model, AnimationFrame, MovementSequence, MovementFrame);
+    Garbage.Free;
+    Exit;
   end;
 
   if IdleSequence.ref <> nil then
   begin
-    Exit(IdleSequence.TransformActorModel(Model, AnimationFrame));
+    Result := IdleSequence.TransformActorModel(Model, AnimationFrame);
+    Garbage.Free;
+    Exit;
   end;
 
-  Exit(MovementSequence.TransformActorModel(Model, MovementFrame));
+  Result := MovementSequence.TransformActorModel(Model, MovementFrame);
+  Garbage.Free;
 end;

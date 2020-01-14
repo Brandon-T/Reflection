@@ -1,0 +1,229 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+{$include_once RSPlayer.simba}
+{$include_once RSCamera.simba}
+
+{Function sar(base: Int32; shift: byte): Int32; override;
+begin
+  result := base div (1 shl shift);
+end;}
+
+Function sal(base: Int32; shift: byte): Int32;
+begin
+  result := base * (1 shl shift);
+end;
+
+Function RSTile.ToLocal: RSTile; constref;
+begin
+  Result.X := Sal(self.X - RSClient.BaseX, 7) + Sal(1, 6);
+  Result.Y := Sal(self.Y - RSClient.BaseY, 7) + Sal(1, 6);
+end;
+
+Function RSTile.ToGlobal: RSTile; constref;
+begin
+  Result.X := RSClient.BaseX + self.X div 128;
+  Result.Y := RSClient.BaseY + self.Y div 128;
+end;
+
+{* Converts a Local Tile to MM point *}
+Function RSTile.TileToMM: TPoint; constref;
+const
+  MaxDrawDistance = 6400;
+var
+  X, Y: Int32;
+  LocalX, LocalY: Int32;
+  SinA, CosA, Angle: Int32;
+  Player: RSPlayer;
+begin
+  Player := RSPlayer.Me;
+  if Player.ref = nil then
+    Exit(Point(-1, -1));
+
+  LocalX := Player.LocalX;
+  LocalY := Player.LocalY;
+  Player.Free;
+
+  Angle := RSClient.MapAngle and $7FF;
+  X := (Self.X div 32) - (LocalX div 32);
+	Y := (Self.Y div 32) - (LocalY div 32);
+
+  if (X * X + Y * Y <= MaxDrawDistance) then
+  begin
+    SinA := SINE[Angle];
+    CosA := COSINE[Angle];
+    Result.X := Sar((X * CosA) + (Y * SinA), 16) + 642; //642 = (mm_location.x + mm_width / 2)
+    Result.Y := Sar((X * SinA) - (Y * CosA), 16) + 84;  //84 = (mm_location.y + mm_height / 2)
+    //In resizeable:
+    //Result.X += 91;
+    //Result.Y += 0;
+    Exit(Result);
+  end;
+
+  Exit(Point(-1, -1));
+end;
+
+{* Converts a MM Point to a Local Tile *}
+Function RSTile.MMToTile: RSTile; constref;
+var
+  X, Y, XX, YY: Int32;
+  LocalX, LocalY: Int32;
+  DestX, DestY: Int32;
+  SinA, CosA, Angle: Int32;
+  Player: RSPlayer;
+begin
+  Player := RSPlayer.Me;
+  if Player.ref = nil then
+    Exit(Point(-1, -1));
+
+  LocalX := Player.LocalX;
+  LocalY := Player.LocalY;
+  Player.Free;
+
+  X := self.X - 642; //642 = (mm_location.x + mm_width / 2)
+  Y := self.Y - 84;  //84 = (mm_location.y + mm_height / 2)
+
+  Angle := RSClient.MapAngle and $7FF;
+  SinA := SINE[Angle];
+  CosA := COSINE[Angle];
+
+  XX := Sar((X * CosA) + (Y * SinA), 11);
+  YY := Sar((Y * CosA) - (X * SinA), 11);
+
+  DestX := Sar(LocalX + XX, 7);
+  DestY := Sar(LocalY - YY, 7);
+
+  Result.X := RSClient.BaseX + DestX;
+  Result.Y := RSClient.BaseY + DestY;
+
+  Result := Result.ToLocal;
+end;
+
+{* Converts a Local Tile to MS Point *}
+Function RSTile.TileToMS: TPoint; constref;
+var
+  X, Y, Z: Int32;
+  Calculation: Int32;
+  Pitch, Yaw: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+begin
+  if ((self.X >= 128) and (self.Y >= 128) and (self.X <= 13056) and (self.Y <= 13056)) then
+  begin
+    //Local Coordinates
+    X := self.X;
+    Y := self.Y;
+    Z := self.GetHeight();
+
+    //Translate to Camera
+    X -= RSCamera.X;
+    Y -= RSCamera.Y;
+    Z -= RSCamera.Z;
+
+    //Project to Camera
+    Pitch := RSCamera.Pitch;
+    Yaw := RSCamera.Yaw;
+    ViewPortScale := RSClient.ViewPortScale;
+    ViewPortWidth := RSClient.ViewPortWidth;
+    ViewPortHeight := RSClient.ViewPortHeight;
+
+    SinPitch := SINE[Pitch];
+    CosPitch := COSINE[Pitch];
+    SinYaw := SINE[Yaw];
+    CosYaw := COSINE[Yaw];
+
+    Calculation := Sar(((X * CosYaw) + (Y * SinYaw)), 16);
+    Y := Sar(((Y * CosYaw) - (X * SinYaw)), 16);
+    X := Calculation;
+    Calculation := Sar(((Z * CosPitch) - (Y * SinPitch)), 16);
+    Z := Sar(((Y * CosPitch) + (Z * SinPitch)), 16);
+    Y := Calculation;
+
+    if (Z >= 50) then
+    begin
+      X := (X * viewPortScale div Z) + (ViewPortWidth div 2);
+      Y := (Y * viewPortScale div Z) + (ViewPortHeight div 2);
+      Exit(Point(X, Y)); //X + ViewPortXOffset, Y + ViewPortYOffset
+    end;
+  end;
+
+  Exit(Point(-1, -1));
+end;
+
+Function RSTile.GetHeight(plane: Int32): Int32; constref;
+var
+  xSize, ySize: Int32;
+  var1, var2, var3, var4: Int32;
+begin
+  xSize := Sar(self.x, 7);
+  ySize := Sar(self.y, 7);
+
+  if (xSize >= 0) and (ySize >= 0) and (xSize < 104) and (ySize < 104) then
+  begin
+    if (plane < 3) and ((CACHED_TILE_SETTINGS[1][xSize][ySize] and 2) = 2) then
+    begin
+      Inc(plane);
+    end;
+
+    var1 := self.x and 127;
+    var2 := self.y and 127;
+    var3 := Sar(((var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize]) + ((128 - var1) * CACHED_TILE_HEIGHTS[plane][xSize][ySize])), 7);
+    var4 := Sar(((CACHED_TILE_HEIGHTS[plane][xSize][ySize + 1] * (128 - var1)) + (var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize + 1])), 7);
+
+    Result := Sar(((128 - var2) * var3 + var2 * var4), 7);
+    Exit;
+  end;
+
+  Exit(0);
+end;
+
+Function RSTile.GetHeight: Int32; constref; overload;
+begin
+  Result := self.GetHeight(RSClient.Plane);
+end;
+
+{* Projects a vector from 3D space to 2D space *}
+Function TVector.ProjectToScreen(localX, localY, localZ, orientation, cameraX, cameraY, cameraZ, sinYaw, cosYaw, sinPitch, cosPitch, viewPortWidth, viewPortHeight, viewPortScale: Int32): TPoint; constref;
+var
+  p: TVector;
+  x, y, z, calculation: Int32;
+begin
+  p := [self.x, self.z, self.y];
+
+  // Rotate based on orientation
+  p := [Sar(((p.x * COSINE[orientation]) + (p.y * SINE[orientation])), 16),
+        Sar(((p.y * COSINE[orientation]) - (p.x * SINE[orientation])), 16),
+        p.z];
+
+  // Translate to local coords
+  p.x += localX;
+  p.y += localY;
+  p.z += localZ;
+
+  // Translate to camera
+  p.x -= cameraX;
+  p.y -= cameraY;
+  p.z -= cameraZ;
+
+  // Project to canvas
+  x := p.x;
+  y := p.y;
+  z := p.z;
+
+  calculation := Sar(((x * cosYaw) + (y * sinYaw)), 16);
+  y := Sar(((y * cosYaw) - (x * sinYaw)), 16);
+  x := calculation;
+  calculation := Sar(((z * cosPitch) - (y * sinPitch)), 16);
+  z := Sar(((y * cosPitch) + (z * sinPitch)), 16);
+  y := calculation;
+
+  if (z >= 50) then
+  begin
+    Result.X := (x * viewPortScale div z) + (viewPortWidth div 2);
+    Result.Y := (y * viewPortScale div z) + (viewPortHeight div 2);
+    Exit;
+  end
+
+  Result.X := -1;
+  Result.Y := -1;
+end;

@@ -7,7 +7,11 @@
 {$include_once RSAnimation.simba}
 
 
-Function RSAnimatedModel.TriangleFaces: Array of TTriangle;
+{$IFDEF MODEL_TRIANGLES}
+Function RSAnimatedModel.TriangleFaces: Array of TTriangle; constref;
+{$ELSE}
+Function RSAnimatedModel.Triangles: Array of TTriangle; constref;
+{$ENDIF}
 var
   I, IndicesSize: SizeUInt;
   Indices: Array[0..3] of Array of Int32;
@@ -27,7 +31,7 @@ begin
   end;
 end;
 
-Function RSAnimatedModel.Animate(Frame: RSAnimationFrame; FrameID: Int32): RSAnimatedModel;
+Function RSAnimatedModel.Animate(constref Frame: RSAnimationFrame; FrameID: Int32): RSAnimatedModel; constref;
 var
   Model: RSModel;
   Animation: RSAnimation;
@@ -38,22 +42,34 @@ var
   Transformations: Array of Array of Int32;
   TransformX, TransformY, TransformZ: Array of Int32;
   Garbage: RSTypeArray;
+  label Cleanup;
 begin
   Model.ref := self.ref;
-  self.skins := Model.Skins;
-  self.vertices := Model.Vertices;
+  Result.ref := self.ref;
+  Result.skins := Model.Skins;
+  Result.vertices := Model.Vertices;
 
-  if Length(self.skins) > 0 then
+  {$IFDEF MODEL_TRIANGLES}
+  Result.triangles := self.triangles;
+  {$ENDIF}
+
+  if Length(Result.skins) > 0 then
   begin
     if FrameID <> -1 then
     begin
       Animation := Frame.Animation(FrameId);
+      if Animation.ref = nil then
+        goto Cleanup;
+
       Skeleton := Animation.Skeleton;
+      if Skeleton.ref = nil then
+        goto Cleanup;
+
       FrameIDs := Animation.Frames;
 
-      self.ModifierX := 0;
-      self.ModifierY := 0;
-      self.ModifierZ := 0;
+      Result.ModifierX := 0;
+      Result.ModifierY := 0;
+      Result.ModifierZ := 0;
 
       TransformationTypes := Skeleton.TransformationTypes;
       Transformations := Skeleton.Transformations;
@@ -65,19 +81,21 @@ begin
       for I := 0 to Animation.FrameCount - 1 do
       begin
         TransformType := FrameIDs[I];
-        self.Transform(TransformationTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
+        Result.Transform(TransformationTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
       end;
     end;
 	end;
 
-  Garbage := [Skeleton, Animation, Frame];
-  Garbage.Free;
+  Cleanup:
+    Garbage := [Skeleton, Animation, Frame];
+    Garbage.Free;
 
-  self.triangles := self.TriangleFaces;
-  Result := self;
+  {$IFDEF MODEL_TRIANGLES}
+  Result.triangles := Result.TriangleFaces;
+  {$ENDIF}
 end;
 
-Function RSAnimatedModel.Animate(IdleFrame: RSAnimationFrame; IdleFrameID: Int32; MovementFrame: RSAnimationFrame; MovementFrameID: Int32; TransformationTypes: Array of Int32): RSAnimatedModel; overload;
+Function RSAnimatedModel.Animate(constref IdleFrame: RSAnimationFrame; IdleFrameID: Int32; constref MovementFrame: RSAnimationFrame; MovementFrameID: Int32; constref TransformationTypes: Array of Int32): RSAnimatedModel; constref; overload;
 var
   Model: RSModel;
   IdleAnimation: RSAnimation;
@@ -89,24 +107,43 @@ var
   Transformations: Array of Array of Int32;
   TransformX, TransformY, TransformZ: Array of Int32;
   Garbage: RSTypeArray;
+  label Cleanup;
 begin
   Model.ref := self.ref;
-  self.skins := Model.Skins;
+  Result.ref := self.ref;
+  Result.skins := self.skins;
+  Result.vertices := self.vertices;
+
+  {$IFDEF MODEL_TRIANGLES}
+  Result.triangles := self.triangles;
+  {$ENDIF}
 
   if IdleFrameID <> -1 then
   begin
     if (MovementFrameID <> -1) and (Length(TransformationTypes) > 0) then
     begin
-      self.vertices := Model.Vertices;
-      self.triangles := self.TriangleFaces;
+      Result.skins := Model.Skins;
+      Result.vertices := Model.Vertices;
+      {$IFDEF MODEL_TRIANGLES}
+      Result.triangles := Result.TriangleFaces;
+      {$ENDIF}
+
       IdleAnimation := IdleFrame.Animation(IdleFrameID);
+      if IdleAnimation.ref = nil then
+        goto Cleanup;
+
       MovementAnimation := MovementFrame.Animation(MovementFrameID);
+      if MovementAnimation.ref = nil then
+        goto Cleanup;
+
       Skeleton := IdleAnimation.Skeleton;
+      if Skeleton.ref = nil then
+        goto Cleanup;
 
       //Idle Animation
-      self.ModifierX := 0;
-      self.ModifierY := 0;
-      self.ModifierZ := 0;
+      Result.ModifierX := 0;
+      Result.ModifierY := 0;
+      Result.ModifierZ := 0;
 
       FrameIDs := IdleAnimation.Frames;
       TransformTypes := Skeleton.TransformationTypes;
@@ -130,14 +167,14 @@ begin
 
         if (TransformType <> CurrentTransformType) or (TransformTypes[TransformType] = 0) then
         begin
-			    self.Transform(TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
+			    Result.Transform(TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
 		    end;
       end;
 
       //Movement Animation
-      self.ModifierX := 0;
-      self.ModifierY := 0;
-      self.ModifierZ := 0;
+      Result.ModifierX := 0;
+      Result.ModifierY := 0;
+      Result.ModifierZ := 0;
 
       FrameIDs := MovementAnimation.Frames;
 
@@ -159,26 +196,24 @@ begin
 
         if (TransformType <> CurrentTransformType) or (TransformTypes[TransformType] = 0) then
         begin
-			    self.Transform(TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
+			    Result.Transform(TransformTypes[TransformType], Transformations[TransformType], TransformX[I], TransformY[I], TransformZ[I]);
 		    end;
       end;
 
       Garbage := [Skeleton, MovementAnimation, IdleAnimation, IdleFrame, MovementFrame];
       Garbage.Free;
-      Result := self;
-
       Exit;
     end;
 
-    self.Animate(IdleFrame, IdleFrameID);
+    Result.Animate(IdleFrame, IdleFrameID);
   end;
 
-  Garbage := [IdleFrame, MovementFrame];
-  Garbage.Free;
-  Result := self;
+  Cleanup:
+    Garbage := [IdleFrame, MovementFrame];
+    Garbage.Free;
 end;
 
-Procedure RSAnimatedModel.Transform(TransformType: Int32; SkinIDs: Array of Int32; TransformationX, TransformationY, TransformationZ: Int32);
+Procedure RSAnimatedModel.Transform(TransformType: Int32; constref SkinIDs: Array of Int32; TransformationX, TransformationY, TransformationZ: Int32);
 var
   I, J, SkinID, AffectedSkins: Int32;
   TransformCount: Int32;

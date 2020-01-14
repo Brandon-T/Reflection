@@ -1,12 +1,11 @@
 {$include_once RSStructures.simba}
 
-Function RSNameInfo.Name: String;
+Function RSNameInfo.Name: String; constref;
 begin
   Result := RGetString(R_EIOS, ref, NAMEINFO_NAME);
 end;
 
-Function RSNameInfo.DecodedName: String;
+Function RSNameInfo.DecodedName: String; constref;
 begin
-  writeln(ref);
   Result := RGetString(R_EIOS, ref, NAMEINFO_DECODEDNAME);
 end;

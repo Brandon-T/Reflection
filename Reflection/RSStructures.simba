@@ -54,7 +54,9 @@ type
 
   RSAnimatedModel = record(RSType)
     vertices: Array of TVector;
+    {$IFDEF MODEL_TRIANGLES}
     triangles: Array of TTriangle;
+    {$ENDIF}
     skins: Array of Array of Int32;
 
     modifierX, modifierY, modifierZ: Int32;
@@ -65,6 +67,7 @@ Procedure RSType.Free;
 begin
   if ref <> nil then
     RFreeObject(R_EIOS, ref);
+  ref := nil;
 end;
 
 Procedure RSTypeArray.Free;
@@ -78,6 +81,7 @@ begin
     if self[I].ref <> nil then
     begin
       Arr[J] := self[I].ref;
+      self[I].ref := nil;
       Inc(J);
     end;
   end;
