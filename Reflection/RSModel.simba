@@ -108,6 +108,31 @@ begin
   end;
 end;
 
+Function RSModel.Skin(Index: SizeUInt): Array of Int32; constref;
+var
+  Skins: Pointer;
+  IndexSize, SkinsSize: SizeUInt;
+  SkinsArray: Pointer;
+begin
+  Skins := RGetArray(R_EIOS, ref, SkinsSize, MODEL_SKINS);
+  if Skins = nil then
+    Exit;
+
+  SkinsArray := RGetObjectArray(R_EIOS, Skins, Index);
+  RFreeObject(R_EIOS, Skins);
+
+  if SkinsArray <> nil then
+  begin
+    IndexSize := RGetArraySize(R_EIOS, SkinsArray);
+    if IndexSize > 0 then
+    begin
+      Result := RGetIntArray(R_EIOS, SkinsArray, 0, IndexSize);
+    end;
+  end;
+
+  RFreeObject(R_EIOS, SkinsArray);
+end;
+
 Function RSModel.Skins: Array of Array of Int32; constref;
 var
   Skins: Pointer;

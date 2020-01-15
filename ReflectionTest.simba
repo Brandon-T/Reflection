@@ -327,11 +327,12 @@ begin
   me.Free;
 end;
 
-procedure DebugPlayers(bmp: TMufasaBitmap; w, h: Int32);
+procedure DebugPlayers(bmp: TMufasaBitmap);
 var
   i: Integer;
   players: array of RSPlayer;
   def: RSPlayerDefinition;
+  Garbage: RSTypeArray;
 begin
   players := RSClient.AllPlayers;
 
@@ -346,16 +347,20 @@ begin
           DrawPlayer2(players[i], bmp, $FFFFFF);
         except
         end;
+        garbage += def;
       end;
     end;
   end;
+
+  RSTypeArray(players).Free;
 end;
 
-procedure DebugNPCs(bmp: TMufasaBitmap; w, h: Int32);
+procedure DebugNPCs(bmp: TMufasaBitmap);
 var
-  i, j: Integer;
+  i: Integer;
   npcs: array of RSNPC;
   def: RSNPCDefinition;
+  garbage: RSTypeArray;
 begin
   npcs := RSClient.AllNPCs;
 
@@ -370,16 +375,17 @@ begin
           DrawNPC(npcs[i], bmp, $FFFFFF);
         except
         end
+        garbage += def;
       end;
-      def.Free;
     end;
   end;
 
+  Garbage.Free;
   RSTypeArray(npcs).Free;
 end;
 
 var
-  i, j, w, h: Int32;
+  w, h: Int32;
   debugBuffer: ^UInt8;
   bmp: TMufasaBitmap;
 begin
@@ -387,14 +393,15 @@ begin
 
   GetClientDimensions(w, h);
   DebugBuffer := EIOS_GetDebugImageBuffer(R_EIOS);
-  EIOS_SetGraphicsDebugging(R_EIOS, false);
+  EIOS_SetGraphicsDebugging(R_EIOS, True);
 
   Bmp.Init;
   Bmp.SetPersistentMemory(PtrUInt(debugBuffer), w, h);
 
   Bmp.Rectangle([0, 0, w - 1, h - 1], $00);
-  //DebugPlayers(bmp, w, h);
-  //DebugNPCs(bmp, w, h);
+  DebugMe(bmp, w, h);
+  //DebugPlayers(bmp);
+  //DebugNPCs(bmp);
 
 
 

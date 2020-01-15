@@ -25,6 +25,32 @@ begin
   RFreeObject(R_EIOS, Types);
 end;
 
+Function RSAnimationSkeleton.Transformation(Index: SizeUInt): Array of Int32; constref;
+var
+  Transforms: Pointer;
+  Transformations: Pointer;
+  TransformsSize, IndexSize: SizeUInt;
+begin
+  TransformsSize := 0;
+  Transforms := RGetArray(R_EIOS, ref, TransformsSize, ANIMATIONSKELETON_TRANSFORMATIONS);
+  if Transforms = nil then
+    Exit;
+
+  Transformations := RGetObjectArray(R_EIOS, Transforms, Index);
+  RFreeObject(R_EIOS, Transforms);
+
+  If Transformations <> nil then
+  begin
+    IndexSize := RGetArraySize(R_EIOS, Transformations);
+    if IndexSize > 0 then
+    begin
+      Result := RGetIntArray(R_EIOS, Transformations, 0, IndexSize);
+    end;
+  end;
+
+  RFreeObject(R_EIOS, Transformations);
+end;
+
 Function RSAnimationSkeleton.Transformations: Array of Array of Int32; constref;
 var
   Transforms: Pointer;
