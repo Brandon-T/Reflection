@@ -1,0 +1,24 @@
+{$include_once RSStructures.simba}
+{$include_once RSItemDefinition.simba}
+{$include_once RSCache.simba}
+{$include_once RSHashTable.simba}
+
+Function RSItem.Definition: RSItemDefinition; constref
+var
+  Cache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSItemDefinition.Cache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(self.ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;

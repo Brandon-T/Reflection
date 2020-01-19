@@ -19,6 +19,10 @@ type
 
   RSNode = type RSType;
 
+  RSLinkedList = type RSType;
+
+  RSNodeDeque = type RSType;
+
   RSCache = type RSType;
 
   RSHashTable = type RSType;
@@ -61,6 +65,18 @@ type
 
     modifierX, modifierY, modifierZ: Int32;
   end;
+
+  RSGroundObject = type RSType;
+
+  RSItem = record
+    ID: Int32;
+    StackSize: Int32;
+    Tile: RSTile;
+  end;
+
+  RSItemDefinition = type RSType;
+
+  RSWidget = type RSType;
 
 
 Procedure RSType.Free;

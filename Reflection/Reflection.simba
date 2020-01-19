@@ -7,6 +7,8 @@
 {$include_once RSNode.simba}
 {$include_once RSCache.simba}
 {$include_once RSQueue.simba}
+{$include_once RSLinkedList.simba}
+{$include_once RSNodeDeque.simba}
 {$include_once RSHashTable.simba}
 {$include_once RSModel.simba}
 {$include_once RSActor.simba}
@@ -25,3 +27,7 @@
 {$include_once RSAnimationSequence.simba}
 {$include_once RSAnimatedModel.simba}
 {$include_once RSTile.simba}
+{$include_once RSGroundObject.simba}
+{$include_once RSItemDefinition.simba}
+{$include_once RSItem.simba}
+{$include_once RSWidget.simba}

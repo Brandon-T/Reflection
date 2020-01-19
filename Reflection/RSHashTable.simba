@@ -59,7 +59,7 @@ end;
 
 Function RSHashTable.GetObject(ID: Int64): RSNode; constref;
 var
-  Index, CurrentUID: Int64;
+  Index, HeadUID, CurrentUID: Int64;
   Head, Current: RSNode;
   Garbage: RSTypeArray;
 begin
@@ -73,7 +73,8 @@ begin
     Current := Head.Next;
     if Current.ref <> nil then
     begin
-      while Head.UID <> (CurrentUID := Current.UID) do
+      HeadUID := Head.UID;
+      while HeadUID <> (CurrentUID := Current.UID) do
       begin
         if CurrentUID = ID then
         begin

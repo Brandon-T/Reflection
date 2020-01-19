@@ -22,9 +22,9 @@ Node_UID: THook =                                 ['gk', 'cr', 'J', 1];
 Node_Prev: THook =                                ['gk', 'cz', 'Lgk;', 1];
 Node_Next: THook =                                ['gk', 'cy', 'Lgk;', 1];
 
-{NodeDeque: jl}
-NodeDeque_Head: THook =                           ['jl', 'f', 'Lgk;', 1];
-NodeDeque_Current: THook =                        ['jl', 'i', 'Lgk;', 1];
+{NodeDeque: js}
+NodeDeque_Head: THook =                           ['js', 'f', 'Lgk;', 1];
+NodeDeque_Current: THook =                        ['js', 'i', 'Lgk;', 1];
 
 {Cacheable: gw}
 Cacheable_Next: THook =                           ['gw', 'ct', 'Lgw;', 1];
@@ -326,8 +326,9 @@ Widget_BoundsIndex: THook =                       ['ha', 'fq', 'I', 1802978635];
 ItemDefinition_ID: THook =                        ['ii', 'k', 'I', 1070204959];
 ItemDefinition_Name: THook =                      ['ii', 'l', 'Ljava/lang/String;', 1];
 ItemDefinition_IsMembers: THook =                 ['ii', 'aw', 'Z', 1];
-ItemDefinition_Actions: THook =                   ['ii', 'as', '[Ljava/lang/String;', 1];
-ItemDefinition_GroundActions: THook =             ['ii', 'ak', '[Ljava/lang/String;', 1];
+ItemDefinition_Actions: THook =                   ['ii', 'ak', '[Ljava/lang/String;', 1];
+ItemDefinition_GroundActions: THook =             ['ii', 'as', '[Ljava/lang/String;', 1];
+ItemDefinition_Cache: THook =                     ['ii', 'd', 'Leb;', 1];
 
 {Item: ca}
 Item_ID: THook =                                  ['ca', 'f', 'I', -402020319];

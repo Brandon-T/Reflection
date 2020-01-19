@@ -19,6 +19,11 @@ begin
   RIReleaseObjects(eios, instances);
 end;
 
+Function RObjectsEqual(eios: Pointer; first, second: Pointer): Boolean;
+begin
+  result := RIObjectsEqual(eios, first, second);
+end;
+
 
 // MARK: - SINGLE ELEMENTS
 

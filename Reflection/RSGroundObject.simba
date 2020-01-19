@@ -1,0 +1,112 @@
+{$include_once RSStructures.simba}
+{$include_once RSNodeDeque.simba}
+{$include_once RSClient.simba}
+{$include_once RSPlayer.simba}
+{$include_once RSHashTable.simba}
+{$include_once RSLinkedList.simba}
+
+Function RSGroundObject.GetAll: Array of RSItem; static;
+var
+  Tile: RSTile;
+  Plane: Int32;
+  BaseX, BaseY: Int32;
+  MinX, MinY, MaxX, MaxY: Int32;
+  X, Y: Int32;
+  Player: RSPlayer;
+
+  Items: Pointer;
+  ItemsSize: SizeUInt;
+  LinkedList: RSLinkedList;
+  Head, Curr: RSNode;
+  Garbage: RSTYpeArray;
+  Item: RSItem;
+
+  ID, Stack: Int32;
+begin
+  Player := RSPlayer.Me;
+  Tile := Player.Tile;
+  Player.Free;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+  Plane := RSClient.Plane;
+
+  MinX := BaseX;
+  MinY := BaseY;
+  MaxX := BaseX + 104;
+  MaxY := BaseY + 104;
+
+  ItemsSize := 0;
+  Items := RGetArray(R_EIOS, nil, ItemsSize, Client_GroundItems);
+  if ItemsSize = 0 then
+    Exit;
+
+  for Y := MinY to MaxY - 1 do
+  begin
+    for X := MinX to MaxX - 1 do
+    begin
+      LinkedList.ref := RGetObjectArray3D(R_EIOS, Items, Plane, X - BaseX, Y - BaseY);
+      if LinkedList.ref <> nil then
+      begin
+        Head := LinkedList.Head;
+        Curr := Head.Next;
+        Garbage := [LinkedList, Head, Curr];
+
+        while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+        begin
+          ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
+          Stack := RGetInt(R_EIOS, Curr.ref, ITEM_STACKSIZES);
+
+          Item := [ID, Stack, [X, Y]];
+          Result += item;
+
+          Curr := Curr.Next;
+          Garbage += Curr;
+        end;
+      end;
+    end;
+  end;
+
+  Garbage.Free;
+  RFreeObject(R_EIOS, Items);
+end;
+
+Function RSGroundObject.GetItemsAt(X, Y: Int32): Array of RSItem; static;
+var
+  ID, Stack: Int32;
+  BaseX, BaseY: Int32;
+  //Index, Hash: Int32;
+  Items: Pointer;
+  LinkedList: RSLinkedList;
+  Head, Curr: RSNode;
+  Garbage: RSTYpeArray;
+  Item: RSItem;
+begin
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+
+  Items := RGetObject(R_EIOS, nil, Client_GroundItems);
+  LinkedList.ref := RGetObjectArray3D(R_EIOS, Items, RSClient.Plane, X - BaseX, Y - BaseY);
+  RFreeObject(R_EIOS, items);
+
+  //Hash := X or (Y shl 14) or (RSClient.Plane shl 28);
+  //Index := Hash and (ItemsSize - 1);
+
+  Head := LinkedList.Head;
+  Curr := Head.Next;
+  Garbage := [LinkedList, Head, Curr];
+
+  while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+  begin
+    ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
+    Stack := RGetInt(R_EIOS, Curr.ref, ITEM_STACKSIZES);
+
+    Item := [ID, Stack, [X, Y]];
+    Result += item;
+
+    Curr := Curr.Next;
+    Garbage += Curr;
+  end;
+
+  Garbage.Free;
+end;
