@@ -1,4 +1,216 @@
-type
-  RSObject = packed record
-    ref: Pointer;
+{$include_once RSStructures.simba}
+{$include_once RSCache.simba}
+{$include_once RSHashTable.simba}
+{$include_once RSAnimableNode.simba}
+{$include_once RSClient.simba}
+{$include_once RSRegion.simba}
+{$include_once RSSceneTile.simba}
+{$include_once RSObjectDefinition.simba}
+
+Function RSObject.GameObject(ObjectType: RSObjectType; X, Y: Int32): RSObject; static;
+var
+  BaseX, BaseY: Int32;
+  Region: RSRegion;
+  Tile: RSSceneTile;
+  Objects: Pointer;
+begin
+  Region := RSClient.Region;
+  if Region.ref = nil then
+    Exit;
+
+  BaseX := X - RSClient.BaseX;
+  BaseY := Y - RSClient.BaseY;
+  Tile := Region.SceneTile(RSClient.Plane, BaseX, BaseY);
+  if Tile.ref <> nil then
+  begin
+    case ObjectType of
+      GAME_OBJECT: Result := Tile.GameObject;
+      WALL_DECORATION: Result := Tile.WallDecoration;
+      BOUNDARY_OBJECT: Result := Tile.BoundaryObject;
+      FLOOR_DECORATION: Result := Tile.GroundDecoration;
+    end;
+
+    Tile.Free;
   end;
+
+  Region.Free;
+end;
+
+Function RSObject.Hash: Int64; constref;
+begin
+  case self.ObjectType of
+    GAME_OBJECT: Result := RGetLong(R_EIOS, ref, GAMEOBJECT_ID);
+    WALL_DECORATION: Result := RGetLong(R_EIOS, ref, WALLDECORATION_ID);
+    BOUNDARY_OBJECT: Result := RGetLong(R_EIOS, ref, BOUNDARYOBJECT_ID);
+    FLOOR_DECORATION: Result := RGetLong(R_EIOS, ref, FLOORDECORATION_ID);
+  end;
+end;
+
+Function RSObject.ID: Int32; constref;
+begin
+  Result := (self.Hash shr 17) and $FFFFFFFF;
+end;
+
+Function RSObject.LocalTile: RSTile; constref;
+begin
+  case self.ObjectType of
+    GAME_OBJECT:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, GAMEOBJECT_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, GAMEOBJECT_LOCALY);
+      end;
+    WALL_DECORATION:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, WALLDECORATION_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, WALLDECORATION_LOCALY);
+      end;
+    BOUNDARY_OBJECT:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, BOUNDARYOBJECT_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, BOUNDARYOBJECT_LOCALY);
+      end;
+    FLOOR_DECORATION:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, FLOORDECORATION_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, FLOORDECORATION_LOCALY);
+      end;
+  end;
+end;
+
+Function RSObject.Tile: RSTile; constref;
+begin
+  Result := self.LocalTile;
+  Result.X := RSClient.BaseX + Result.X div 128;
+  Result.Y := RSClient.BaseY + Result.Y div 128;
+end;
+
+Function RSObject.Definition: RSObjectDefinition; constref;
+var
+  Cache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSObjectDefinition.DefinitionCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(self.ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;
+
+Function RSObject.GetModel(ID: Int64): RSModel; static;
+var
+  Cache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSObjectDefinition.ModelCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;
+
+
+Function GetDefinition(ID: Int64): RSObjectDefinition;
+var
+  Cache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSObjectDefinition.DefinitionCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;
+
+Function RSObject.Model: RSModel; constref;
+var
+  UID: Int32;
+  Definition: RSObjectDefinition;
+begin
+  case self.ObjectType of
+    GAME_OBJECT:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, GAMEOBJECT_RENDERABLE);
+      end;
+    WALL_DECORATION:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, WALLDECORATION_RENDERABLE);
+        if Result.ref = nil then
+        begin
+          Result.ref := RGetObject(R_EIOS, ref, WALLDECORATION_RENDERABLE2);
+        end;
+      end;
+    BOUNDARY_OBJECT:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, BOUNDARYOBJECT_RENDERABLE);
+        if Result.ref = nil then
+        begin
+          Result.ref := RGetObject(R_EIOS, ref, BOUNDARYOBJECT_RENDERABLE2);
+        end;
+      end;
+    FLOOR_DECORATION:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, FLOORDECORATION_RENDERABLE);
+      end;
+  end;
+
+  //If it's a RSModel, return it..
+  if RObjectInstanceOf(R_EIOS, Result.ref, MODEL_FITSSINGLETILE.cls) then
+  begin
+    Exit;
+  end;
+
+  //If it's a RSAnimableNode, return the model from cache..
+  if RObjectInstanceOf(R_EIOS, Result.ref, ANIMABLENODE_ID.cls) then
+  begin
+    Definition := self.Definition;
+    if Definition.ref <> nil then
+    begin
+      UID := (Definition.ID shl 10) + RSAnimableNode(Result.ref).Orientation;
+
+      writeln(RSAnimableNode(Result.ref).Orientation);
+
+      //UID := (10583 shl 10) + RSAnimableNode(Result.ref).Orientation;
+      //UID := (7182 shl 10) + RSAnimableNode(Result.ref).Orientation;
+
+      if Length(Definition.ModelIDs) > 0 then
+      begin
+        UID += RSAnimableNode(Result.ref).Flags shl 3;
+      end;
+
+      writeln(self.Hash);
+      Result := RSObject.GetModel(UID);  //10836995 = Bank, 7354371 = Chair
+
+      Definition.Free;
+      Exit;
+    end;
+
+    Result.ref := nil;
+    Exit;
+  end;
+
+  Result.ref := nil;
+end;

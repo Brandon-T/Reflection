@@ -27,7 +27,7 @@ end;
 Function RSActor.LocalTile: RSTile; constref;
 begin
   Result.X := RGetInt(R_EIOS, ref, ACTOR_LOCALX);
-  Result.Y := RGetInt(R_EIOS, ref, ACTOR_LOCALY)
+  Result.Y := RGetInt(R_EIOS, ref, ACTOR_LOCALY);
 end;
 
 Function RSActor.Tile: RSTile; constref;

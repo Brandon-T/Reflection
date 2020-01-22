@@ -1,0 +1,64 @@
+{$include_once RSStructures.simba}
+
+Function RSRegion.SceneTile(X, Y, Z: Int32): RSSceneTile; constref;
+var
+  Tiles: Pointer;
+begin
+  Tiles := RGetArray(R_EIOS, ref, REGION_SCENETILES);
+  Result.ref := RGetObjectArray3D(R_EIOS, Tiles, X, Y, Z);
+  RFreeObject(R_EIOS, Tiles);
+end;
+
+Function RSRegion.SceneTiles: Array of Array of Array of RSSceneTile; constref;
+var
+  Tiles: Pointer;
+  I, J, TilesSize: SizeUInt;
+  SX, SY: Array of Pointer;
+type
+  RSSceneTileArray = Array of RSSceneTile;
+begin
+  TilesSize := 0;
+  Tiles := RGetArray(R_EIOS, ref, TilesSize, REGION_SCENETILES);
+  SX := RGetObjectArray(R_EIOS, Tiles, 0, TilesSize);
+  RFreeObject(R_EIOS, Tiles);
+
+  SetLength(Result, TilesSize);
+
+  for I := 0 to TilesSize - 1 do
+  begin
+    SY := RGetObjectArray(R_EIOS, SX[I], 0, RGetArraySize(R_EIOS, SX[I]));
+    SetLength(Result[I], Length(SY));
+
+    for J := 0 to High(SY) do
+    begin
+      Result[I][J] := RSSceneTileArray(RGetObjectArray(R_EIOS, SY[J], 0, RGetArraySize(R_EIOS, SY[J])));
+    end;
+
+    RFreeObjects(R_EIOS, SY);
+  end;
+  RFreeObjects(R_EIOS, SX);
+end;
+
+Function RSRegion.InteractableObjects: Array of RSObject; constref;
+var
+  Objects: Pointer;
+  I, ObjectsSize: SizeUInt;
+  GameObjects: Array of Pointer;
+type
+  RSObjectArray = Array of RSObject;
+begin
+  ObjectsSize := 0;
+  Objects := RGetArray(R_EIOS, ref, REGION_INTERACTABLEOBJECTS);
+  if Objects = nil then
+    Exit;
+
+  SetLength(Result, ObjectsSize);
+  GameObjects := RGetObjectArray(R_EIOS, Objects, 0, ObjectsSize);
+  RFreeObject(R_EIOS, Objects);
+
+  for I := 0 to ObjectsSize - 1 do
+  begin
+    Result[I].ref := GameObjects[I];
+    Result[I].ObjectType = RSObjectType.GAME_OBJECT;
+  end;
+end;

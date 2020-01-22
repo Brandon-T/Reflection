@@ -1,0 +1,36 @@
+{$include_once RSStructures.simba}
+{$include_once RSCache.simba}
+
+Function RSObjectDefinition.ID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_ID);
+end;
+
+Function RSObjectDefinition.ModelIDs: Array of Int32; constref;
+var
+  IDs: Pointer;
+  IDsSize: SizeUInt;
+begin
+  IDsSize := 0;
+  IDs := RGetArray(R_EIOS, ref, IDsSize, OBJECTDEFINITION_MODELIDS);
+  if IDs = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, IDs, 0, IDsSize);
+  RFreeObject(R_EIOS, IDs);
+end;
+
+Function RSObjectDefinition.Name: String; constref;
+begin
+  Result := RGetString(R_EIOS, ref, OBJECTDEFINITION_NAME);
+end;
+
+Function RSObjectDefinition.DefinitionCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, OBJECTDEFINITION_DEFINITIONCACHE);
+end;
+
+Function RSObjectDefinition.ModelCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, OBJECTDEFINITION_MODELCACHE);
+end;

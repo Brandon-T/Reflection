@@ -3,6 +3,8 @@
 {$include_once Structures.simba}
 
 type
+  RSObjectType = (GAME_OBJECT, WALL_DECORATION, BOUNDARY_OBJECT, FLOOR_DECORATION);
+
   RSType = packed record
     ref: Pointer;
   end;
@@ -12,6 +14,10 @@ type
   PRSTypeArray = Array of ^RSType;
 
   RSTile = type TPoint;
+
+  RSSceneTile = type RSType;
+
+  RSRegion = type RSType;
 
   RSClient = type RSType;
 
@@ -29,11 +35,15 @@ type
 
   RSQueue = type RSType;
 
+  RSAnimableNode = type RSType;
+
   RSModel = type RSType;
 
   RSPlayerDefinition = type RSType;
 
   RSNPCDefinition = type RSType;
+
+  RSObjectDefinition = type RSType;
 
   RSActor = type RSType;
 
@@ -72,6 +82,10 @@ type
     ID: Int32;
     StackSize: Int32;
     Tile: RSTile;
+  end;
+
+  RSObject = record(RSType)
+    ObjectType: RSObjectType;
   end;
 
   RSItemDefinition = type RSType;

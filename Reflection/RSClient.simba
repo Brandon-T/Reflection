@@ -161,3 +161,8 @@ Function RSClient.AnimationFrameCache: RSCache; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_ANIMATIONFRAMECACHE);
 end;
+
+Function RSClient.Region: RSRegion; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, CLIENT_REGION);
+end;

@@ -1,0 +1,51 @@
+{$include_once RSStructures.simba}
+{$include_once RSAnimationSequence.simba}
+{$include_once RSClient.simba}
+{$include_once RSTile.simba}
+
+Function RSAnimableNode.ID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, ANIMABLENODE_ID);
+end;
+
+Function RSAnimableNode.AnimationSequence: RSAnimationSequence; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, ANIMABLENODE_ANIMATIONSEQUENCE);
+end;
+
+Function RSAnimableNode.Flags: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, ANIMABLENODE_FLAGS);
+end;
+
+Function RSAnimableNode.Orientation: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, ANIMABLENODE_ORIENTATION);
+end;
+
+Function RSAnimableNode.Plane: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, ANIMABLENODE_PLANE);
+end;
+
+Function RSAnimableNode.LocalX: Int32; constref;
+begin
+  Result := (RGetInt(R_EIOS, ref, ANIMABLENODE_X) shl 7) + (1 shl 6);
+end;
+
+Function RSAnimableNode.LocalY: Int32; constref;
+begin
+  Result := (RGetInt(R_EIOS, ref, ANIMABLENODE_Y) shl 7) + (1 shl 6);
+end;
+
+Function RSAnimableNode.LocalTile: RSTile; constref;
+begin
+  Result.X := self.LocalX;
+  Result.Y := self.LocalY;
+end;
+
+Function RSAnimableNode.Tile: RSTile; constref;
+begin
+  Result.X := RSClient.BaseX + RGetInt(R_EIOS, ref, ANIMABLENODE_X);
+  Result.Y := RSClient.BaseY + RGetInt(R_EIOS, ref, ANIMABLENODE_Y);
+end;

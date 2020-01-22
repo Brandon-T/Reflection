@@ -1,0 +1,76 @@
+{$include_once RSStructures.simba}
+
+Function RSSceneTile.BoundaryObject: RSObject; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_BOUNDARYOBJECT);
+  Result.ObjectType := RSObjectType.BOUNDARY_OBJECT;
+end;
+
+Function RSSceneTile.SceneTileObject: RSSceneTile; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_SCENETILEOBJECT);
+end;
+
+Function RSSceneTile.GameObject: RSObject; constref;
+var
+  Objects: Pointer;
+  ObjectsSize: SizeUInt;
+begin
+  ObjectsSize := 0;
+  Objects := RGetArray(R_EIOS, ref, ObjectsSize, SCENETILE_GAMEOBJECT);
+  if (Objects = nil) or (ObjectsSize = 0) then
+    Exit;
+
+  Result.ref := RGetObjectArray(R_EIOS, Objects, 0);
+  Result.ObjectType := RSObjectType.GAME_OBJECT;
+  RFreeObject(R_EIOS, Objects);
+end;
+
+Function RSSceneTile.GameObjects: Array of RSObject; constref;
+var
+  Objects: Pointer;
+  I, ObjectsSize: SizeUInt;
+  GameObjects: Array of Pointer;
+begin
+  ObjectsSize := 0;
+  Objects := RGetArray(R_EIOS, ref, ObjectsSize, SCENETILE_GAMEOBJECT);
+  if Objects = nil then
+    Exit;
+
+  SetLength(Result, ObjectsSize);
+  GameObjects := RGetObjectArray(R_EIOS, Objects, 0, ObjectsSize);
+  RFreeObject(R_EIOS, Objects);
+
+  for I := 0 to ObjectsSize - 1 do
+  begin
+    Result[I].ref := GameObjects[I];
+    Result[I].ObjectType := RSObjectType.GAME_OBJECT;
+  end;
+end;
+
+Function RSSceneTile.WallDecoration: RSObject; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_WALLDECORATION);
+  Result.ObjectType := RSObjectType.WALL_DECORATION;
+end;
+
+Function RSSceneTile.GroundDecoration: RSObject; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_GROUNDDECORATION);
+  Result.ObjectType := RSObjectType.FLOOR_DECORATION;
+end;
+
+Function RSSceneTile.LocalX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, SCENETILE_LOCALX);
+end;
+
+Function RSSceneTile.LocalY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, SCENETILE_LOCALY);
+end;
+
+Function RSSceneTile.Plane: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, SCENETILE_PLANE);
+end;

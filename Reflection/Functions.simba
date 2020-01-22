@@ -24,6 +24,11 @@ begin
   result := RIObjectsEqual(eios, first, second);
 end;
 
+Function RObjectInstanceOf(eios: Pointer; instance: Pointer; cls: String): Boolean;
+begin
+  result := RIObjectIsInstanceOf(eios, instance, cls);
+end;
+
 
 // MARK: - SINGLE ELEMENTS
 

@@ -10,6 +10,7 @@
 {$include_once RSLinkedList.simba}
 {$include_once RSNodeDeque.simba}
 {$include_once RSHashTable.simba}
+{$include_once RSAnimableNode.simba}
 {$include_once RSModel.simba}
 {$include_once RSActor.simba}
 {$include_once RSNameInfo.simba}
@@ -26,8 +27,11 @@
 {$include_once RSAnimationSkeleton.simba}
 {$include_once RSAnimationSequence.simba}
 {$include_once RSAnimatedModel.simba}
+{$include_once RSRegion.simba}
 {$include_once RSTile.simba}
+{$include_once RSObjectDefinition.simba}
 {$include_once RSGroundObject.simba}
+{$include_once RSObject.simba}
 {$include_once RSItemDefinition.simba}
 {$include_once RSItem.simba}
 {$include_once RSWidget.simba}

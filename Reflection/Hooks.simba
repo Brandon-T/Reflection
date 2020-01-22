@@ -108,16 +108,16 @@ Renderable_ModelHeight: THook =                   ['ep', 'ce', 'I', -294742571];
 
 {Region: ej}
 Region_SceneTiles: THook =                        ['ej', 'b', '[[[Ldy;', 1];
-Region_InteractableObjects: THook =               ['ej', 'a', '[Lel;', 1];
+Region_InteractableObjects: THook =               ['ej', 'ak', '[Lel;', 1];
 
 {AnimableNode: cg}
-AnimableNode_ID: THook =                          ['cg', 'f', 'I', 1];
-AnimableNode_Animation: THook =                   ['cg', 'e', 'Liv;', 1];
-AnimableNode_Flags: THook =                       ['cg', 'i', 'I', 1];
-AnimableNode_Orientation: THook =                 ['cg', 'y', 'I', 1];
-AnimableNode_Plane: THook =                       ['cg', 'w', 'I', 1];
-AnimableNode_X: THook =                           ['cg', 'p', 'I', 1];
-AnimableNode_Y: THook =                           ['cg', 'b', 'I', 1];
+AnimableNode_ID: THook =                          ['cg', 'f', 'I', -95317183];
+AnimableNode_AnimationSequence: THook =           ['cg', 'e', 'Liv;', 1];
+AnimableNode_Flags: THook =                       ['cg', 'i', 'I', 1520992013];
+AnimableNode_Orientation: THook =                 ['cg', 'y', 'I', 1128540715];
+AnimableNode_Plane: THook =                       ['cg', 'w', 'I', 1824445575];
+AnimableNode_X: THook =                           ['cg', 'p', 'I', -1187953645];
+AnimableNode_Y: THook =                           ['cg', 'b', 'I', -589129473];
 
 {BoundaryObject: er}
 BoundaryObject_ID: THook =                        ['er', 'x', 'J', 3162324910013074859];
@@ -127,8 +127,8 @@ BoundaryObject_Height: THook =                    ['er', 'p', 'I', 951647449];
 BoundaryObject_LocalX: THook =                    ['er', 'i', 'I', -1718210699];
 BoundaryObject_LocalY: THook =                    ['er', 'y', 'I', -1666415467];
 BoundaryObject_Orientation: THook =               ['er', 'w', 'I', -211420525];
-BoundaryObject_Render: THook =                    ['er', 'b', 'Lep;', 1];
-BoundaryObject_Render2: THook =                   ['er', 'e', 'Lep;', 1];
+BoundaryObject_Renderable: THook =                ['er', 'b', 'Lep;', 1];
+BoundaryObject_Renderable2: THook =               ['er', 'e', 'Lep;', 1];
 
 {WallDecoration: ee}
 WallDecoration_ID: THook =                        ['ee', 'd', 'J', 7500452750327667815];
@@ -149,21 +149,21 @@ FloorDecoration_Flags: THook =                    ['du', 'b', 'I', -1187671267];
 FloorDecoration_LocalX: THook =                   ['du', 'i', 'I', -508707057];
 FloorDecoration_LocalY: THook =                   ['du', 'y', 'I', 1453565009];
 FloorDecoration_Plane: THook =                    ['du', 'f', 'I', -813492053];
-FloorDecoration_Render: THook =                   ['du', 'w', 'Lep;', 1];
+FloorDecoration_Renderable: THook =               ['du', 'w', 'Lep;', 1];
 
 {GameObject: el}
-GameObject_Render: THook =                        ['el', 'p', 'Lep;', 1];
 GameObject_ID: THook =                            ['el', 'v', 'J', -9063285699696577959];
 GameObject_Flags: THook =                         ['el', 'k', 'I', 1504732917];
 GameObject_Orientation: THook =                   ['el', 'b', 'I', -472959783];
 GameObject_Plane: THook =                         ['el', 'f', 'I', -1053912573];
 GameObject_Height: THook =                        ['el', 'i', 'I', 684195751];
-GameObject_WorldX: THook =                        ['el', 'y', 'I', -2140499041];
-GameObject_WorldY: THook =                        ['el', 'w', 'I', 1955373001];
-GameObject_LocalX: THook =                        ['el', 'e', 'I', 1045037505];
-GameObject_LocalY: THook =                        ['el', 'a', 'I', -1317685703];
+GameObject_WorldX: THook =                        ['el', 'e', 'I', 1045037505];
+GameObject_WorldY: THook =                        ['el', 'a', 'I', -1317685703];
+GameObject_LocalX: THook =                        ['el', 'y', 'I', -2140499041];
+GameObject_LocalY: THook =                        ['el', 'w', 'I', 1955373001];
 GameObject_OffsetX: THook =                       ['el', 'x', 'I', 820155369];
 GameObject_OffsetY: THook =                       ['el', 'd', 'I', -1799608733];
+GameObject_Renderable: THook =                    ['el', 'p', 'Lep;', 1];
 
 {SceneTile: dy}
 SceneTile_BoundaryObject: THook =                 ['dy', 'e', 'Ler;', 1];
@@ -295,6 +295,14 @@ Player_Visible: THook =                           ['bn', 'u', 'Z', 1];
 Player_Definition: THook =                        ['bn', 'i', 'Lhh;', 1];
 Player_CombatLevel: THook =                       ['bn', 'e', 'I', 2063784201];
 
+{ObjectDefinition ig}
+ObjectDefinition_ID: THook =                      ['ig', 'a', 'I', 380155021];
+ObjectDefinition_DefinitionCache: THook =         ['ig', 'w', 'Leb;', 1];
+ObjectDefinition_ModelCache: THook =              ['ig', 'b', 'Leb;', 1];
+ObjectDefinition_ModelIDs: THook =                ['ig', 'd', '[I', 1];
+ObjectDefinition_Name: THook =                    ['ig', 'o', 'Ljava/lang/String;', 1];
+
+
 {WidgetNode: bz}
 WidgetNode_ID: THook =                            ['bz', 'f', 'I', 1533834755];
 
@@ -303,6 +311,7 @@ Widget_Name: THook =                              ['ha', 'ec', 'Ljava/lang/Strin
 Widget_Text: THook =                              ['ha', 'cp', 'Ljava/lang/String;', 1];
 Widget_WidgetID: THook =                          ['ha', 'n', 'I', 1299476265];
 Widget_ParentID: THook =                          ['ha', 'az', 'I', -782776051];
+Widget_Parent: THook =                            ['ha', 'dx', 'Lha;', 1];
 Widget_ItemID: THook =                            ['ha', 'ez', 'I', 1299822723];
 Widget_InvIDs: THook =                            ['ha', 'eu', '[I', 1];
 Widget_StackSizes: THook =                        ['ha', 'ea', '[I', 1];
