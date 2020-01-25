@@ -1,0 +1,14 @@
+{$include_once Structures.simba}
+{$include_once RSStructures.simba}
+{$include_once RSCamera.simba}
+{$include_once RSClient.simba}
+{$include_once RSTile.simba}
+
+Procedure TMufasaBitmap.DrawPolygon(constref poly: T2DTriangle; Colour: TColor); overload;
+begin
+  self.LineTo(Point(poly.A.X, poly.A.Y), Point(poly.B.X, poly.B.Y), Colour);
+  self.LineTo(Point(poly.B.X, poly.B.Y), Point(poly.C.X, poly.C.Y), Colour);
+  self.LineTo(Point(poly.C.X, poly.C.Y), Point(poly.A.X, poly.A.Y), Colour);
+end;
+
+

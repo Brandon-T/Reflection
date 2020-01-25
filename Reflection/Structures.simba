@@ -1,10 +1,18 @@
 type
   TVector = record
-    x, y, z: Int32;
+    X, Y, Z: Int32;
   end;
 
   TTriangle = record
-    a, b, c: TVector;
+    A, B, C: TVector;
+  end;
+
+  T2DTriangle = record
+    A, B, C: TPoint;
+  end;
+
+  T2DRectangle = record
+    NW, NE, SW, SE: TPoint;
   end;
 
 

@@ -39,3 +39,5 @@
 {$include_once RSGameShell.simba}
 {$include_once RSVarps.simba}
 {$include_once RSVarbitDefinition.simba}
+{$include_once RSMath.simba}
+{$include_once RSGraphics.simba}

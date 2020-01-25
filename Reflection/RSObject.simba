@@ -7,7 +7,7 @@
 {$include_once RSSceneTile.simba}
 {$include_once RSObjectDefinition.simba}
 
-Function RSObject.GameObject(ObjectType: RSObjectType; X, Y: Int32): RSObject; static;
+Function RSObject.Get(ObjectType: RSObjectType; X, Y: Int32): RSObject; static;
 var
   BaseX, BaseY: Int32;
   Region: RSRegion;

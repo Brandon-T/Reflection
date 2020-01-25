@@ -3,6 +3,7 @@
 {$include_once RSClient.simba}
 {$include_once RSPlayer.simba}
 {$include_once RSCamera.simba}
+{$include_once RSMath.simba}
 
 {Function sar(base: Int32; shift: byte): Int32; override;
 begin
@@ -102,49 +103,14 @@ end;
 {* Converts a Local Tile to MS Point *}
 Function RSTile.TileToMS: TPoint; constref;
 var
-  X, Y, Z: Int32;
-  Calculation: Int32;
-  Pitch, Yaw: Int32;
-  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
-  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+  P: TVector;
 begin
   if ((self.X >= 128) and (self.Y >= 128) and (self.X <= 13056) and (self.Y <= 13056)) then
   begin
-    //Local Coordinates
-    X := self.X;
-    Y := self.Y;
-    Z := self.GetHeight();
-
-    //Translate to Camera
-    X -= RSCamera.X;
-    Y -= RSCamera.Y;
-    Z -= RSCamera.Z;
-
-    //Project to Camera
-    Pitch := RSCamera.Pitch;
-    Yaw := RSCamera.Yaw;
-    ViewPortScale := RSClient.ViewPortScale;
-    ViewPortWidth := RSClient.ViewPortWidth;
-    ViewPortHeight := RSClient.ViewPortHeight;
-
-    SinPitch := SINE[Pitch];
-    CosPitch := COSINE[Pitch];
-    SinYaw := SINE[Yaw];
-    CosYaw := COSINE[Yaw];
-
-    Calculation := Sar(((X * CosYaw) + (Y * SinYaw)), 16);
-    Y := Sar(((Y * CosYaw) - (X * SinYaw)), 16);
-    X := Calculation;
-    Calculation := Sar(((Z * CosPitch) - (Y * SinPitch)), 16);
-    Z := Sar(((Y * CosPitch) + (Z * SinPitch)), 16);
-    Y := Calculation;
-
-    if (Z >= 50) then
-    begin
-      X := (X * viewPortScale div Z) + (ViewPortWidth div 2);
-      Y := (Y * viewPortScale div Z) + (ViewPortHeight div 2);
-      Exit(Point(X, Y)); //X + ViewPortXOffset, Y + ViewPortYOffset
-    end;
+    P.X := self.X;
+    P.Y := self.Y;
+    P.Z := self.GetHeight();
+    Exit(P.WorldToScreen);
   end;
 
   Exit(Point(-1, -1));
@@ -180,50 +146,4 @@ end;
 Function RSTile.GetHeight: Int32; constref; overload;
 begin
   Result := self.GetHeight(RSClient.Plane);
-end;
-
-{* Projects a vector from 3D space to 2D space *}
-Function TVector.ProjectToScreen(localX, localY, localZ, orientation, cameraX, cameraY, cameraZ, sinYaw, cosYaw, sinPitch, cosPitch, viewPortWidth, viewPortHeight, viewPortScale: Int32): TPoint; constref;
-var
-  p: TVector;
-  x, y, z, calculation: Int32;
-begin
-  p := [self.x, self.z, self.y];
-
-  // Rotate based on orientation
-  p := [Sar(((p.x * COSINE[orientation]) + (p.y * SINE[orientation])), 16),
-        Sar(((p.y * COSINE[orientation]) - (p.x * SINE[orientation])), 16),
-        p.z];
-
-  // Translate to local coords
-  p.x += localX;
-  p.y += localY;
-  p.z += localZ;
-
-  // Translate to camera
-  p.x -= cameraX;
-  p.y -= cameraY;
-  p.z -= cameraZ;
-
-  // Project to canvas
-  x := p.x;
-  y := p.y;
-  z := p.z;
-
-  calculation := Sar(((x * cosYaw) + (y * sinYaw)), 16);
-  y := Sar(((y * cosYaw) - (x * sinYaw)), 16);
-  x := calculation;
-  calculation := Sar(((z * cosPitch) - (y * sinPitch)), 16);
-  z := Sar(((y * cosPitch) + (z * sinPitch)), 16);
-  y := calculation;
-
-  if (z >= 50) then
-  begin
-    Result.X := (x * viewPortScale div z) + (viewPortWidth div 2);
-    Result.Y := (y * viewPortScale div z) + (viewPortHeight div 2);
-    Exit;
-  end
-
-  Result.X := -1;
-  Result.Y := -1;
 end;
