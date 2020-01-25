@@ -113,6 +113,7 @@ Region_InteractableObjects: THook =               ['ej', 'ak', '[Lel;', 1];
 {AnimableNode: cg}
 AnimableNode_ID: THook =                          ['cg', 'f', 'I', -95317183];
 AnimableNode_AnimationSequence: THook =           ['cg', 'e', 'Liv;', 1];
+AnimableNode_AnimationFrameID: THook =            ['cg', 'x', 'I', 1848001731];
 AnimableNode_Flags: THook =                       ['cg', 'i', 'I', 1520992013];
 AnimableNode_Orientation: THook =                 ['cg', 'y', 'I', 1128540715];
 AnimableNode_Plane: THook =                       ['cg', 'w', 'I', 1824445575];
@@ -298,10 +299,13 @@ Player_CombatLevel: THook =                       ['bn', 'e', 'I', 2063784201];
 {ObjectDefinition ig}
 ObjectDefinition_ID: THook =                      ['ig', 'a', 'I', 380155021];
 ObjectDefinition_DefinitionCache: THook =         ['ig', 'w', 'Leb;', 1];
-ObjectDefinition_ModelCache: THook =              ['ig', 'b', 'Leb;', 1];
+ObjectDefinition_ModelCache: THook =              ['ig', 'e', 'Leb;', 1];
 ObjectDefinition_ModelIDs: THook =                ['ig', 'd', '[I', 1];
+ObjectDefinition_Models: THook =                  ['ig', 'c', '[I', 1];
 ObjectDefinition_Name: THook =                    ['ig', 'o', 'Ljava/lang/String;', 1];
-
+ObjectDefinition_Transformations: THook =         ['ig', 'ae', '[I', 1];
+ObjectDefinition_TransformVarbit: THook =         ['ig', 'ad', 'I', -1292334105];
+ObjectDefinition_TransformVarp: THook =           ['ig', 'aj', 'I', 1597795119];
 
 {WidgetNode: bz}
 WidgetNode_ID: THook =                            ['bz', 'f', 'I', 1533834755];
@@ -342,6 +346,16 @@ ItemDefinition_Cache: THook =                     ['ii', 'd', 'Leb;', 1];
 {Item: ca}
 Item_ID: THook =                                  ['ca', 'f', 'I', -402020319];
 Item_StackSizes: THook =                          ['ca', 'i', 'I', 260716727];
+
+{Varps: hu}
+Varps_Masks: THook =                              ['hu', 'f', '[I', 1];
+Varps_Main: THook =                               ['hu', 'y', '[I', 1];
+
+{VarbitDefinition: iq}
+VarbitDefinition_Cache: THook =                   ['iq', 'i', 'Leb;', 1];
+VarbitDefinition_BaseVar: THook =                 ['iq', 'y', 'I', -254384539];
+VarbitDefinition_StartBit: THook =                ['iq', 'w', 'I', 1384432493];
+VarbitDefinition_EndBit: THook =                  ['iq', 'p', 'I', 1295947567];
 
 {Client: client}
 Client_Revision: THook =                          ['client', '187', 'I', 1];

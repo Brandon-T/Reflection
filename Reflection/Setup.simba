@@ -25,6 +25,7 @@ begin
     RaiseException(erCustomError, 'Reflection Not Setup - No EIOS Target');
 
   RInitializeConstants;
-  RInitializeTileSettings(R_EIOS);
-  RInitializeTileHeights(R_EIOS);
+  RInitializeTileSettings;
+  RInitializeTileHeights;
+  RInitializeVarpMasks;
 end;

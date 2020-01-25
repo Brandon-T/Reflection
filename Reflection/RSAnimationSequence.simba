@@ -67,6 +67,28 @@ begin
   Exit(Result.Animate(Frames, FrameID));
 end;
 
+Function RSAnimationSequence.TransformObjectModel(constref Model: RSModel; FrameID: Int32): RSAnimatedModel; constref;
+var
+  Frames: RSAnimationFrame;
+begin
+  FrameID := self.Frame(FrameID);
+  Frames := RSAnimationFrame.GetFrame(Sar(FrameID, 16));
+  FrameID := FrameID and 65535;
+
+  Result.ref := Model.ref;
+
+  if Frames.ref = nil then
+  begin
+    Result.vertices := Model.Vertices;
+    {$IFDEF MODEL_TRIANGLES}
+    Result.triangles := Result.TriangleFaces;
+    {$ENDIF}
+    Exit(Result);
+  end;
+
+  Exit(Result.Animate(Frames, FrameID));
+end;
+
 Function RSAnimationSequence.ApplyTransformations(constref Model: RSModel; IdleFrameID: Int32; constref AnimationSequence: RSAnimationSequence; MovementFrameID: Int32): RSAnimatedModel; constref;
 var
   Frames, Frames2: RSAnimationFrame;

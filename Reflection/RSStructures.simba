@@ -45,6 +45,8 @@ type
 
   RSObjectDefinition = type RSType;
 
+  RSEntity = type RSType;
+
   RSActor = type RSType;
 
   RSNPC = type RSActor;
@@ -91,6 +93,12 @@ type
   RSItemDefinition = type RSType;
 
   RSWidget = type RSType;
+
+  RSVarps = type RSType;
+
+  RSVarbitDefinition = type RSType;
+
+  RSGameShell = type RSType;
 
 
 Procedure RSType.Free;

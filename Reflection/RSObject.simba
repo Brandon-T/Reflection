@@ -12,7 +12,6 @@ var
   BaseX, BaseY: Int32;
   Region: RSRegion;
   Tile: RSSceneTile;
-  Objects: Pointer;
 begin
   Region := RSClient.Region;
   if Region.ref = nil then
@@ -85,70 +84,11 @@ begin
 end;
 
 Function RSObject.Definition: RSObjectDefinition; constref;
-var
-  Cache: RSCache;
-  HashTable: RSHashTable;
-  Garbage: RSTypeArray;
 begin
-  Cache := RSObjectDefinition.DefinitionCache;
-  if Cache.ref <> nil then
-  begin
-    HashTable := Cache.HashTable;
-    if HashTable.ref <> nil then
-    begin
-      Result.ref := HashTable.GetObject(self.ID).ref;
-    end;
-  end;
-
-  Garbage := [HashTable, Cache];
-  Garbage.Free;
+  Result := RSObjectDefinition.Definition(self.ID);
 end;
 
-Function RSObject.GetModel(ID: Int64): RSModel; static;
-var
-  Cache: RSCache;
-  HashTable: RSHashTable;
-  Garbage: RSTypeArray;
-begin
-  Cache := RSObjectDefinition.ModelCache;
-  if Cache.ref <> nil then
-  begin
-    HashTable := Cache.HashTable;
-    if HashTable.ref <> nil then
-    begin
-      Result.ref := HashTable.GetObject(ID).ref;
-    end;
-  end;
-
-  Garbage := [HashTable, Cache];
-  Garbage.Free;
-end;
-
-
-Function GetDefinition(ID: Int64): RSObjectDefinition;
-var
-  Cache: RSCache;
-  HashTable: RSHashTable;
-  Garbage: RSTypeArray;
-begin
-  Cache := RSObjectDefinition.DefinitionCache;
-  if Cache.ref <> nil then
-  begin
-    HashTable := Cache.HashTable;
-    if HashTable.ref <> nil then
-    begin
-      Result.ref := HashTable.GetObject(ID).ref;
-    end;
-  end;
-
-  Garbage := [HashTable, Cache];
-  Garbage.Free;
-end;
-
-Function RSObject.Model: RSModel; constref;
-var
-  UID: Int32;
-  Definition: RSObjectDefinition;
+Function RSObject.Renderable: RSEntity; constref;
 begin
   case self.ObjectType of
     GAME_OBJECT:
@@ -176,41 +116,126 @@ begin
         Result.ref := RGetObject(R_EIOS, ref, FLOORDECORATION_RENDERABLE);
       end;
   end;
+end;
+
+Function RSObject.Model: RSModel; constref;
+var
+  UID: Int64;
+  Entity: RSEntity;
+  Definition: RSObjectDefinition;
+  Garbage: RSTypeArray;
+begin
+  Entity := self.Renderable;
 
   //If it's a RSModel, return it..
-  if RObjectInstanceOf(R_EIOS, Result.ref, MODEL_FITSSINGLETILE.cls) then
+  if RObjectInstanceOf(R_EIOS, Entity.ref, MODEL_FITSSINGLETILE.cls) then
   begin
+    Result.ref := Entity.ref;
     Exit;
   end;
 
   //If it's a RSAnimableNode, return the model from cache..
-  if RObjectInstanceOf(R_EIOS, Result.ref, ANIMABLENODE_ID.cls) then
+  if RObjectInstanceOf(R_EIOS, Entity.ref, ANIMABLENODE_ID.cls) then
   begin
     Definition := self.Definition;
     if Definition.ref <> nil then
     begin
-      UID := (Definition.ID shl 10) + RSAnimableNode(Result.ref).Orientation;
-
-      writeln(RSAnimableNode(Result.ref).Orientation);
-
-      //UID := (10583 shl 10) + RSAnimableNode(Result.ref).Orientation;
-      //UID := (7182 shl 10) + RSAnimableNode(Result.ref).Orientation;
-
-      if Length(Definition.ModelIDs) > 0 then
+      if Definition.HasTransformations then
       begin
-        UID += RSAnimableNode(Result.ref).Flags shl 3;
+        Garbage += Definition;
+        Definition := Definition.Transform;
+        Garbage += Definition;
       end;
 
-      writeln(self.Hash);
-      Result := RSObject.GetModel(UID);  //10836995 = Bank, 7354371 = Chair
+      if Definition.ref = nil then
+      begin
+        Garbage += Entity;
+        Garbage.Free;
+        Exit;
+      end;
 
-      Definition.Free;
+      if Not Definition.HasModels then
+      begin
+        UID := RSAnimableNode(Entity.ref).Orientation + (Definition.ID shl 10);
+      end else
+        begin
+          UID := RSAnimableNode(Entity.ref).Orientation + (RSAnimableNode(Result.ref).Flags shl 3) + (Definition.ID shl 10);
+        end;
+
+      Garbage += Entity;
+      Result := RSObjectDefinition.Model(UID);
+      Garbage.Free;
       Exit;
     end;
+  end;
 
-    Result.ref := nil;
+  RFreeObject(R_EIOS, Entity.ref);
+end;
+
+Function RSObject.AnimatedModel: RSAnimatedModel; constref;
+var
+  UID: Int64;
+  Entity: RSEntity;
+  Definition: RSObjectDefinition;
+  AnimationSequence: RSAnimationSequence;
+  Garbage: RSTypeArray;
+begin
+  Entity := self.Renderable;
+
+  //If it's a RSModel, return it..
+  if RObjectInstanceOf(R_EIOS, Entity.ref, MODEL_FITSSINGLETILE.cls) then
+  begin
+    Result.ref := Entity.ref;
     Exit;
   end;
 
-  Result.ref := nil;
+  //If it's a RSAnimableNode, return the model from cache..
+  if RObjectInstanceOf(R_EIOS, Entity.ref, ANIMABLENODE_ID.cls) then
+  begin
+    Definition := self.Definition;
+    if Definition.ref <> nil then
+    begin
+      if Definition.HasTransformations then
+      begin
+        Garbage += Definition;
+        Definition := Definition.Transform;
+        Garbage += Definition;
+      end;
+
+      if Definition.ref = nil then
+      begin
+        Garbage += Entity;
+        Garbage.Free;
+        Exit;
+      end;
+
+      if Not Definition.HasModels then
+      begin
+        UID := RSAnimableNode(Entity.ref).Orientation + (Definition.ID shl 10);
+      end else
+        begin
+          UID := RSAnimableNode(Entity.ref).Orientation + (RSAnimableNode(Entity.ref).Flags shl 3) + (Definition.ID shl 10);
+        end;
+
+      Garbage += Entity;
+      Result.ref := RSObjectDefinition.Model(UID).ref;
+
+      if Result.ref <> nil then
+      begin
+        AnimationSequence := RSAnimableNode(Entity.ref);
+        if AnimationSequence.ref <> nil then
+        begin
+          Garbage += [RSType(Result.ref), AnimationSequence];
+          Result := AnimationSequence.TransformObjectModel(RSModel(Result.ref), RSAnimableNode(Entity.ref).AnimationFrameID);
+          Garbage.Free;
+          Exit;
+        end;
+      end;
+
+      Garbage.Free;
+      Exit;
+    end;
+  end;
+
+  RFreeObject(R_EIOS, Entity.ref);
 end;

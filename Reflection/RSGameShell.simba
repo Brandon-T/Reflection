@@ -1,0 +1,18 @@
+{$include_once RSStructures.simba}
+{$include_once RSVarps.simba}
+{$include_once RSVarbitDefinition.simba}
+
+Function RSGameShell.GetVarBit(ID: Int32): Int32; static;
+var
+  Definition: RSVarbitDefinition;
+  BaseVar, StartBit, EndBit, Mask: Int32;
+begin
+  Definition := RSVarbitDefinition.Definition(ID);
+  BaseVar = Definition.BaseVar;
+  StartBit = Definition.StartBit;
+  EndBit = Definition.EndBit;
+  Definition.Free;
+
+  Mask = RSVarps.VarpMask(EndBit - StartBit);
+  Result := Sar(RSVarps.VarpMain(BaseVar), StartBit) and Mask;
+end;

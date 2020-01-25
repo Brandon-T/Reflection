@@ -13,6 +13,7 @@ var
 
   CACHED_TILE_SETTINGS: array of array of array of UInt8;
   CACHED_TILE_HEIGHTS: array of array of array of Int32;
+  CACHED_VARP_MASKS: array[0..32] of Int32;
 
 Procedure RInitializeConstants;
 var
@@ -25,59 +26,88 @@ begin
   end;
 end;
 
-Procedure RInitializeTileSettings(eios: Pointer);
+Procedure RInitializeTileSettings;
 var
   Settings: Pointer;
   I, J, SettingsSize: SizeUInt;
   SX, SY: Array of Pointer;
 begin
   SettingsSize := 0;
-  Settings := RGetArray(eios, nil, SettingsSize, CLIENT_TILESETTINGS);
-  SX := RGetObjectArray(eios, Settings, 0, SettingsSize);
-  RFreeObject(eios, Settings);
+  Settings := RGetArray(R_EIOS, nil, SettingsSize, CLIENT_TILESETTINGS);
+  SX := RGetObjectArray(R_EIOS, Settings, 0, SettingsSize);
+  RFreeObject(R_EIOS, Settings);
 
   SetLength(CACHED_TILE_SETTINGS, SettingsSize);
 
   for I := 0 to SettingsSize - 1 do
   begin
-    SY := RGetObjectArray(eios, SX[I], 0, RGetArraySize(eios, SX[I]));
+    SY := RGetObjectArray(R_EIOS, SX[I], 0, RGetArraySize(R_EIOS, SX[I]));
     SetLength(CACHED_TILE_SETTINGS[I], Length(SY));
 
     for J := 0 to High(SY) do
     begin
-      CACHED_TILE_SETTINGS[I][J] := RGetByteArray(eios, SY[J], 0, RGetArraySize(eios, SY[J]));
+      CACHED_TILE_SETTINGS[I][J] := RGetByteArray(R_EIOS, SY[J], 0, RGetArraySize(R_EIOS, SY[J]));
     end;
 
-    RFreeObjects(eios, SY);
+    RFreeObjects(R_EIOS, SY);
   end;
-  RFreeObjects(eios, SX);
+  RFreeObjects(R_EIOS, SX);
 end;
 
-Procedure RInitializeTileHeights(eios: Pointer);
+Procedure RInitializeTileHeights;
 var
   Heights: Pointer;
   I, J, HeightsSize: SizeUInt;
   SX, SY: Array of Pointer;
 begin
   HeightsSize := 0;
-  Heights := RGetArray(eios, nil, HeightsSize, CLIENT_TILEHEIGHTS);
-  SX := RGetObjectArray(eios, Heights, 0, HeightsSize);
-  RFreeObject(eios, Heights);
+  Heights := RGetArray(R_EIOS, nil, HeightsSize, CLIENT_TILEHEIGHTS);
+  SX := RGetObjectArray(R_EIOS, Heights, 0, HeightsSize);
+  RFreeObject(R_EIOS, Heights);
 
   SetLength(CACHED_TILE_HEIGHTS, HeightsSize);
 
   for I := 0 to HeightsSize - 1 do
   begin
-    SY := RGetObjectArray(eios, SX[I], 0, RGetArraySize(eios, SX[I]));
+    SY := RGetObjectArray(R_EIOS, SX[I], 0, RGetArraySize(R_EIOS, SX[I]));
     SetLength(CACHED_TILE_HEIGHTS[I], Length(SY));
 
     for J := 0 to High(SY) do
     begin
-      CACHED_TILE_HEIGHTS[I][J] := RGetIntArray(eios, SY[J], 0, RGetArraySize(eios, SY[J]));
+      CACHED_TILE_HEIGHTS[I][J] := RGetIntArray(R_EIOS, SY[J], 0, RGetArraySize(R_EIOS, SY[J]));
     end;
 
-    RFreeObjects(eios, SY);
+    RFreeObjects(R_EIOS, SY);
   end;
 
-  RFreeObjects(eios, SX);
+  RFreeObjects(R_EIOS, SX);
 end;
+
+{$IFDEF DYNAMIC_VARPS}
+Procedure RInitializeVarpMasks;
+var
+  Masks: Pointer;
+  MasksSize: SizeUInt;
+begin
+  MasksSize := 0;
+  Masks := RGetArray(R_EIOS, nil, VARP_MASKS);
+  if Masks = nil then
+    Exit;
+
+  CACHED_VARP_MASKS := RGetIntArray(R_EIOS, Masks, 0, MasksSize);
+  RFreeObject(R_EIOS, Masks);
+end;
+{$ELSE}
+Procedure RInitializeVarpMasks;
+var
+  I, Mask: Int32;
+begin
+  Mask := 2;
+
+  for I := 0 to high(CACHED_VARP_MASKS) do
+  begin
+    CACHED_VARP_MASKS[I] := Mask - 1;
+    Mask += Mask;
+  end;
+end;
+{$ENDIF}

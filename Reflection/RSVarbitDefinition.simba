@@ -1,0 +1,43 @@
+{$include_once RSStructures.simba}
+{$include_once RSCache.simba}
+{$include_once RSHashTable.simba}
+
+Function RSVarbitDefinition.BaseVar: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, VARBITDEFINITION_BASEVAR);
+end;
+
+Function RSVarbitDefinition.StartBit: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, VARBITDEFINITION_STARTBIT);
+end;
+
+Function RSVarbitDefinition.EndBit: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, VARBITDEFINITION_ENDBIT);
+end;
+
+Function RSVarbitDefinition.DefinitionCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, VARBITDEFINITION_CACHE);
+end;
+
+Function RSVarbitDefinition.Definition(ID: Int64): RSVarbitDefinition; static;
+var
+  Cache: RSCache;
+  HashTable: RSHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSVarbitDefinition.DefinitionCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;

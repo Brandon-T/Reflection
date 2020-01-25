@@ -1,0 +1,28 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$DEFINE USE_CACHED_VARPS}
+
+{$IFDEF USE_CACHED_VARPS}
+Function RSVarps.VarpMask(Index: Int32): Int32; constref;
+begin
+  Result := CACHED_VARP_MASKS[Index];
+end;
+{$ELSE}
+Function RSVarps.VarpMask(Index: Int32): Int32; constref;
+var
+  Masks: Pointer;
+begin
+  Masks := RGetArray(R_EIOS, nil, VARPS_MASKS);
+  Result := RGetIntArray(R_EIOS, Masks, Index);
+  RFreeObject(R_EIOS, Masks);
+end;
+{$ENDIF}
+
+Function RSVarps.VarpMain(Index: Int32): Int32; constref;
+var
+  Masks: Pointer;
+begin
+  Masks := RGetArray(R_EIOS, nil, VARPS_MAIN);
+  Result := RGetIntArray(R_EIOS, Masks, Index);
+  RFreeObject(R_EIOS, Masks);
+end;
