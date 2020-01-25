@@ -1,5 +1,9 @@
 {$include_once RSStructures.simba}
 {$include_once Static.simba}
+{$include_once RSCache.simba}
+{$include_once RSHashTable.simba}
+{$include_once RSModel.simba}
+{$include_once RSAnimationSequence.simba}
 
 Function RSNPCDefinition.ID: Int32; constref;
 begin
