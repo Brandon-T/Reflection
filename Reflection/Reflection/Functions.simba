@@ -95,6 +95,11 @@ begin
   result := RIGetArraySize(eios, instance);
 end;
 
+Function RGetArraySize(eios: Pointer; instance: Pointer; index: SizeUInt): SizeUInt; overload;
+begin
+  result := RIGetArraySize(eios, instance, index);
+end;
+
 
 // MARK: - Array of 1-Dimension
 

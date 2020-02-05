@@ -4,7 +4,7 @@
 
 Function RSVarbitDefinition.BaseVar: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, VARBITDEFINITION_BASEVAR);
+  Result := RGetInt(R_EIOS, ref, VARBITDEFINITION_BASE);
 end;
 
 Function RSVarbitDefinition.StartBit: Int32; constref;

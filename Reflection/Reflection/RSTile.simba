@@ -10,12 +10,11 @@ begin
   result := base div (1 shl shift);
 end;}
 
-Function sal(base: Int32; shift: byte): Int32;
-begin
-  result := base * (1 shl shift);
-end;
-
 Function RSTile.ToLocal: RSTile; constref;
+  Function sal(base: Int32; shift: byte): Int32;
+  begin
+    result := base * (1 shl shift);
+  end;
 begin
   Result.X := Sal(self.X - RSClient.BaseX, 7) + Sal(1, 6);
   Result.Y := Sal(self.Y - RSClient.BaseY, 7) + Sal(1, 6);
@@ -32,7 +31,7 @@ Function RSTile.TileToMM: TPoint; constref;
 const
   MaxDrawDistance = 6400;
 var
-  X, Y: Int32;
+  X, Y, W, H: Int32;
   LocalX, LocalY: Int32;
   SinA, CosA, Angle: Int32;
   Player: RSPlayer;
@@ -53,11 +52,21 @@ begin
   begin
     SinA := SINE[Angle];
     CosA := COSINE[Angle];
-    Result.X := Sar((X * CosA) + (Y * SinA), 16) + 642; //642 = (mm_location.x + mm_width / 2)
-    Result.Y := Sar((X * SinA) - (Y * CosA), 16) + 84;  //84 = (mm_location.y + mm_height / 2)
-    //In resizeable:
-    //Result.X += 91;
-    //Result.Y += 0;
+    Result.X := Sar((X * CosA) + (Y * SinA), 16);  // + (mm_location.x + mm_width / 2)
+    Result.Y := Sar((X * SinA) - (Y * CosA), 16);  // + (mm_location.y + mm_height / 2)
+
+    if RSClient.IsResizeable then
+    begin
+      GetClientDimensions(W, H);
+      Result.X += (W - 82);   //MM.Center.X = 82 from the right.
+      Result.Y += 84;         //MM.Center.Y = 84 from the top.
+    end else
+      begin
+        GetClientDimensions(W, H);
+        Result.X += (W - 122);
+        Result.Y += 84;
+      end;
+
     Exit(Result);
   end;
 

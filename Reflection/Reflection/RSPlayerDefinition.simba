@@ -5,7 +5,7 @@
 
 Function RSPlayerDefinition.ID: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, PLAYERDEFINITION_ID);
+  Result := RGetInt(R_EIOS, ref, PLAYERDEFINITION_NPCTRANSFORMID);
 end;
 
 Function RSPlayerDefinition.IsFemale: Boolean; constref;

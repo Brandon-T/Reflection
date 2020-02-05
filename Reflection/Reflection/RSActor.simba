@@ -68,7 +68,7 @@ end;
 
 Function RSActor.IsIdle: Boolean; constref;
 begin
-  Result := RGetBool(R_EIOS, ref, ACTOR_ISANIMATING);
+  Result := not self.isAnimating;
 end;
 
 Function RSActor.InteractingIndex: Int32; constref;

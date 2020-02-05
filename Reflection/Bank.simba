@@ -1,0 +1,102 @@
+{$include_once Reflection/Reflection.simba}
+{$include_once Constants.simba}
+
+const
+  R_BANK_ITEM_SLOT_INDEX = 11;
+
+type
+  TRSBankItem = record
+    ID: Int32;
+    Amount: Int32;
+    Slot: Int32;
+    Name: String;
+    Bounds: TBox;
+  end;
+
+Function R_BankScreen: Boolean;
+begin
+  Result := RSWidget.IsValid(R_INTERFACE_BANK);
+end;
+
+Function R_PinScreen: Boolean;
+begin
+  Result := RSWidget.IsValid(R_INTERFACE_PINSCREEN);
+end;
+
+Function R_DepositBox: Boolean;
+begin
+  Result := RSWidget.IsValid(R_INTERFACE_DEPOSITBOX);
+end;
+
+Function R_GetAllBankItems: Array of TRSBankItem;
+var
+  I, J, ItemID: Int32;
+  BankItemContainer: RSWidget;
+  ItemSlots: Array of RSWidget;
+begin
+  if not R_BankScreen then
+    Exit;
+
+  BankItemContainer := RSWidget.Get(R_BANK_ITEM_CONTAINER.Group, R_BANK_ITEM_CONTAINER.Child);
+  if BankItemContainer.ref = nil then
+    Exit;
+
+  J := 0;
+  ItemSlots := BankItemContainer.Children;
+  SetLength(Result, Length(ItemSlots));
+  for I := 0 to high(ItemSlots) do
+  begin
+    if ItemSlots[I].ChildID = R_BANK_ITEM_SLOT_INDEX then
+    begin
+      ItemID := ItemSlots[I].ItemID;
+      if ItemID <> -1 then
+      begin
+        Result[J].ID := ItemID;
+        Result[J].Amount := ItemSlots[I].ItemAmount;
+        Result[J].Slot := I;
+        Result[J].Name := ItemSlots[I].Name;
+        Result[J].Bounds := ItemSlots[I].Bounds;
+        Inc(J);
+      end;
+    end;
+  end;
+
+  SetLength(Result, J);
+  RSTypeArray(ItemSlots).Free;
+  BankItemContainer.Free;
+end;
+
+Function R_FindBankItem(ID: Int32): TRSBankItem;
+var
+  I, ItemID: Int32;
+  BankItemContainer: RSWidget;
+  ItemSlots: Array of RSWidget;
+begin
+  if not R_BankScreen then
+    Exit;
+
+  BankItemContainer := RSWidget.Get(R_BANK_ITEM_CONTAINER.Group, R_BANK_ITEM_CONTAINER.Child);
+  if BankItemContainer.ref = nil then
+    Exit;
+
+  Result.ID := -1;
+  ItemSlots := BankItemContainer.Children;
+  for I := 0 to high(ItemSlots) do
+  begin
+    if ItemSlots[I].ChildID = R_BANK_ITEM_SLOT_INDEX then
+    begin
+      ItemID := ItemSlots[I].ItemID;
+      if ItemID = ID then
+      begin
+        Result.ID := ItemID;
+        Result.Amount := ItemSlots[I].ItemAmount;
+        Result.Slot := I;
+        Result.Name := ItemSlots[I].Name;
+        Result.Bounds := ItemSlots[I].Bounds;
+      end;
+    end;
+  end;
+
+  RSTypeArray(ItemSlots).Free;
+  BankItemContainer.Free;
+end;

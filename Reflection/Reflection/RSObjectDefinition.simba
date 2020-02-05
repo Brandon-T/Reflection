@@ -128,12 +128,12 @@ end;
 
 Function RSObjectDefinition.TransformVarbit: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMVARBIT);
+  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMATIONVARBIT);
 end;
 
 Function RSObjectDefinition.TransformVarp: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMVARP);
+  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMATIONVARP);
 end;
 
 Function RSObjectDefinition.Transform: RSObjectDefinition; constref;

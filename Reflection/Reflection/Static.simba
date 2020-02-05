@@ -1,5 +1,5 @@
-{$include_once Reflection/Functions.simba}
-{$include_once Reflection/Hooks.simba}
+{$include_once Functions.simba}
+{$include_once Hooks.simba}
 
 const
   SINGLEUNIT: Double = PI / 1024.0;

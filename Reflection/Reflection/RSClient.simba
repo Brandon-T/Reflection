@@ -166,3 +166,11 @@ Function RSClient.Region: RSRegion; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_REGION);
 end;
+
+Function RSClient.IsResizeable: Boolean; static;
+var
+  W, H: Int32;
+begin
+  GetClientDimensions(W, H);
+  Result := (W <> 765) or (H <> 503);
+end;

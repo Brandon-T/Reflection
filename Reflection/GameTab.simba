@@ -1,0 +1,146 @@
+{$include_once Reflection/Reflection.simba}
+{$include_once Constants.simba}
+
+const
+  GAMETAB_COMBAT             = 0;
+  GAMETAB_STATS              = 1;
+  GAMETAB_QUEST              = 2;
+  GAMETAB_INVENTORY          = 3;
+  GAMETAB_EQUIPMENT          = 4;
+  GAMETAB_PRAYER             = 5;
+  GAMETAB_MAGIC              = 6;
+  GAMETAB_CLAN               = 7;
+  GAMETAB_IGNORES            = 8;
+  GAMETAB_ACCOUNT_MANAGEMENT = 8;
+  GAMETAB_FRIENDS            = 9;
+  GAMETAB_LOGOUT             = 10;
+  GAMETAB_SETTINGS           = 11;
+  GAMETAB_EMOTES             = 12;
+  GAMETAB_MUSIC              = 13;
+
+  MM_LEVEL_HITPOINTS         = 0;
+  MM_LEVEL_PRAYER            = 1;
+  MM_LEVEL_RUN               = 2;
+  MM_LEVEL_COMBAT_SPECIAL    = 3;
+
+
+Function R_GameTabIDs: Array of RWidget;
+begin
+  if not RSClient.IsResizeable then
+  begin
+    Result := [
+      R_GAMETAB_FIXED_COMBAT,
+      R_GAMETAB_FIXED_STATS,
+      R_GAMETAB_FIXED_QUEST,
+      R_GAMETAB_FIXED_INVENTORY,
+      R_GAMETAB_FIXED_EQUIPMENT,
+      R_GAMETAB_FIXED_PRAYER,
+      R_GAMETAB_FIXED_MAGIC,
+
+      R_GAMETAB_FIXED_CLAN,
+      R_GAMETAB_FIXED_IGNORES,
+      R_GAMETAB_FIXED_FRIENDS,
+      R_GAMETAB_FIXED_LOGOUT,
+      R_GAMETAB_FIXED_SETTINGS,
+      R_GAMETAB_FIXED_EMOTES,
+      R_GAMETAB_FIXED_MUSIC
+    ];
+    Exit;
+  end;
+
+  Result := [
+    R_GAMETAB_RESIZEABLE_COMBAT,
+    R_GAMETAB_RESIZEABLE_STATS,
+    R_GAMETAB_RESIZEABLE_QUEST,
+    R_GAMETAB_RESIZEABLE_INVENTORY,
+    R_GAMETAB_RESIZEABLE_EQUIPMENT,
+    R_GAMETAB_RESIZEABLE_PRAYER,
+    R_GAMETAB_RESIZEABLE_MAGIC,
+
+    R_GAMETAB_RESIZEABLE_CLAN,
+    R_GAMETAB_RESIZEABLE_ACCOUNT_MANAGEMENT,
+    R_GAMETAB_RESIZEABLE_FRIENDS,
+    R_GAMETAB_RESIZEABLE_LOGOUT,
+    R_GAMETAB_RESIZEABLE_SETTINGS,
+    R_GAMETAB_RESIZEABLE_EMOTES,
+    R_GAMETAB_RESIZEABLE_MUSIC
+  ];
+end;
+
+Function R_IsGameTabOpen(Tab: Int32): Boolean;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  Result := False;
+  ID := R_GameTabIDs[Tab];
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  if Widget.ref <> nil then
+  begin
+    Result := Widget.TextureID <> -1;
+    Widget.Free;
+  end;
+end;
+
+Function R_GameTabBounds(Tab: Int32): TBox;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  Result := [-1, -1, -1, -1];
+  ID := R_GameTabIDs[Tab];
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  if Widget.ref <> nil then
+  begin
+    Result := Widget.Bounds;
+    Widget.Free;
+  end;
+end;
+
+Function R_CurrentGameTab: Int32;
+var
+  I: Int32;
+  IDs: Array of RWidget;
+  Widget: RSWidget;
+  Garbage: RSTypeArray;
+begin
+  Result := -1;
+  IDs := R_GameTabIDs;
+
+  for I := 0 to High(IDs) do
+  begin
+    Widget := RSWidget.Get(IDs[I].Group, IDs[I].Child);
+    if Widget.ref <> nil then
+    begin
+      Garbage += Widget;
+      if Widget.TextureID <> -1 then
+      begin
+        Garbage.Free;
+        Exit(I);
+      end;
+    end;
+  end;
+
+  Garbage.Free;
+end;
+
+Function R_GetMMLevels(Level: Int32): Int32;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  Result := -1;
+
+  case Level of
+    MM_LEVEL_HITPOINTS: ID := R_INTERFACE_MINIMAP_ORB_HEALTH_LABEL;
+    MM_LEVEL_PRAYER: ID := R_INTERFACE_MINIMAP_ORB_PRAYER_LABEL;
+    MM_LEVEL_RUN: ID := R_INTERFACE_MINIMAP_ORB_RUN_LABEL;
+    MM_LEVEL_COMBAT_SPECIAL: ID := R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL_LABEL;
+  end;
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  Result := StrToInt(Widget.Text);
+  Widget.Free;
+end;
