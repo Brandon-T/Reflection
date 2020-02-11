@@ -2,7 +2,6 @@
 {$include_once RSStructures.simba}
 {$include_once RSModel.simba}
 {$include_once RSAnimatedModel.simba}
-{$include_once RSHashTable.simba}
 {$include_once RSCache.simba}
 {$include_once RSAnimationFrame.simba}
 

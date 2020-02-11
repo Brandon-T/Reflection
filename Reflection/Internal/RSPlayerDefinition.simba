@@ -46,7 +46,7 @@ Function RSPlayerDefinition.CachedModel: RSModel; constref;
 var
   ModelID: Int64;
   Cache: RSCache;
-  HashTable: RSHashTable;
+  HashTable: RSIterableHashTable;
   Garbage: RSTypeArray;
 begin
   if self.ref <> nil then

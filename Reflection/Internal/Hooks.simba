@@ -34,12 +34,19 @@ Cacheable_Prev: THook =                           ['fa', 'cw', 'Lfa;', 1];
 LinkedList_Head: THook =                          ['jj', 'c', 'Lft;', 1];
 LinkedList_Current: THook =                       ['jj', 't', 'Lft;', 1];
 
-{HashTable: lp}
-HashTable_Head: THook =                           ['lp', 'o', 'Lft;', 1];
-HashTable_Tail: THook =                           ['lp', 'e', 'Lft;', 1];
-HashTable_Buckets: THook =                        ['lp', 't', '[Lft;', 1];
-HashTable_Index: THook =                          ['lp', 'i', 'I', 1];
-HashTable_Size: THook =                           ['lp', 'c', 'I', 1];
+{HashTable: ln}
+HashTable_Head: THook =                           ['ln', 'o', 'Lft;', 1];
+HashTable_Tail: THook =                           ['ln', 'e', 'Lft;', 1];
+HashTable_Buckets: THook =                        ['ln', 't', '[Lft;', 1];
+HashTable_Index: THook =                          ['ln', 'i', 'I', 1];
+HashTable_Size: THook =                           ['ln', 'c', 'I', 1];
+
+{IterableHashTable: lp}
+IterableHashTable_Head: THook =                   ['lp', 'o', 'Lft;', 1];
+IterableHashTable_Tail: THook =                   ['lp', 'e', 'Lft;', 1];
+IterableHashTable_Buckets: THook =                ['lp', 't', '[Lft;', 1];
+IterableHashTable_Index: THook =                  ['lp', 'i', 'I', 1];
+IterableHashTable_Size: THook =                   ['lp', 'c', 'I', 1];
 
 {Queue: jb}
 Queue_Head: THook =                               ['jb', 'c', 'Lfa;', 1];
@@ -338,6 +345,11 @@ Widget_Children: THook =                          ['hn', 'ed', '[Lhn;', 1];
 Widget_BoundsIndex: THook =                       ['hn', 'fb', 'I', 604114463];
 Widget_WidgetCycle: THook =                       ['hn', 'fz', 'I', -1831666503];
 
+{ItemNode: bl}
+ItemNode_ItemIDs: THook =                         ['bl', 't', '[I', 1];
+ItemNode_ItemQuantities: THook =                  ['bl', 'o', '[I', 1];
+ItemNode_Cache: THook =                           ['bl', 'c', 'Lln;', 1];
+
 {ItemDefinition: if}
 ItemDefinition_ID: THook =                        ['if', 'n', 'I', -536446943];
 ItemDefinition_Name: THook =                      ['if', 'w', 'Ljava/lang/String;', 1];
@@ -392,6 +404,7 @@ Client_Sine: THook =                              ['ey', 'u', '[I', 1];
 Client_Cosine: THook =                            ['ey', 'ae', '[I', 1];
 Client_TileHeights: THook =                       ['bk', 'c', '[[[I', 1];
 Client_TileSettings: THook =                      ['bk', 't', '[[[B', 1];
+Client_ItemNodeCache: THook =                     ['bl', 'c', 'Lln;', 1];
 Client_Widgets: THook =                           ['az', 'd', '[[Lhn;', 1];
 Client_GameSettings: THook =                      ['hb', 'o', '[I', 1];
 Client_WidgetNodeCache: THook =                   ['client', 'mx', 'Lln;', 1];

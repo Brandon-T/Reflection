@@ -1,53 +1,84 @@
 {$include_once RSStructures.simba}
-{$include_once Static.simba}
 {$include_once RSClient.simba}
-{$include_once RSNPCDefinition.simba}
+{$include_once RSNameInfo.simba}
 {$include_once RSActor.simba}
+{$include_once RSPlayerDefinition.simba}
+{$include_once RSIterableHashTable.simba}
+{$include_once RSAnimation.simba}
 
-Function RSNPC.Definition: RSNPCDefinition; constref;
+
+Function RSPlayer.Me: RSLocalPlayer; static;
 begin
-  Result.ref := RGetObject(R_EIOS, ref, NPC_DEFINITION);
+  Result.ref := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYER);
 end;
 
-Function RSNPC.AllNPCs: Array of RSNPC; static;
+Function RSPlayer.AllPlayers: Array of RSPlayer; static;
 var
-  NPCs: Pointer;
-  NPCsArray: Array of Pointer;
+  Players: Pointer;
+  PlayersArray: Array of Pointer;
   Indices: Array of Int32;
-  I, NPCsSize: SizeUInt;
+  I, PlayersSize: SizeUInt;
 begin
-  Indices := RSClient.NPCIndices;
+  Indices := RSClient.PlayerIndices;
   if Length(Indices) < 1 then
     Exit;
 
-  NPCsSize := 0;
-  NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCS);
-  if NPCs = nil then
+  PlayersSize := 0;
+  Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  if Players = nil then
     Exit;
 
-  NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
-  RFreeObject(R_EIOS, NPCs);
+  PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
+  RFreeObject(R_EIOS, Players);
 
   SetLength(Result, Length(Indices));
 
   for I := 0 to High(Indices) do
   begin
-    Result[I].ref := NPCsArray[Indices[I]];
+    Result[I].ref := PlayersArray[Indices[I]];
   end;
 end;
 
-Function RSNPC.Model: RSModel; constref;
+Function RSPlayer.Name: String; constref;
 var
-  Definition: RSNPCDefinition;
+  NameInfo: RSNameInfo;
+begin
+  NameInfo.ref := RGetObject(R_EIOS, ref, PLAYER_NAME);
+  if NameInfo.ref = nil then
+    Exit;
+
+  Result := NameInfo.Name;
+  NameInfo.Free;
+end;
+
+Function RSPlayer.IsVisible: Boolean; constref;
+begin
+  Result := RGetBool(R_EIOS, ref, PLAYER_VISIBLE);
+end;
+
+Function RSPlayer.Definition: RSPlayerDefinition; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, PLAYER_DEFINITION);
+end;
+
+Function RSPlayer.CombatLevel: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
+end;
+
+Function RSPlayer.Model: RSModel; constref;
+var
+  Definition: RSPlayerDefinition;
 begin
   Definition := self.Definition;
   if Definition.ref = nil then
     Exit;
+
   Result := Definition.CachedModel;
   Definition.Free;
 end;
 
-Function RSNPC.AnimatedModel: RSAnimatedModel; constref;
+Function RSPlayer.AnimatedModel: RSAnimatedModel; constref;
 var
   AnimationId, AnimationDelay: Int32;
   AnimationFrame, MovementId: Int32;
@@ -57,7 +88,7 @@ var
   MovementSequence: RSAnimationSequence;
 
   AnimationCache: RSCache;
-  HashTable: RSHashTable;
+  HashTable: RSIterableHashTable;
   Garbage: RSTypeArray;
 begin
   Model := self.Model;
@@ -101,7 +132,7 @@ begin
     end;
 
     Garbage.Free;
-    Exit(RSNPCDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
+    Exit(RSPlayerDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
   end
 
   Result.ref := Model.ref;

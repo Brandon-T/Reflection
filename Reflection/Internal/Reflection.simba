@@ -10,6 +10,7 @@
 {$include_once RSLinkedList.simba}
 {$include_once RSNodeDeque.simba}
 {$include_once RSHashTable.simba}
+{$include_once RSIterableHashTable.simba}
 {$include_once RSAnimableNode.simba}
 {$include_once RSModel.simba}
 {$include_once RSEntity.simba}
@@ -35,6 +36,7 @@
 {$include_once RSObject.simba}
 {$include_once RSItemDefinition.simba}
 {$include_once RSItem.simba}
+{$include_once RSItemNode.simba}
 {$include_once RSWidgetNode.simba}
 {$include_once RSWidget.simba}
 {$include_once RSGameShell.simba}

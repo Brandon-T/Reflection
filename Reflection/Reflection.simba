@@ -4,6 +4,6 @@
 {$include_once Equipment.simba}
 {$include_once GameTab.simba}
 
-///begin
-//  RSetup;
-//end.
+begin
+  RSetup;
+end.

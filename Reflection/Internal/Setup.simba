@@ -12,7 +12,11 @@ begin
     PID := EIOS_GetClientPID(I);
     if PID <> -1 then
     begin
+      {$IFDEF WINDOWS}
+      SetEIOSTarget('RemoteInput', IntToStr(PID));
+      {$ELSE}
       SetEIOSTarget('LibRemoteInput', IntToStr(PID));
+      {$ENDIF}
       break;
     end;
   end;

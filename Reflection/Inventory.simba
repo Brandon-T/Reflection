@@ -1,4 +1,4 @@
-{$include_once Reflection/Reflection.simba}
+{$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
 
 type

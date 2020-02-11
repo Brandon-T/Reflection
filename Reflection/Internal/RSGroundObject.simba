@@ -2,10 +2,9 @@
 {$include_once RSNodeDeque.simba}
 {$include_once RSClient.simba}
 {$include_once RSPlayer.simba}
-{$include_once RSHashTable.simba}
 {$include_once RSLinkedList.simba}
 
-Function RSGroundObject.GetAll: Array of RSItem; static;
+Function RSGroundObject.GetAll: Array of RSGroundItem; static;
 var
   Tile: RSTile;
   Plane: Int32;
@@ -19,7 +18,7 @@ var
   LinkedList: RSLinkedList;
   Head, Curr: RSNode;
   Garbage: RSTYpeArray;
-  Item: RSItem;
+  Item: RSGroundItem;
 
   ID, Stack: Int32;
 begin
@@ -71,7 +70,7 @@ begin
   RFreeObject(R_EIOS, Items);
 end;
 
-Function RSGroundObject.GetItemsAt(X, Y: Int32): Array of RSItem; static;
+Function RSGroundObject.GetItemsAt(X, Y: Int32): Array of RSGroundItem; static;
 var
   ID, Stack: Int32;
   BaseX, BaseY: Int32;
@@ -80,7 +79,7 @@ var
   LinkedList: RSLinkedList;
   Head, Curr: RSNode;
   Garbage: RSTYpeArray;
-  Item: RSItem;
+  Item: RSGroundItem;
 begin
   BaseX := RSClient.BaseX;
   BaseY := RSClient.BaseY;

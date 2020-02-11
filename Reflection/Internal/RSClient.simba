@@ -162,6 +162,11 @@ begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_ANIMATIONFRAMECACHE);
 end;
 
+Function RSClient.ItemNodeCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, CLIENT_ITEMNODECACHE);
+end;
+
 Function RSClient.Region: RSRegion; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_REGION);

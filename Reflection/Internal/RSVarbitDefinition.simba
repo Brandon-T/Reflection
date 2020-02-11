@@ -1,6 +1,6 @@
 {$include_once RSStructures.simba}
 {$include_once RSCache.simba}
-{$include_once RSHashTable.simba}
+{$include_once RSIterableHashTable.simba}
 
 Function RSVarbitDefinition.BaseVar: Int32; constref;
 begin
@@ -25,7 +25,7 @@ end;
 Function RSVarbitDefinition.Definition(ID: Int64): RSVarbitDefinition; static;
 var
   Cache: RSCache;
-  HashTable: RSHashTable;
+  HashTable: RSIterableHashTable;
   Garbage: RSTypeArray;
 begin
   Cache := RSVarbitDefinition.DefinitionCache;

@@ -1,6 +1,6 @@
 {$include_once RSStructures.simba}
 {$include_once RSCache.simba}
-{$include_once RSHashTable.simba}
+{$include_once RSIterableHashTable.simba}
 {$include_once RSModel.simba}
 {$include_once RSGameShell.simba}
 
@@ -89,7 +89,7 @@ end;
 Function RSObjectDefinition.Definition(ID: Int64): RSObjectDefinition; static;
 var
   Cache: RSCache;
-  HashTable: RSHashTable;
+  HashTable: RSIterableHashTable;
   Garbage: RSTypeArray;
 begin
   Cache := RSObjectDefinition.DefinitionCache;
@@ -109,7 +109,7 @@ end;
 Function RSObjectDefinition.Model(ID: Int64): RSModel; static;
 var
   Cache: RSCache;
-  HashTable: RSHashTable;
+  HashTable: RSIterableHashTable;
   Garbage: RSTypeArray;
 begin
   Cache := RSObjectDefinition.ModelCache;

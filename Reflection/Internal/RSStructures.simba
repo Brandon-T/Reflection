@@ -33,6 +33,8 @@ type
 
   RSHashTable = type RSType;
 
+  RSIterableHashTable = type RSType;
+
   RSQueue = type RSType;
 
   RSAnimableNode = type RSType;
@@ -80,11 +82,15 @@ type
 
   RSGroundObject = type RSType;
 
-  RSItem = record
+  RSItem = type RSType;
+
+  RSGroundItem = record
     ID: Int32;
     StackSize: Int32;
     Tile: RSTile;
   end;
+
+  RSItemNode = type RSType;
 
   RSObject = record(RSType)
     ObjectType: RSObjectType;
