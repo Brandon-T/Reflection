@@ -6,4 +6,4 @@
 
 begin
   RSetup;
-end.
+end;
