@@ -9,6 +9,12 @@ type
     Bounds: TBox;
   end;
 
+const
+  InventoryXPadding = 10; //Widget XYPadding
+  InventoryYPadding = 4;
+  ItemSlotSize = 32;      //InventoryWidget.Child(Index).Size
+
+
 Function R_GetInventoryWidgetID: RWidget;
 begin
   if RSWidget.IsValid(R_BANK_INVENTORY_ITEM_CONTAINER.Group) then
@@ -23,17 +29,14 @@ end;
 
 Function R_GetInventoryItem(ID: Int32): Array of TRSInventoryItem;
 var
-  Item: RSWidget;
-  Children: Array of RSWidget;
   InventoryID: RWidget;
-  ItemIDs, StackSizes: Array of Int32;
-  I, J, ChildID, Columns, Row, Column: Int32;
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs, ItemQuantities: Array of Int32;
+  I, J, Columns, Row, Column: Int32;
+  Widget, Child: RSWidget;
   Location: TPoint;
-const
-  XPadding = 10;
-  YPadding = 4;
-  ItemSlotSize = 32;
-  InvalidBankItemID = 6512;
+  Garbage: RSTypeArray;
 begin
   if ID < 0 then
     Exit;
@@ -42,78 +45,80 @@ begin
   if InventoryID.Group = -1 then
     Exit;
 
-  Item := RSWidget.Get(InventoryID.Group, InventoryID.Child);
-  if Item.ref <> nil then
-  begin
-    if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
-    begin
-      ItemIDs := Item.InventoryIDs;
-      StackSizes := Item.StackSizes;
-      SetLength(Result, Length(ItemIDs));
+  Widget := RSWidget.Get(InventoryID.Group, InventoryID.Child);
+  if Widget.ref = nil then
+    Exit;
 
-      for I := 0 to High(ItemIDs) do
+  Garbage += Widget;
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
+  begin
+    Garbage += ItemNodeCache;
+    ItemNode.ref := ItemNodeCache.GetObject(93).ref;
+
+    if ItemNode.ref <> nil then
+    begin
+      Garbage += ItemNode;
+      ItemIDs := ItemNode.ItemIDs;
+      ItemQuantities := ItemNode.ItemQuantities;
+
+      SetLength(Result, Length(ItemIDs));
+      for I := 0 to high(ItemIDs) do
       begin
-        ItemIDs[I] -= 1;
         if ItemIDs[I] = ID then
         begin
-          Columns := Item.Width;
-          Row := I div Columns;
-		      Column := I mod Columns;
-          Location := Item.AbsoluteLocation;
+          if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+          begin
+            Columns := Widget.Width;
+            Row := I div Columns;
+		        Column := I mod Columns;
+            Location := Widget.AbsoluteLocation;
 
-          Result[J].ID := ItemIDs[I];
-          Result[J].Amount := StackSizes[I];
-          Result[J].Slot := I;
-		      Result[J].Bounds.X1 := Location.X + ((ItemSlotSize + XPadding) * Column);
-		      Result[J].Bounds.Y1 := Location.Y + ((ItemSlotSize + YPadding) * Row);
-          Result[J].Bounds.X2 := Result[J].Bounds.X1 + ItemSlotSize;
-          Result[J].Bounds.Y2 := Result[J].Bounds.Y1 + ItemSlotSize;
-          Inc(J);
+            Result[J].ID := ID;
+            Result[J].Slot := I;
+            Result[J].Amount := ItemQuantities[I];
+            Result[J].Bounds.X1 := Location.X + ((ItemSlotSize + InventoryXPadding) * Column);
+		        Result[J].Bounds.Y1 := Location.Y + ((ItemSlotSize + InventoryYPadding) * Row);
+            Result[J].Bounds.X2 := Result[J].Bounds.X1 + ItemSlotSize;
+            Result[J].Bounds.Y2 := Result[J].Bounds.Y1 + ItemSlotSize;
+            Inc(J);
+          end else
+            begin
+              Child := Widget.Child(I);
+              if Child.ref <> nil then
+              begin
+                Garbage += Child;
+                Result[J].ID := ID;
+                Result[J].Slot := I;
+                Result[J].Amount := ItemQuantities[I];
+		            Result[J].Bounds := Child.Bounds;
+                Inc(J);
+              end;
+            end;
         end;
       end;
       SetLength(Result, J);
-    end else
-      begin
-        Children := Item.Children;
-        SetLength(Result, Length(Children));
-
-        for I := 0 to High(Children) do
-        begin
-          ChildID := Children[I].ItemID;
-          if ChildID = ID then
-          begin
-            Result[J].ID := ChildID;
-            Result[J].Amount := Children[I].ItemAmount;
-            Result[J].Slot := I;
-		        Result[J].Bounds := Children[I].Bounds;
-            if Result[J].ID = InvalidBankItemID then
-              Result[J].ID := -1;
-
-            Inc(J);
-          end;
-        end;
-
-        RSTypeArray(Children).Free;
-        SetLength(Result, J);
-      end;
-
-    Item.Free;
+    end;
   end;
+
+  Garbage.Free;
 end;
 
 Function R_GetInventorySlotItem(Index: Int32): TRSInventoryItem;
 var
-  Item, Child: RSWidget;
   InventoryID: RWidget;
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs, ItemQuantities: Array of Int32;
   Columns, Row, Column: Int32;
+  Widget, Child: RSWidget;
   Location: TPoint;
-const
-  XPadding = 10;
-  YPadding = 4;
-  ItemSlotSize = 32;
-  InvalidBankItemID = 6512;
+  Garbage: RSTypeArray;
 begin
   Result.ID := -1;
+  Result.Amount := -1;
+  Result.Slot := -1;
+
   if (Index < 0) or (Index > 27) then
     Exit;
 
@@ -121,114 +126,127 @@ begin
   if InventoryID.Group = -1 then
     Exit;
 
-  Item := RSWidget.Get(InventoryID.Group, InventoryID.Child);
-  if Item.ref <> nil then
+  Widget := RSWidget.Get(InventoryID.Group, InventoryID.Child);
+  if Widget.ref = nil then
+    Exit;
+
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
   begin
-    if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+    Garbage += ItemNodeCache;
+    ItemNode.ref := ItemNodeCache.GetObject(93).ref;
+
+    if ItemNode.ref <> nil then
     begin
-      Columns := Item.Width;
-      Row := Index div Columns;
-		  Column := Index mod Columns;
-      Location := Item.AbsoluteLocation;
+      Garbage += ItemNode;
+      ItemIDs := ItemNode.ItemIDs;
 
-      Result.ID := Item.InventoryIDs[Index] - 1;
-      Result.Amount := Item.StackSizes[Index];
-      Result.Slot := Index;
-		  Result.Bounds.X1 := Location.X + ((ItemSlotSize + XPadding) * Column);
-		  Result.Bounds.Y1 := Location.Y + ((ItemSlotSize + YPadding) * Row);
-      Result.Bounds.X2 := Result.Bounds.X1 + ItemSlotSize;
-      Result.Bounds.Y2 := Result.Bounds.Y1 + ItemSlotSize;
-    end else
+      if Index < Length(ItemIDs) then
       begin
-        Child := Item.Child(Index);
-        Result.ID := Child.ItemID;
-        Result.Amount := Child.ItemAmount;
-        Result.Slot := Index;
-		    Result.Bounds := Child.Bounds;
+        if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+        begin
+          Columns := Widget.Width;
+          Row := Index div Columns;
+		      Column := Index mod Columns;
+          Location := Widget.AbsoluteLocation;
 
-        if Result.ID = InvalidBankItemID then
-          Result.ID := -1;
-
-        Child.Free;
+          ItemQuantities := ItemNode.ItemQuantities;
+          Result.ID := ItemIDs[Index];
+          Result.Slot := Index;
+          Result.Amount := ItemQuantities[Index];
+          Result.Bounds.X1 := Location.X + ((ItemSlotSize + InventoryXPadding) * Column);
+		      Result.Bounds.Y1 := Location.Y + ((ItemSlotSize + InventoryYPadding) * Row);
+          Result.Bounds.X2 := Result.Bounds.X1 + ItemSlotSize;
+          Result.Bounds.Y2 := Result.Bounds.Y1 + ItemSlotSize;
+        end else
+          begin
+            Child := Widget.Child(Index);
+            if Child.ref <> nil then
+            begin
+              Garbage += Child;
+              Result.ID := ItemIDs[Index];
+              Result.Slot := Index;
+              Result.Amount := ItemQuantities[Index];
+		          Result.Bounds := Child.Bounds;
+            end;
+          end;
       end;
-
-    Item.Free;
+    end;
   end;
+
+  Garbage.Free;
 end;
 
 Function R_GetAllInventoryItems: Array of TRSInventoryItem;
 var
-  Item: RSWidget;
-  Children: Array of RSWidget;
   InventoryID: RWidget;
-  ItemIDs, StackSizes: Array of Int32;
-  I, J, ChildID, Columns, Row, Column: Int32;
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs, ItemQuantities: Array of Int32;
+  I, J, Columns, Row, Column: Int32;
+  Widget, Child: RSWidget;
   Location: TPoint;
-const
-  XPadding = 10;
-  YPadding = 4;
-  ItemSlotSize = 32;
-  InvalidBankItemID = 6512;
+  Garbage: RSTypeArray;
 begin
   InventoryID := R_GetInventoryWidgetID;
   if InventoryID.Group = -1 then
     Exit;
 
-  Item := RSWidget.Get(InventoryID.Group, InventoryID.Child);
-  if Item.ref <> nil then
-  begin
-    if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
-    begin
-      ItemIDs := Item.InventoryIDs;
-      StackSizes := Item.StackSizes;
-      SetLength(Result, Length(ItemIDs));
+  Widget := RSWidget.Get(InventoryID.Group, InventoryID.Child);
+  if Widget.ref = nil then
+    Exit;
 
-      for I := 0 to High(ItemIDs) do
+  Garbage += Widget;
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
+  begin
+    Garbage += ItemNodeCache;
+    ItemNode.ref := ItemNodeCache.GetObject(93).ref;
+
+    if ItemNode.ref <> nil then
+    begin
+      Garbage += ItemNode;
+      ItemIDs := ItemNode.ItemIDs;
+      ItemQuantities := ItemNode.ItemQuantities;
+
+      SetLength(Result, Length(ItemIDs));
+      for I := 0 to high(ItemIDs) do
       begin
-        ItemIDs[I] -= 1;
         if ItemIDs[I] <> -1 then
         begin
-          Columns := Item.Width;
-          Row := I div Columns;
-		      Column := I mod Columns;
-          Location := Item.AbsoluteLocation;
+          if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+          begin
+            Columns := Widget.Width;
+            Row := I div Columns;
+		        Column := I mod Columns;
+            Location := Widget.AbsoluteLocation;
 
-          Result[J].ID := ItemIDs[I];
-          Result[J].Amount := StackSizes[I];
-          Result[J].Slot := I;
-		      Result[J].Bounds.X1 := Location.X + ((ItemSlotSize + XPadding) * Column);
-		      Result[J].Bounds.Y1 := Location.Y + ((ItemSlotSize + YPadding) * Row);
-          Result[J].Bounds.X2 := Result[J].Bounds.X1 + ItemSlotSize;
-          Result[J].Bounds.Y2 := Result[J].Bounds.Y1 + ItemSlotSize;
-          Inc(J);
+            Result[J].ID := ItemIDs[I];
+            Result[J].Slot := I;
+            Result[J].Amount := ItemQuantities[I];
+            Result[J].Bounds.X1 := Location.X + ((ItemSlotSize + InventoryXPadding) * Column);
+		        Result[J].Bounds.Y1 := Location.Y + ((ItemSlotSize + InventoryYPadding) * Row);
+            Result[J].Bounds.X2 := Result[J].Bounds.X1 + ItemSlotSize;
+            Result[J].Bounds.Y2 := Result[J].Bounds.Y1 + ItemSlotSize;
+            Inc(J);
+          end else
+            begin
+              Child := Widget.Child(I);
+              if Child.ref <> nil then
+              begin
+                Garbage += Child;
+                Result[J].ID := ItemIDs[I];
+                Result[J].Slot := I;
+                Result[J].Amount := ItemQuantities[I];
+		            Result[J].Bounds := Child.Bounds;
+                Inc(J);
+              end;
+            end;
         end;
       end;
       SetLength(Result, J);
-    end else
-      begin
-        Children := Item.Children;
-        SetLength(Result, Length(Children));
-
-        for I := 0 to High(Children) do
-        begin
-          ChildID := Children[I].ItemID;
-          if ChildID = InvalidBankItemID then
-            ChildID := -1;
-
-          if ChildID <> -1 then
-          begin
-            Result[J].ID := ChildID;
-            Result[J].Amount := Children[I].ItemAmount;
-            Result[J].Slot := I;
-		        Result[J].Bounds := Children[I].Bounds;
-            Inc(J);
-          end;
-        end;
-
-        RSTypeArray(Children).Free;
-        SetLength(Result, J);
-      end;
-
-    Item.Free;
+    end;
   end;
+
+  Garbage.Free;
 end;
