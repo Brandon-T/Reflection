@@ -5,6 +5,11 @@ var
   PID: Int32;
   I, ClientCount: SizeUInt;
 begin
+
+  {$IFDEF WINDOWS}
+  RIInject('JagexLauncher.exe');
+  {$ENDIF}
+
   PID := -1;
   ClientCount := EIOS_GetClients(true);
   for I := 0 to ClientCount - 1 do
