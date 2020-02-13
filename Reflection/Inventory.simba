@@ -27,6 +27,57 @@ begin
   Result.Child := -1;
 end;
 
+Function R_InventoryCount: Int32;
+var
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs: Array of Int32;
+begin
+  Result := 0;
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
+  begin
+    ItemNode.ref := ItemNodeCache.GetObject(93).ref;
+
+    if ItemNode.ref <> nil then
+    begin
+      ItemIDs := ItemNode.ItemIDs;
+      Result := Length(ItemIDs);
+      ItemNode.Free;
+    end;
+    ItemNodeCache.Free;
+  end;
+end;
+
+Function R_CountInventoryItem(ID: Int32): Int32;
+var
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs, ItemQuantities: Array of Int32;
+  I: Int32;
+begin
+  Result := 0;
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
+  begin
+    ItemNode.ref := ItemNodeCache.GetObject(93).ref;
+
+    if ItemNode.ref <> nil then
+    begin
+      ItemIDs := ItemNode.ItemIDs;
+      ItemQuantities := ItemNode.ItemQuantities;
+
+      for I := 0 to high(ItemIDs) do
+      begin
+        if ItemIDs[I] = ID then
+          Inc(Result, ItemQuantities[I]);
+      end;
+      ItemNode.Free;
+    end;
+    ItemNodeCache.Free;
+  end;
+end;
+
 Function R_GetInventoryItem(ID: Int32): Array of TRSInventoryItem;
 var
   InventoryID: RWidget;

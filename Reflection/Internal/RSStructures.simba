@@ -122,7 +122,7 @@ var
   Arr: Array of Pointer;
 begin
   SetLength(Arr, Length(self));
-  for I := 0 to High(Arr) do
+  for I := 0 to High(self) do
   begin
     if self[I].ref <> nil then
     begin
@@ -132,8 +132,6 @@ begin
     end;
   end;
 
-  if J > 0 then
-    SetLength(Arr, J - 1);
-
+  SetLength(Arr, J);
   RFreeObjects(R_EIOS, Arr);
 end;

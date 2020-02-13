@@ -4,11 +4,23 @@
 const
   R_BANK_ITEM_SLOT_INDEX = 11;
 
+  VARBIT_CURRENT_BANK_TAB = 4150;
+  VARBIT_BANK_TAB_COUNT_1 = 4171;
+	VARBIT_BANK_TAB_COUNT_2 = 4172;
+	VARBIT_BANK_TAB_COUNT_3 = 4173;
+	VARBIT_BANK_TAB_COUNT_4 = 4174;
+	VARBIT_BANK_TAB_COUNT_5 = 4175;
+	VARBIT_BANK_TAB_COUNT_6 = 4176;
+	VARBIT_BANK_TAB_COUNT_7 = 4177;
+	VARBIT_BANK_TAB_COUNT_8 = 4178;
+	VARBIT_BANK_TAB_COUNT_9 = 4179;
+
 type
   TRSBankItem = record
     ID: Int32;
     Amount: Int32;
     Slot: Int32;
+    Tab: Int32;
     Name: String;
     Bounds: TBox;
   end;
@@ -28,11 +40,78 @@ begin
   Result := RSWidget.IsValid(R_INTERFACE_DEPOSITBOX);
 end;
 
+Function R_CurrentBankTab: Int32;
+begin
+  Result := RSClient.getVarbit(VARBIT_CURRENT_BANK_TAB);
+end;
+
+Function R_BankTabCount(Index: Int32): Int32;
+var
+  TabVarbits: Array of Int32;
+begin
+  if (Index < 0) or (Index > 8) then
+    Exit(-1);
+
+  TabVarbits := [VARBIT_BANK_TAB_COUNT_1, VARBIT_BANK_TAB_COUNT_2,
+                 VARBIT_BANK_TAB_COUNT_3, VARBIT_BANK_TAB_COUNT_4,
+                 VARBIT_BANK_TAB_COUNT_5, VARBIT_BANK_TAB_COUNT_6,
+                 VARBIT_BANK_TAB_COUNT_7, VARBIT_BANK_TAB_COUNT_8,
+                 VARBIT_BANK_TAB_COUNT_9];
+
+  Result := RSClient.getVarbit(TabVarbits[Index]);
+end;
+
+Function R_BankSlotToTab(Slot: Int32): Int32;
+var
+  I: Int32;
+  TabCount, Total: Int32;
+begin
+  Result := 0;
+  TabCount := 0;
+
+  for I := 0 to 8 do
+  begin
+    TabCount := R_BankTabCount(I);
+    if TabCount = 0 then
+      continue;
+
+    Total += TabCount;
+    if Slot < Total then
+      Exit(I + 1);
+  end;
+end;
+
+Function R_BankSlotToTabSlot(Slot: Int32): Int32;
+var
+  I: Int32;
+  TabCount, Total: Int32;
+begin
+  Result := 0;
+  TabCount := 0;
+
+  for I := 0 to 8 do
+  begin
+    TabCount := R_BankTabCount(I);
+    if TabCount = 0 then
+      continue;
+
+    Total += TabCount;
+    if Slot < Total then
+    begin
+      Exit(TabCount - (Total - Slot)); //Exit(0 - (Total - Slot - TabCount));
+    end;
+  end;
+  Result := Slot - Total;
+end;
+
 Function R_GetAllBankItems: Array of TRSBankItem;
 var
-  I, J, ItemID: Int32;
-  BankItemContainer: RSWidget;
-  ItemSlots: Array of RSWidget;
+  BankItemContainer, Child: RSWidget;
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs, ItemQuantities: Array of Int32;
+  I, J: Int32;
+  Garbage: RSTypeArray;
 begin
   if not R_BankScreen then
     Exit;
@@ -41,37 +120,56 @@ begin
   if BankItemContainer.ref = nil then
     Exit;
 
-  J := 0;
-  ItemSlots := BankItemContainer.Children;
-  SetLength(Result, Length(ItemSlots));
-  for I := 0 to high(ItemSlots) do
+  Garbage += BankItemContainer;
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
   begin
-    if ItemSlots[I].ChildID = R_BANK_ITEM_SLOT_INDEX then
+    Garbage += ItemNodeCache;
+    ItemNode.ref := ItemNodeCache.GetObject(95).ref;
+
+    if ItemNode.ref <> nil then
     begin
-      ItemID := ItemSlots[I].ItemID;
-      if ItemID <> -1 then
+      Garbage += ItemNode;
+      ItemIDs := ItemNode.ItemIDs;
+      ItemQuantities := ItemNode.ItemQuantities;
+      SetLength(Result, Length(ItemIDs));
+
+      for I := 0 to high(ItemIDs) do
       begin
-        Result[J].ID := ItemID;
-        Result[J].Amount := ItemSlots[I].ItemAmount;
-        Result[J].Slot := I;
-        Result[J].Name := ItemSlots[I].Name;
-        Result[J].Bounds := ItemSlots[I].Bounds;
-        Inc(J);
+        Child := BankItemContainer.Child(I);
+        if Child.ref <> nil then
+        begin
+          Garbage += Child;
+          Result[J].ID := ItemIDs[I];
+          Result[J].Amount := ItemQuantities[I];
+          Result[J].Slot := I;
+          Result[J].Tab := R_BankSlotToTab(I);
+          Result[J].Name := Child.Name;
+          Result[J].Bounds := Child.Bounds;
+          Inc(J);
+        end;
       end;
     end;
   end;
 
   SetLength(Result, J);
-  RSTypeArray(ItemSlots).Free;
-  BankItemContainer.Free;
+  Garbage.Free;
 end;
 
 Function R_FindBankItem(ID: Int32): TRSBankItem;
 var
-  I, ItemID: Int32;
-  BankItemContainer: RSWidget;
-  ItemSlots: Array of RSWidget;
+  BankItemContainer, Child: RSWidget;
+  ItemNodeCache: RSHashTable;
+  ItemNode: RSItemNode;
+  ItemIDs, ItemQuantities: Array of Int32;
+  I: Int32;
+  Garbage: RSTypeArray;
 begin
+  Result.ID := -1;
+  Result.Amount := -1;
+  Result.Slot := -1;
+  Result.Tab := -1;
+
   if not R_BankScreen then
     Exit;
 
@@ -79,24 +177,39 @@ begin
   if BankItemContainer.ref = nil then
     Exit;
 
-  Result.ID := -1;
-  ItemSlots := BankItemContainer.Children;
-  for I := 0 to high(ItemSlots) do
+  Garbage += BankItemContainer;
+  ItemNodeCache := RSClient.ItemNodeCache;
+  if ItemNodeCache.ref <> nil then
   begin
-    if ItemSlots[I].ChildID = R_BANK_ITEM_SLOT_INDEX then
+    Garbage += ItemNodeCache;
+    ItemNode.ref := ItemNodeCache.GetObject(95).ref;
+
+    if ItemNode.ref <> nil then
     begin
-      ItemID := ItemSlots[I].ItemID;
-      if ItemID = ID then
+      Garbage += ItemNode;
+      ItemIDs := ItemNode.ItemIDs;
+      ItemQuantities := ItemNode.ItemQuantities;
+
+      for I := 0 to high(ItemIDs) do
       begin
-        Result.ID := ItemID;
-        Result.Amount := ItemSlots[I].ItemAmount;
-        Result.Slot := I;
-        Result.Name := ItemSlots[I].Name;
-        Result.Bounds := ItemSlots[I].Bounds;
+        if ItemIDs[I] = ID then
+        begin
+          Child := BankItemContainer.Child(I);
+          if Child.ref <> nil then
+          begin
+            Garbage += Child;
+            Result.ID := ItemIDs[I];
+            Result.Amount := ItemQuantities[I];
+            Result.Slot := I;
+            Result.Tab := R_BankSlotToTab(I);
+            Result.Name := Child.Name;
+            Result.Bounds := Child.Bounds;
+            break;
+          end;
+        end;
       end;
     end;
   end;
 
-  RSTypeArray(ItemSlots).Free;
-  BankItemContainer.Free;
+  Garbage.Free;
 end;
