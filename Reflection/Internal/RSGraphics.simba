@@ -4,6 +4,21 @@
 {$include_once RSPlayer.simba}
 {$include_once RSNPC.simba}
 
+procedure TMufasaBitmap.DrawPolygon(points: TPointArray; color: TColor);
+var
+  i, h: Integer;
+begin
+  h := (High(points) - 1);
+
+  if (h = -1) then
+    exit;
+
+  for i := 0 to h do
+    self.LineTo(points[i], points[i + 1], color);
+
+  self.LineTo(points[h + 1], points[0], color);
+end;
+
 Procedure TMufasaBitmap.DrawPolygon(constref poly: T2DTriangle; Colour: TColor); overload;
 begin
   self.LineTo(Point(poly.A.X, poly.A.Y), Point(poly.B.X, poly.B.Y), Colour);

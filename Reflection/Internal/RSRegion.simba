@@ -59,6 +59,6 @@ begin
   for I := 0 to ObjectsSize - 1 do
   begin
     Result[I].ref := GameObjects[I];
-    Result[I].ObjectType = RSObjectType.GAME_OBJECT;
+    Result[I].ObjectType := RSObjectType.GAME_OBJECT;
   end;
 end;

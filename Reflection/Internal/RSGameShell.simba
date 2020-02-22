@@ -8,11 +8,11 @@ var
   BaseVar, StartBit, EndBit, Mask: Int32;
 begin
   Definition := RSVarbitDefinition.Definition(ID);
-  BaseVar = Definition.BaseVar;
-  StartBit = Definition.StartBit;
-  EndBit = Definition.EndBit;
+  BaseVar := Definition.BaseVar;
+  StartBit := Definition.StartBit;
+  EndBit := Definition.EndBit;
   Definition.Free;
 
-  Mask = RSVarps.VarpMask(EndBit - StartBit);
+  Mask := RSVarps.VarpMask(EndBit - StartBit);
   Result := Sar(RSVarps.VarpMain(BaseVar), StartBit) and Mask;
 end;
