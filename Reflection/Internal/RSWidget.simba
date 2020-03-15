@@ -1,15 +1,16 @@
 {$include_once RSStructures.simba}
 {$include_once RSIterableHashTable.simba}
 {$include_once RSWidgetNode.simba}
+{$include_once RSText.simba}
 
 Function RSWidget.Name: String; constref;
 begin
-  Result := RGetString(R_EIOS, ref, WIDGET_NAME);
+  Result := Trim(StripHTML(RGetString(R_EIOS, ref, WIDGET_NAME)));
 end;
 
 Function RSWidget.Text: String; constref;
 begin
-  Result := RGetString(R_EIOS, ref, WIDGET_TEXT);
+  Result := Trim(StripHTML(RGetString(R_EIOS, ref, WIDGET_TEXT)));
 end;
 
 Function RSWidget.ID: Int32; constref;

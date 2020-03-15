@@ -44,3 +44,4 @@
 {$include_once RSVarbitDefinition.simba}
 {$include_once RSMath.simba}
 {$include_once RSGraphics.simba}
+{$include_once RSText.simba}

@@ -102,7 +102,7 @@ begin
 
     Garbage.Free;
     Exit(RSNPCDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
-  end
+  end;
 
   Result.ref := Model.ref;
   Result.vertices := [];

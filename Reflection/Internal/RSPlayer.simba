@@ -66,6 +66,22 @@ begin
   Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
 end;
 
+Function RSPlayer.Destination: RSTile;
+var
+  X, Y: Int32;
+begin
+  X := RSClient.DestinationX;
+  Y := RSClient.DestinationY;
+
+  if (X <= 0) or (Y <= 0) then
+  begin
+    Exit(Self.Tile);
+  end;
+
+  Result.X := X + RSClient.BaseX;
+  Result.Y := Y + RSClient.BaseY;
+end;
+
 Function RSPlayer.Model: RSModel; constref;
 var
   Definition: RSPlayerDefinition;
@@ -133,7 +149,7 @@ begin
 
     Garbage.Free;
     Exit(RSPlayerDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
-  end
+  end;
 
   Result.ref := Model.ref;
   Result.vertices := [];

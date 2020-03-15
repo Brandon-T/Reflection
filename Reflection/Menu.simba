@@ -1,0 +1,151 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Mouse.simba}
+{$include_once Timing.simba}
+
+Function R_MenuItems: Array of String;
+var
+  I, Count: Int32;
+  Actions: Array of String;
+  Options: Array of String;
+  Action, Option: String;
+begin
+  Count := RSClient.MenuCount;
+  if Count > 0 then
+  begin
+    Actions := RSClient.MenuActions;
+    Options := RSClient.MenuOptions;
+
+    for I := Count - 1 downto 0 do
+    begin
+      Action := StripHTML(Actions[I]);
+      Option := StripHTML(Options[I]);
+
+      if (Length(Action) = 0) and (Length(Option) = 0) then
+        break;
+
+      Result += Trim(Action + ' ' + Option);
+    end;
+  end;
+end;
+
+Function R_IsMenuOpen: Boolean;
+begin
+  Result := RSClient.IsMenuOpen;
+end;
+
+Function R_ChooseOptions(options: Array of String; caseSensitive: Boolean = True): Boolean;
+var
+  T: Int64;
+  I, J, Offset: Int32;
+  X, Y: Int32;
+  Items: Array of String;
+  Bounds, OptionBounds: TBox;
+begin
+  T := GetTickCount();
+  while(not R_IsMenuOpen) do
+  begin
+    if GetTickCount() - T > 500 then
+      Exit(False);
+
+    Wait(50 + RandomRange(0, 100));
+  end;
+
+  Items := R_MenuItems;
+  Bounds := RSClient.MenuBounds;
+
+  For I := 0 To high(Items) do
+  begin
+    For J := 0 To high(Options) do
+    begin
+      If (caseSensitive and (Pos(Options[J], Items[I]) > 0)) or (not caseSensitive and (Pos(LowerCase(Options[J]), Lowercase(Items[I])) > 0)) then
+      begin
+        //The menu title is 21 in height.
+        //Each Item is 16 in height.
+        //The font of each item is 12 in height.
+        Offset := 21 + (I * 16); // + RandomRange(2, 10);
+
+        //Small characters are 4 pixels wide with a 4px offset from the left
+        OptionBounds := Box(Bounds.X1 + 4, Bounds.Y1 + Offset + 2, Bounds.X1 + 4 + ((Length(Items[I]) * 4) - 4), Bounds.Y1 + Offset + 10);
+        Mouse.Move(OptionBounds);
+        GetMousePos(X, Y);
+        if PointInBox(Point(X, Y), OptionBounds) then
+        begin
+          Mouse.Click(MOUSE_LEFT);
+          Exit(True);
+        end;
+      end;
+    end;
+  end;
+  Result := False;
+end;
+
+Function R_WaitChooseOptions(options: Array of String; caseSensitive: Boolean = True; timeout: UInt32): Boolean;
+var
+  timer: Timer;
+begin
+  timer.Start;
+  while (not R_ChooseOptions(options, caseSensitive)) do
+  begin
+    if timer.ElapsedTime >= timeout then
+      Exit(False);
+
+    Wait(50 + Random(50));
+  end;
+  Result := True;
+end;
+
+Function R_Uptext: String;
+var
+  Count: Int32;
+  Items: Array of String;
+begin
+  Items := R_MenuItems;
+  if Length(Items) > 0 then
+  begin
+    Result := Items[0];
+    Count := Length(Items);
+    if (Count > 2) and (Result <> '') then
+    begin
+      Result += ' / ' + ToStr(Count - 2) + ' more options';
+    end;
+  end;
+end;
+
+Function R_IsUptext(options: Array of String; caseSensitive: Boolean = True): Boolean;
+var
+  I: Int32;
+  T: Int64;
+  Uptext: String;
+begin
+  T := GetTickCount();
+  while((Uptext := R_Uptext) = '') do
+  begin
+    If GetTickCount() - T > 1000 then
+      Exit(False);
+
+    Wait(50 + RandomRange(0, 100));
+  end;
+
+  For I := 0 to high(Options) do
+  begin
+    if (caseSensitive and (Pos(Options[I], Uptext) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[I]), Lowercase(Uptext)) > 0)) then
+    begin
+      Exit(True);
+    end;
+  end;
+end;
+
+Function R_WaitUptext(options: Array of String; caseSensitive: Boolean = True; timeout: UInt32): Boolean;
+var
+  timer: Timer;
+begin
+  timer.Start;
+  while (not R_IsUptext(options, caseSensitive)) do
+  begin
+    if timer.ElapsedTime >= timeout then
+      Exit(False);
+
+    Wait(50 + Random(50));
+  end;
+  Result := True;
+end;

@@ -4,7 +4,7 @@
 {$include_once RSPlayer.simba}
 {$include_once RSNPC.simba}
 
-procedure TMufasaBitmap.DrawPolygon(points: TPointArray; color: TColor);
+procedure TMufasaBitmap._DrawPolygon(points: TPointArray; color: TColor);
 var
   i, h: Integer;
 begin
@@ -19,7 +19,7 @@ begin
   self.LineTo(points[h + 1], points[0], color);
 end;
 
-Procedure TMufasaBitmap.DrawPolygon(constref poly: T2DTriangle; Colour: TColor); overload;
+Procedure TMufasaBitmap._DrawPolygon(constref poly: T2DTriangle; Colour: TColor); overload;
 begin
   self.LineTo(Point(poly.A.X, poly.A.Y), Point(poly.B.X, poly.B.Y), Colour);
   self.LineTo(Point(poly.B.X, poly.B.Y), Point(poly.C.X, poly.C.Y), Colour);
@@ -35,7 +35,7 @@ begin
 
   for i := 0 to high(triangles) do
   begin
-    self.DrawPolygon(triangles[i], Colour);
+    self._DrawPolygon(triangles[i], Colour);
   end;
 end;
 
@@ -48,7 +48,7 @@ begin
 
   for i := 0 to high(triangles) do
   begin
-    self.DrawPolygon(triangles[i], Colour);
+    self._DrawPolygon(triangles[i], Colour);
   end;
 end;
 

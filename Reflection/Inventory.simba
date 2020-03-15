@@ -29,6 +29,7 @@ end;
 
 Function R_InventoryCount: Int32;
 var
+  I: Int32;
   ItemNodeCache: RSHashTable;
   ItemNode: RSItemNode;
   ItemIDs: Array of Int32;
@@ -42,7 +43,9 @@ begin
     if ItemNode.ref <> nil then
     begin
       ItemIDs := ItemNode.ItemIDs;
-      Result := Length(ItemIDs);
+      for I := 0 to High(ItemIDs) do
+        if ItemIDs[I] <> -1 then
+          Inc(Result);
       ItemNode.Free;
     end;
     ItemNodeCache.Free;
@@ -217,7 +220,7 @@ begin
               Garbage += Child;
               Result.ID := ItemIDs[Index];
               Result.Slot := Index;
-              Result.Amount := ItemQuantities[Index];
+              Result.Amount := Child.ItemAmount;
 		          Result.Bounds := Child.Bounds;
             end;
           end;

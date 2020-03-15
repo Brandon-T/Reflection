@@ -3,6 +3,10 @@
 {$include_once Skills.simba}
 {$include_once Equipment.simba}
 {$include_once GameTab.simba}
+{$include_once Chat.simba}
+{$include_once Menu.simba}
+{$include_once Timing.simba}
+{$include_once Mouse.simba}
 
 begin
   RSetup;

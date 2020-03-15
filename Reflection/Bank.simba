@@ -1,5 +1,9 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
+{$include_once Menu.simba}
+{$include_once Inventory.simba}
+{$include_once Mouse.simba}
+{$include_once Timing.simba}
 
 const
   R_BANK_ITEM_SLOT_INDEX = 11;
@@ -30,14 +34,29 @@ begin
   Result := RSWidget.IsValid(R_INTERFACE_BANK);
 end;
 
+Function R_WaitBankScreen(timeout: UInt32): Boolean;
+begin
+  Result := R_WaitFunction(timeout, 50, @R_BankScreen);
+end;
+
 Function R_PinScreen: Boolean;
 begin
   Result := RSWidget.IsValid(R_INTERFACE_PINSCREEN);
 end;
 
+Function R_WaitPinScreen(timeout: UInt32): Boolean;
+begin
+  Result := R_WaitFunction(timeout, 50, @R_PinScreen);
+end;
+
 Function R_DepositBox: Boolean;
 begin
   Result := RSWidget.IsValid(R_INTERFACE_DEPOSITBOX);
+end;
+
+Function R_WaitDepositBox(timeout: UInt32): Boolean;
+begin
+  Result := R_WaitFunction(timeout, 50, @R_DepositBox);
 end;
 
 Function R_CurrentBankTab: Int32;
@@ -102,6 +121,58 @@ begin
     end;
   end;
   Result := Slot - Total;
+end;
+
+Function R_SelectBankTab(Index: Int32): Boolean;
+var
+  TabWidget: RSWidget;
+begin
+  if (Index < 0) or (Index > 8) then
+    Exit(False);
+
+  if not R_BankScreen then
+    Exit;
+
+  TabWidget := RSWidget.Get(R_BANK_TAB_CONTAINER.Group, R_BANK_TAB_CONTAINER.Child, Index);
+  if TabWidget.ref = nil then
+    Exit(False);
+
+  Mouse.Click(TabWidget.Bounds, MOUSE_LEFT);
+  TabWidget.Free;
+end;
+
+Function R_BankSlotVisible(Index: Int32): Boolean;
+var
+  TabContainer: RSWidget;
+  TabWidget: RSWidget;
+  BankBounds: TBox;
+begin
+  if not R_BankScreen then
+    Exit(False);
+
+  TabContainer := RSWidget.Get(R_BANK_ITEM_CONTAINER.Group, R_BANK_ITEM_CONTAINER.Child);
+  if TabContainer.ref = nil then
+    Exit(False);
+
+  TabWidget := TabContainer.Child(Index);
+  if TabWidget.ref = nil then
+  begin
+    TabContainer.Free;
+    Exit(False);
+  end;
+
+  BankBounds := TabContainer.Bounds;
+  TabContainer.Free;
+
+  Result := BankBounds.Contains(TabContainer.Bounds);
+  TabWidget.Free;
+end;
+
+Function R_ScrollToBankSlot(Index: Int32; UseMouseWheel: Boolean = True): Boolean;
+var
+  ScrollBar: RSWidget;
+begin
+
 end;
 
 Function R_GetAllBankItems: Array of TRSBankItem;
@@ -213,3 +284,84 @@ begin
 
   Garbage.Free;
 end;
+
+Function R_IsBankSlotVisible(Index: Int32): Boolean;
+begin
+  //R_BANK_ITEM_CONTAINER
+end;
+
+Function R_DepositAll_Items: Boolean;
+var
+  Widget: RSWidget;
+begin
+  if not R_BankScreen then
+    Exit;
+
+  Widget := RSWidget.Get(R_BANK_DEPOSIT_INVENTORY_ICON.Group, R_BANK_DEPOSIT_INVENTORY_ICON.Child);
+  if Widget.ref = nil then
+    Exit(False);
+
+  Mouse.Move(Widget.Bounds);
+  Wait(50 + RandomRange(0, 50));
+  Mouse.Click(MOUSE_LEFT);
+  Widget.Free;
+  Result := True;
+end;
+
+Function R_DepositAll_Equipment: Boolean;
+var
+  Widget: RSWidget;
+begin
+  if not R_BankScreen then
+    Exit;
+
+  Widget := RSWidget.Get(R_BANK_DEPOSIT_EQUIPMENT_ICON.Group, R_BANK_DEPOSIT_EQUIPMENT_ICON.Child);
+  if Widget.ref = nil then
+    Exit(False);
+
+  Mouse.Move(Widget.Bounds);
+  Wait(50 + RandomRange(0, 50));
+  Mouse.Click(MOUSE_LEFT);
+  Widget.Free;
+  Result := True;
+end;
+
+Function R_DepositSlot(Index: Int32; All: Boolean = False): Boolean;
+var
+  InvItem: TRSInventoryItem;
+begin
+  if not R_BankScreen then
+    Exit;
+
+  InvItem := R_GetInventorySlotItem(Index);
+  if InvItem.ID <> -1 then
+  begin
+    if All then
+    begin
+      Mouse.Click(InvItem.Bounds, MOUSE_RIGHT);
+      Wait(50 + RandomRange(0, 50));
+      Exit(R_ChooseOptions(['-All']));
+    end;
+
+    Mouse.Move(InvItem.Bounds);
+    Wait(50 + RandomRange(0, 50));
+    Mouse.Click(MOUSE_LEFT);
+    Exit(True);
+  end;
+end;
+
+Function R_WithdrawItem(ID: Int32): Boolean;
+var
+  item: TRSBankItem;
+begin
+  if not R_BankScreen then
+    Exit(False);
+
+  item := R_FindBankItem(ID);
+  if item.ID = -1 then
+    Exit(False);
+
+
+end;
+
+

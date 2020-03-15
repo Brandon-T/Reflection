@@ -204,3 +204,69 @@ begin
 	Mask := (1 shl ((MSB - LSB) + 1)) - 1;
 	Result := (Varp shr LSB) and Mask;
 end;
+
+Function RSClient.MenuActions: Array of String; static;
+var
+  Actions: Pointer;
+  Size: SizeUInt;
+begin
+  Actions := RGetArray(R_EIOS, nil, Size, CLIENT_MENUACTIONS);
+  if Actions = nil then
+    Exit;
+
+  if Size = 0 then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Actions, 0, Size);
+  RFreeObject(R_EIOS, Actions);
+end;
+
+Function RSClient.MenuOptions: Array of String; static;
+var
+  Options: Pointer;
+  Size: SizeUInt;
+begin
+  Options := RGetArray(R_EIOS, nil, Size, CLIENT_MENUOPTIONS);
+  if Options = nil then
+    Exit;
+
+  if Size = 0 then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Options, 0, Size);
+  RFreeObject(R_EIOS, Options);
+end;
+
+Function RSClient.MenuCount: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_MENUCOUNT);
+end;
+
+Function RSClient.MenuLocation: TPoint; static;
+begin
+  Result.X := RGetInt(R_EIOS, nil, CLIENT_MENUX);
+  Result.Y := RGetInt(R_EIOS, nil, CLIENT_MENUY);
+end;
+
+Function RSClient.MenuWidth: SizeUInt; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_MENUWIDTH);
+end;
+
+Function RSClient.MenuHeight: SizeUInt; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_MENUHEIGHT);
+end;
+
+Function RSClient.MenuBounds: TBox; static;
+begin
+  Result.X1 := RGetInt(R_EIOS, nil, CLIENT_MENUX);
+  Result.Y1 := RGetInt(R_EIOS, nil, CLIENT_MENUY);
+  Result.X2 := Result.X1 + RSClient.MenuWidth;
+  Result.Y2 := Result.Y1 + RSClient.MenuHeight;
+end;
+
+Function RSClient.IsMenuOpen: Boolean; static;
+begin
+  Result := RGetBool(R_EIOS, nil, CLIENT_ISMENUOPEN);
+end;

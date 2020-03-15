@@ -1,0 +1,16 @@
+
+Function StripHTML(Str: String): String;
+var
+  It, Jt: Int32;
+begin
+  It := Pos( '<', Str);
+
+  while (It <> 0) do
+  begin
+    Jt := PosEx('>', Str, It);
+    Delete(Str, It, (Jt - It) + 1);
+    It := Pos( '<', Str);
+  end;
+
+  Result := Str;
+end;

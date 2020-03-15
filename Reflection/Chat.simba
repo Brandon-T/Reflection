@@ -1,0 +1,182 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once Mouse.simba}
+{$include_once Timing.simba}
+
+type
+  TRSChatMessage = record
+    Name: String;
+    Message: String;
+    LineNumber: Int32;
+  end;
+
+Function R_ChatMessages(Limit: UInt32 = 0): Array of TRSChatMessage;
+var
+  I, J, Count: Int32;
+  ChatWidget: RSWidget;
+  Children: Array of RSWidget;
+  Name: String;
+  Message: String;
+begin
+  ChatWidget := RSWidget.Get(R_CHATBOX_MESSAGES_CHATLINES_TEXT.Group, R_CHATBOX_MESSAGES_CHATLINES_TEXT.Child);
+  if ChatWidget.ref = nil then
+    Exit;
+
+  J := 0;
+  Count := 0;
+  Children := ChatWidget.Children;
+  For I := 0 to High(Children) do
+  begin
+    if Limit > 0 then
+    begin
+      if Count = Limit then
+        break;
+
+      Inc(Count);
+    end;
+
+    Name := Children[I].Text;
+    Message := Children[I + 1].Text;
+
+    if (Name = '') and (Message = '') then
+      break;
+
+    if (Name <> '') and (Message = '') then
+      Swap(Name, Message);
+
+    Result += [Name, Message, J];
+    I += 1;
+    J += 1;
+  end;
+
+  ChatWidget.Free;
+end;
+
+Function R_ChatDialog: Boolean;
+var
+  Dialog: RSWidget;
+begin
+  Dialog := RSWidget.Get(R_CHATBOX_DIALOG.Group, R_CHATBOX_DIALOG.Child);
+  if Dialog.ref <> nil then
+  begin
+    Dialog.Free;
+    Exit(True);
+  end;
+
+  Dialog := RSWidget.Get(R_CHATBOX_PLAYER_DIALOG.Group, R_CHATBOX_PLAYER_DIALOG.Child);
+  if Dialog.ref <> nil then
+  begin
+    Dialog.Free;
+    Exit(True);
+  end;
+end;
+
+Function R_ChatInput: Boolean;
+var
+  Input: RSWidget;
+begin
+  Input := RSWidget.Get(R_CHATBOX_MESSAGES_CHATINPUT.Group, R_CHATBOX_MESSAGES_CHATINPUT.Child);
+  if Input.ref <> nil then
+  begin
+    Mouse.Click(Input.Bounds, MOUSE_LEFT);
+    Input.Free;
+    Exit(True);
+  end;
+end;
+
+Function R_ChatChooseOption(options: Array of String; caseSensitive: Boolean = True): Boolean;
+var
+  I, J: Int32;
+  Dialog: RSWidget;
+  Items: Array of RSWidget;
+  Title: String;
+begin
+  Dialog := RSWidget.Get(R_CHATBOX_NPC_DIALOG_OPTION.Group, R_CHATBOX_NPC_DIALOG_OPTION.Child);
+  if Dialog.ref = nil then
+    Exit(False);
+
+  Items := Dialog.Children;
+  Dialog.Free;
+
+  For I := 1 to High(Items) do
+  begin
+    Title := Items[I].Text;
+    if Title <> '' then
+    begin
+      For J := 0 to High(Options) do
+      begin
+        if (caseSensitive and (Pos(Options[J], Title) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[J]), Lowercase(Title)) > 0)) then
+        begin
+          Mouse.Click(Items[I].Bounds, MOUSE_LEFT);
+          RSTypeArray(Items).Free;
+          Exit(True);
+        end;
+      end;
+    end;
+  end;
+end;
+
+Function R_ClickToContinue: Boolean;
+var
+  NPCContinue, PlayerContinue: RSWidget;
+begin
+  NPCContinue := RSWidget.Get(R_CHATBOX_NPC_CLICK_TO_CONTINUE.Group, R_CHATBOX_NPC_CLICK_TO_CONTINUE.Child);
+  if NPCContinue.ref <> nil then
+  begin
+    Mouse.Click(NPCContinue.Bounds, MOUSE_LEFT);
+    NPCContinue.Free;
+    Exit(True);
+  end;
+
+  PlayerContinue := RSWidget.Get(R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Group, R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Child);
+  if PlayerContinue.ref <> nil then
+  begin
+    Mouse.Click(PlayerContinue.Bounds, MOUSE_LEFT);
+    PlayerContinue.Free;
+    Exit(True);
+  end;
+end;
+
+Function R_ChatSkillChooseOptions(option: Int32): Boolean;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(R_INTERFACE_SKILL_OPTIONS, 14 + (Option - 1), 38);
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Widget.Free;
+    Exit(True);
+  end;
+end;
+
+Function R_ChatSkillChooseOptions(options: Array of String; caseSensitive: Boolean = True): Boolean; overload;
+var
+  I, J: Int32;
+  Widget: RSWidget;
+  Widgets: Array of RSWidget;
+  Title: String;
+begin
+  For I := 0 to 8 do
+  begin
+    Widget := RSWidget.Get(R_INTERFACE_SKILL_OPTIONS, 14 + I);
+    if Widget.ref <> nil then
+    begin
+      Widgets += Widget;
+
+      For J := 0 to High(Options) do
+      begin
+        Title := Widget.Name;
+        if (caseSensitive and (Pos(Options[J], Title) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[J]), Lowercase(Title)) > 0)) then
+        begin
+          Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+          RSTypeArray(Widgets).Free;
+          Exit(True);
+        end;
+      end;
+    end;
+  end;
+
+  RSTypeArray(Widgets).Free;
+end;
+

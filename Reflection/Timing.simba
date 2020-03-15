@@ -1,0 +1,34 @@
+type
+  Timer = record
+    Tick: Int64;
+  end;
+
+Procedure Timer.Start;
+begin
+  tick := GetTickCount();
+end;
+
+Function Timer.ElapsedTime: Int64;
+begin
+  Result := GetTickCount() - self.Tick;
+end;
+
+Procedure Timer.Reset();
+begin
+  self.Tick := 0;
+end;
+
+Function R_WaitFunction(timeout: UInt32; timePerLoop: Int32 = 50; func: Function: Boolean): Boolean;
+var
+  timer: Timer;
+begin
+  timer.Start;
+  while(not func) do
+  begin
+    if timer.ElapsedTime >= timeout then
+      Exit(False);
+
+    Wait(timePerLoop + Random(50));
+  end;
+  Result := True;
+end;

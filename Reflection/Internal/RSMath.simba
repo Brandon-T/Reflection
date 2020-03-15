@@ -48,7 +48,7 @@ begin
     Result.X := (X * viewPortScale div Z) + (ViewPortWidth div 2);
     Result.Y := (Y * viewPortScale div Z) + (ViewPortHeight div 2);
     Exit;
-  end
+  end;
 
   Result.X := -1;
   Result.Y := -1;
@@ -101,6 +101,7 @@ begin
   CosYaw := COSINE[Yaw];
 
   P := [self.X, self.Z, self.Y];
+
   Result := P.WorldToScreen(0, 0, 0,
                             -1,
                             RSCamera.X, RSCamera.Y, RSCamera.Z,
