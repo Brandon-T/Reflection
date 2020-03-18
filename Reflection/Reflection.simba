@@ -6,6 +6,8 @@
 {$include_once Chat.simba}
 {$include_once Menu.simba}
 {$include_once Timing.simba}
+{$include_once Walking.simba}
+{$include_once Model.simba}
 {$include_once Mouse.simba}
 
 begin

@@ -262,6 +262,8 @@ const //Widgets
   R_CHATBOX_BUTTON_REPORT_BACKGROUND: RWidget =     [R_INTERFACE_CHAT, 35];
   R_CHATBOX_BUTTON_TITLE: RWidget =                 [R_INTERFACE_CHAT, 36];
   R_CHATBOX_BACKGROUND: RWidget =                   [R_INTERFACE_CHAT, 38];
+  R_CHATBOX_INPUT_TITLE: RWidget =                  [R_INTERFACE_CHAT, 44];
+  R_CHATBOX_INPUT_FULL: RWidget =                   [R_INTERFACE_CHAT, 45];
   R_CHATBOX_MESSAGES: RWidget =                     [R_INTERFACE_CHAT, 55];
   R_CHATBOX_MESSAGES_CHATLINES: RWidget =           [R_INTERFACE_CHAT, 56];
   R_CHATBOX_MESSAGES_CHATINPUT: RWidget =           [R_INTERFACE_CHAT, 57];

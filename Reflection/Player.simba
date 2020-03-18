@@ -1,0 +1,44 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once srl/shared.simba}
+
+type
+  TRSPlayer = record
+    Name: String;
+    Tile: TPoint;
+    Destination: TPoint;
+    CombatLevel: Int32;
+    Equipment: Array of Int32;
+  end;
+
+Function R_GetMe: TRSPlayer;
+var
+  LocalPlayer: RSPlayer;
+  Definition: RSPlayerDefinition;
+begin
+  LocalPlayer := RSPlayer.Me;
+  Definition := LocalPlayer.Definition;
+  Result.Name := LocalPlayer.Name;
+  Result.Tile := LocalPlayer.Tile;
+  Result.Destination := LocalPlayer.Destination;
+  Result.CombatLevel := LocalPlayer.CombatLevel;
+  Result.Equipment := Definition.Equipment;
+  Definition.Free;
+  LocalPlayer.Free;
+end;
+
+Function R_GetPlayers: Array of TRSPlayer;
+var
+  LocalPlayer: RSPlayer;
+  Definition: RSPlayerDefinition;
+begin
+  LocalPlayer := RSPlayer.Me;
+  Definition := LocalPlayer.Definition;
+  Result.Name := LocalPlayer.Name;
+  Result.Tile := LocalPlayer.Tile;
+  Result.Destination := LocalPlayer.Destination;
+  Result.CombatLevel := LocalPlayer.CombatLevel;
+  Result.Equipment := Definition.Equipment;
+  Definition.Free;
+  LocalPlayer.Free;
+end;

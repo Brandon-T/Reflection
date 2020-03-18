@@ -29,6 +29,10 @@ type
     Bounds: TBox;
   end;
 
+type
+  TRSBankScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
+  TRSBankQuantity = (ONE, FIVE, TEN, X, ALL);
+
 Function R_BankScreen: Boolean;
 begin
   Result := RSWidget.IsValid(R_INTERFACE_BANK);
@@ -126,6 +130,7 @@ end;
 Function R_SelectBankTab(Index: Int32): Boolean;
 var
   TabWidget: RSWidget;
+  T: Timer;
 begin
   if (Index < 0) or (Index > 8) then
     Exit(False);
@@ -133,12 +138,24 @@ begin
   if not R_BankScreen then
     Exit;
 
+  if R_CurrentBankTab = Index then
+    Exit(True);
+
   TabWidget := RSWidget.Get(R_BANK_TAB_CONTAINER.Group, R_BANK_TAB_CONTAINER.Child, Index);
   if TabWidget.ref = nil then
     Exit(False);
 
   Mouse.Click(TabWidget.Bounds, MOUSE_LEFT);
   TabWidget.Free;
+
+  T.Start;
+  while R_CurrentBankTab <> Index do
+  begin
+    if T.ElapsedTime > 1000 then
+      Exit(False);
+    Wait(50, Random(50));
+  end;
+  Result := R_CurrentBankTab = Index;
 end;
 
 Function R_BankSlotVisible(Index: Int32): Boolean;
@@ -168,11 +185,126 @@ begin
   TabWidget.Free;
 end;
 
-Function R_ScrollToBankSlot(Index: Int32; UseMouseWheel: Boolean = True): Boolean;
+Function R_BankSlotToBox(Index: Int32): TBox;
 var
-  ScrollBar: RSWidget;
+  ItemContainer, Slot: RSWidget;
 begin
+  if not R_BankScreen then
+    Exit(Box(-1, -1, -1, -1));
 
+  ItemContainer := RSWidget.Get(R_BANK_ITEM_CONTAINER.Group, R_BANK_ITEM_CONTAINER.Child, Index);
+  if ItemContainer.ref = nil then
+    Exit(Box(-1, -1, -1, -1));
+
+  Result := ItemContainer.Bounds;
+  ItemContainer.Free;
+end;
+
+Function R_ScrollToBankSlot(Index: Int32; ScrollType: TRSBankScroll = TRSBankScroll.SCROLLWHEEL): Boolean;
+var
+  ScrollBar, ScrollArrow, ItemContainer: RSWidget;
+  ItemContainerBounds: TBox;
+  T: Timer;
+  Down: Boolean;
+  P: TPoint;
+begin
+  ItemContainer := RSWidget.Get(R_BANK_CONTENT_CONTAINER.Group, R_BANK_CONTENT_CONTAINER.Child);
+  if ItemContainer.ref = nil then
+    Exit(False);
+
+  ItemContainerBounds := ItemContainer.Bounds;
+  ItemContainer.Free;
+
+  if ItemContainerBounds.Contains(R_BankSlotToBox(Index)) then
+    Exit(True);
+
+  //Gain focus on the interface
+  Down := ItemContainerBounds.Middle.Y < R_BankSlotToBox(Index).Middle.Y;
+
+  //Scroll the interface using the mouse-wheel
+  if ScrollType = TRSBankScroll.SCROLLWHEEL then
+  begin
+    Mouse.Move(ItemContainerBounds, True);
+
+    T.Start;
+    while not ItemContainerBounds.Contains(R_BankSlotToBox(Index)) do
+    begin
+      if T.ElapsedTime > 5000 then
+        Exit(False);
+
+      Mouse.Scroll(3, Down);
+    end;
+
+    Exit(ItemContainerBounds.Contains(R_BankSlotToBox(Index).Middle));
+  end;
+
+  //Scroll the interface using the scroll-bar
+  if ScrollType = TRSBankScroll.SCROLLBAR then
+  begin
+    ScrollBar := RSWidget.Get(R_BANK_SCROLLBAR_BAR.Group, R_BANK_SCROLLBAR_BAR.Child, R_BANK_SCROLLBAR_BAR.Index);
+    if ScrollBar.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollBar.Bounds);
+    Mouse.Click(MOUSE_LEFT);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollBar.Free;
+
+    T.Start;
+    while not ItemContainerBounds.Contains(R_BankSlotToBox(Index)) do
+    begin
+      if T.ElapsedTime > 5000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+
+      P := Mouse.GetPosition;
+      if Down then
+      begin
+        Mouse.Move(P.X + RandomRange(-3, 3), P.Y + RandomRange(5, 10));
+      end else
+        begin
+          Mouse.Move(P.X + RandomRange(-3, 3), P.Y - RandomRange(5, 10));
+        end;
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ItemContainerBounds.Contains(R_BankSlotToBox(Index).Middle));
+  end;
+
+  //Scroll the interface using the arrows
+  if ScrollType = TRSBankScroll.SCROLLARROWS then
+  begin
+    if Down then
+      ScrollArrow := RSWidget.Get(R_BANK_SCROLLBAR_BAR_DOWN.Group, R_BANK_SCROLLBAR_BAR_DOWN.Child, R_BANK_SCROLLBAR_BAR_DOWN.Index)
+    else
+      ScrollArrow := RSWidget.Get(R_BANK_SCROLLBAR_BAR_UP.Group, R_BANK_SCROLLBAR_BAR_UP.Child, R_BANK_SCROLLBAR_BAR_UP.Index);
+
+    if ScrollArrow.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollArrow.Bounds);
+    Mouse.Click(MOUSE_LEFT);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollArrow.Free;
+
+    T.Start;
+    while not ItemContainerBounds.Contains(R_BankSlotToBox(Index)) do
+    begin
+      //It can take a long time to get from slot 0 to 800 (worst case) with the scroll arrows!
+      //Ideally, we should calculate the distance from the current slot to the target slot
+      //and determine how much time is necessary to get there based on scroll velocity..
+      if T.ElapsedTime > 30000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ItemContainerBounds.Contains(R_BankSlotToBox(Index).Middle));
+  end;
 end;
 
 Function R_GetAllBankItems: Array of TRSBankItem;
@@ -350,18 +482,139 @@ begin
   end;
 end;
 
-Function R_WithdrawItem(ID: Int32): Boolean;
+Function R_WithdrawItem(ID: Int32; Amount: Int32 = 0): Boolean;
 var
-  item: TRSBankItem;
+  Item: TRSBankItem;
+  InputFull: RSWidget;
+  Retries: Int32;
 begin
   if not R_BankScreen then
     Exit(False);
 
-  item := R_FindBankItem(ID);
-  if item.ID = -1 then
+  Item := R_FindBankItem(ID);
+  if Item.ID = -1 then
     Exit(False);
 
+  if Item.Slot = 0 then
+  begin
+    if not R_ScrollToBankSlot(Item.Slot, TRSBankScroll.SCROLLWHEEL) then
+      Exit(False);
+  end else
+    begin
+      if R_CurrentBankTab <> Item.Tab then
+      begin
+        if not R_SelectBankTab(Item.Tab) then
+          Exit(False);
+      end;
+    end;
 
+  Item := R_FindBankItem(ID);
+  if Item.ID = -1 then
+    Exit(False);
+
+  if Amount = 0 then
+  begin
+    Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+    Wait(50 + RandomRange(50, 100));
+    Exit(R_ChooseOptions(['Withdraw-All']))
+  end;
+
+  if Amount = -1 then
+  begin
+    Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+    Wait(50 + RandomRange(50, 100));
+    Exit(R_ChooseOptions(['Withdraw-All-but-1']));
+  end;
+
+  Mouse.Move(Item.Bounds);
+  Wait(50 + RandomRange(50, 100));
+  if R_WaitUptext(['Withdraw-' + IntToStr(Amount)], True, RandomRange(200, 300)) then
+  begin
+    Mouse.Click(Item.Bounds, MOUSE_LEFT);
+    Exit(True);
+  end;
+
+  Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+  Wait(50 + RandomRange(50, 100));
+  if R_ChooseOptions(['Withdraw-' + IntToStr(Amount)]) then
+  begin
+    Exit(True);
+  end;
+
+  if R_ChooseOptions(['Withdraw-X']) then
+  begin
+    InputFull := RSWidget.Get(R_CHATBOX_INPUT_FULL.Group, R_CHATBOX_INPUT_FULL.Child);
+    if InputFull.ref = nil then
+      Exit(False);
+
+    while Retries < 3 do
+    begin
+      if InputFull.Text <> '*' then
+      begin
+        Keyboard.KeyDown(VK_BACK);
+        while InputFull.Text <> '*' do
+        begin
+          Wait(50 + RandomRange(50, 100));
+        end;
+        Keyboard.KeyUp(VK_BACK);
+      end;
+
+      Keyboard.Send(IntToStr(Amount));
+      Result := InputFull.Text = IntToStr(Amount) + '*';
+      if Result then
+      begin
+        Keyboard.PressKey(VK_ENTER);
+        Exit(True);
+      end;
+
+      Inc(Retries);
+    end;
+  end;
+end;
+
+Function R_SetBankWithdrawMode(Noted: Boolean): Boolean;
+var
+  Button: RSWidget;
+begin
+  if not R_BankScreen then
+    Exit(False);
+
+  if Noted then
+    Button := RSWidget.Get(R_BANK_WITHDRAW_NOTE.Group, R_BANK_WITHDRAW_NOTE.Child)
+  else
+    Button := RSWidget.Get(R_BANK_WITHDRAW_ITEM.Group, R_BANK_WITHDRAW_ITEM.Child);
+
+  if Button.ref = nil then
+    Exit(False);
+
+  Mouse.Click(Button.Bounds, MOUSE_LEFT);
+  Button.Free;
+
+  Result := True; //TODO: Check if the mode actually changed by checking button spriteId..
+end;
+
+Function R_SetBankQuantityMode(Mode: TRSBankQuantity): Boolean;
+var
+  Button: RSWidget;
+begin
+  if not R_BankScreen then
+    Exit(False);
+
+  case Mode of
+    ONE:  begin Button := RSWidget.Get(R_BANK_QUANTITY_1.Group, R_BANK_QUANTITY_1.Child) end;
+    FIVE: begin Button := RSWidget.Get(R_BANK_QUANTITY_5.Group, R_BANK_QUANTITY_5.Child) end;
+    TEN:  begin Button := RSWidget.Get(R_BANK_QUANTITY_10.Group, R_BANK_QUANTITY_10.Child) end;
+    X:    begin Button := RSWidget.Get(R_BANK_QUANTITY_X.Group, R_BANK_QUANTITY_X.Child) end;
+    ALL:  begin Button := RSWidget.Get(R_BANK_QUANTITY_ALL.Group, R_BANK_QUANTITY_ALL.Child) end;
+  end;
+
+  if Button.ref = nil then
+    Exit(False);
+
+  Mouse.Click(Button.Bounds, MOUSE_LEFT);
+  Button.Free;
+
+  Result := True; //TODO: Check if the mode actually changed by checking button spriteId..
 end;
 
 

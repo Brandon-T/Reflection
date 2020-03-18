@@ -1,0 +1,30 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once srl/shared.simba}
+
+Function R_TileToMM(Tile: TPoint): TPoint;
+begin
+  Result := RSTile(Tile).ToLocal.TileToMM;
+end;
+
+Function R_MMToMS(P: TPoint): TPoint;
+begin
+  Result := TPoint(RSTile(P).MMToTile.TileToMS);
+end;
+
+Function R_TileHeight(Tile: TPoint): Int32;
+begin
+  Result := RSTile.GetHeight;
+end;
+
+Function R_TileBounds(Tile: TPoint): TRectangle;
+var
+  Rect: T2DRectangle;
+begin
+  Rect := RSTile(Tile).Project;
+
+  Result.Top := Rect.NW;
+  Result.Right := Rect.NE;
+  Result.Btm   := Rect.SE;
+  Result.Left  := Rect.SW;
+end;
