@@ -2,6 +2,68 @@
 {$IFNDEF FUNCTIONS}
 {$DEFINE FUNCTIONS}
 
+//Used to check for leaks in the include..
+{type
+  MemoryPointer = Array of Pointer;
+
+var
+  MemoryTracker: MemoryPointer;
+
+procedure MemoryPointer.DeleteIndex(index: integer);
+var
+  i: Integer;
+begin
+  if (index >= 0) and (index < Length(self)) then
+  begin
+    for i := index + 1 to high(self) do
+    begin
+      self[i - 1] := self[i];
+    end;
+
+    SetLength(self, Length(self) - 1);
+  end;
+end;
+
+function MemoryPointer.IndexOf(value: pointer): Int32;
+var
+  i: Integer;
+begin
+  for i := 0 to high(self) do
+    if self[i] = value then
+      exit(i);
+
+  exit(-1);
+end;
+
+Procedure MemoryPointer.Add(ptr: Pointer);
+begin
+  self += ptr;
+end;
+
+Procedure MemoryPointer.Add(ptr: Array of Pointer); overload;
+begin
+  self += ptr;
+end;
+
+Procedure MemoryPointer.Remove(ptr: Pointer);
+var
+  J: Integer;
+begin
+  J := self.IndexOf(ptr);
+  if J >= 0 then
+    Delete(self, J, 1);
+end;
+
+Procedure MemoryPointer.Remove(ptrs: Array of Pointer); overload;
+var
+  I: Integer;
+begin
+  for i := 0 to high(ptrs) do
+  begin
+    self.Remove(ptrs[I]);
+  end;
+end;}
+
 // MARK: - OBJECT
 
 Function RGetObject(eios: Pointer; instance: Pointer; constref hook: THook): Pointer;
