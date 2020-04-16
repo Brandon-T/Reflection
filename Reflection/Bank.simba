@@ -29,9 +29,11 @@ type
     Bounds: TBox;
   end;
 
+{$scopedenums on}
 type
   TRSBankScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
   TRSBankQuantity = (ONE, FIVE, TEN, X, ALL);
+{$scopedenums off}
 
 Function R_BankScreen: Boolean;
 begin
@@ -224,7 +226,7 @@ begin
   //Scroll the interface using the mouse-wheel
   if ScrollType = TRSBankScroll.SCROLLWHEEL then
   begin
-    Mouse.Move(ItemContainerBounds, True);
+    Mouse.Move(ItemContainerBounds);
 
     T.Start;
     while not ItemContainerBounds.Contains(R_BankSlotToBox(Index)) do
@@ -601,11 +603,11 @@ begin
     Exit(False);
 
   case Mode of
-    ONE:  begin Button := RSWidget.Get(R_BANK_QUANTITY_1.Group, R_BANK_QUANTITY_1.Child) end;
-    FIVE: begin Button := RSWidget.Get(R_BANK_QUANTITY_5.Group, R_BANK_QUANTITY_5.Child) end;
-    TEN:  begin Button := RSWidget.Get(R_BANK_QUANTITY_10.Group, R_BANK_QUANTITY_10.Child) end;
-    X:    begin Button := RSWidget.Get(R_BANK_QUANTITY_X.Group, R_BANK_QUANTITY_X.Child) end;
-    ALL:  begin Button := RSWidget.Get(R_BANK_QUANTITY_ALL.Group, R_BANK_QUANTITY_ALL.Child) end;
+    TRSBankQuantity.ONE:  begin Button := RSWidget.Get(R_BANK_QUANTITY_1.Group, R_BANK_QUANTITY_1.Child) end;
+    TRSBankQuantity.FIVE: begin Button := RSWidget.Get(R_BANK_QUANTITY_5.Group, R_BANK_QUANTITY_5.Child) end;
+    TRSBankQuantity.TEN:  begin Button := RSWidget.Get(R_BANK_QUANTITY_10.Group, R_BANK_QUANTITY_10.Child) end;
+    TRSBankQuantity.X:    begin Button := RSWidget.Get(R_BANK_QUANTITY_X.Group, R_BANK_QUANTITY_X.Child) end;
+    TRSBankQuantity.ALL:  begin Button := RSWidget.Get(R_BANK_QUANTITY_ALL.Group, R_BANK_QUANTITY_ALL.Child) end;
   end;
 
   if Button.ref = nil then

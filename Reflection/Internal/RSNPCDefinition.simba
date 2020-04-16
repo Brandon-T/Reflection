@@ -50,7 +50,7 @@ end;
 
 Function RSNPCDefinition.IsVisible: Boolean; constref;
 begin
-  Result := RGetBool(R_EIOS, ref, NPCDEFINITION_ISVISIBLE);
+  Result := RGetBool(R_EIOS, ref, NPCDEFINITION_VISIBLE);
 end;
 
 Function RSNPCDefinition.Transformations: Array of Int32; constref;
