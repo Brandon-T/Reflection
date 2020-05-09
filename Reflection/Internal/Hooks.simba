@@ -1,11 +1,6 @@
 {$IFNDEF REMOTEINPUT}
 {$DEFINE REMOTEINPUT}
-
-{$ifdef WINDOWS}
-{$loadlib RemoteInput}
-{$else}
 {$loadlib LibRemoteInput}
-{$endif}
 
 type
   PRIField = ^RIField;
