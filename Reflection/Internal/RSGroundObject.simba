@@ -15,7 +15,7 @@ var
 
   Items: Pointer;
   ItemsSize: SizeUInt;
-  LinkedList: RSLinkedList;
+  NodeDeque: RSNodeDeque;
   Head, Curr: RSNode;
   Garbage: RSTYpeArray;
   Item: RSGroundItem;
@@ -44,12 +44,12 @@ begin
   begin
     for X := MinX to MaxX - 1 do
     begin
-      LinkedList.ref := RGetObjectArray3D(R_EIOS, Items, Plane, X - BaseX, Y - BaseY);
-      if LinkedList.ref <> nil then
+      NodeDeque.ref := RGetObjectArray3D(R_EIOS, Items, Plane, X - BaseX, Y - BaseY);
+      if NodeDeque.ref <> nil then
       begin
-        Head := LinkedList.Head;
+        Head := NodeDeque.Head;
         Curr := Head.Next;
-        Garbage := [LinkedList, Head, Curr];
+        Garbage := [NodeDeque, Head, Curr];
 
         while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
         begin
@@ -76,7 +76,7 @@ var
   BaseX, BaseY: Int32;
   //Index, Hash: Int32;
   Items: Pointer;
-  LinkedList: RSLinkedList;
+  NodeDeque: RSNodeDeque;
   Head, Curr: RSNode;
   Garbage: RSTYpeArray;
   Item: RSGroundItem;
@@ -85,15 +85,15 @@ begin
   BaseY := RSClient.BaseY;
 
   Items := RGetObject(R_EIOS, nil, Client_GroundItems);
-  LinkedList.ref := RGetObjectArray3D(R_EIOS, Items, RSClient.Plane, X - BaseX, Y - BaseY);
+  NodeDeque.ref := RGetObjectArray3D(R_EIOS, Items, RSClient.Plane, X - BaseX, Y - BaseY);
   RFreeObject(R_EIOS, items);
 
   //Hash := X or (Y shl 14) or (RSClient.Plane shl 28);
   //Index := Hash and (ItemsSize - 1);
 
-  Head := LinkedList.Head;
+  Head := NodeDeque.Head;
   Curr := Head.Next;
-  Garbage := [LinkedList, Head, Curr];
+  Garbage := [NodeDeque, Head, Curr];
 
   while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
   begin
