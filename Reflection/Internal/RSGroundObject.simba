@@ -4,6 +4,16 @@
 {$include_once RSPlayer.simba}
 {$include_once RSLinkedList.simba}
 
+(*
+RSGroundObject.GetAll
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns all items on the ground (ID, Stack Size, Tile)
+
+Example:
+
+  Writeln(RSGroundObject.GetAll);
+*)
 Function RSGroundObject.GetAll: Array of RSGroundItem; static;
 var
   Tile: RSTile;
@@ -68,6 +78,141 @@ begin
 
   Garbage.Free;
   RFreeObject(R_EIOS, Items);
+end;
+
+(*
+RSGroundObject.GetTileByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns all tiles that contain a specific object ID.
+
+Example:
+
+  Writeln(RSGroundObject.GetTileByID(526));
+*)
+Function RSGroundObject.GetTileByID(itemID: Int32): Array of RSTile; static;
+var
+  Tile: RSTile;
+  Plane: Int32;
+  BaseX, BaseY: Int32;
+  MinX, MinY, MaxX, MaxY: Int32;
+  X, Y: Int32;
+  Player: RSPlayer;
+
+  Items: Pointer;
+  ItemsSize: SizeUInt;
+  NodeDeque: RSNodeDeque;
+  Head, Curr: RSNode;
+  Garbage: RSTYpeArray;
+
+  ID: Int32;
+begin
+  Player := RSPlayer.Me;
+  Tile := Player.Tile;
+  Player.Free;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+  Plane := RSClient.Plane;
+
+  MinX := BaseX;
+  MinY := BaseY;
+  MaxX := BaseX + 104;
+  MaxY := BaseY + 104;
+
+  ItemsSize := 0;
+  Items := RGetArray(R_EIOS, nil, ItemsSize, Client_GroundItems);
+  if ItemsSize = 0 then
+    Exit;
+
+  for Y := MinY to MaxY - 1 do
+  begin
+    for X := MinX to MaxX - 1 do
+    begin
+      NodeDeque.ref := RGetObjectArray3D(R_EIOS, Items, Plane, X - BaseX, Y - BaseY);
+      if NodeDeque.ref <> nil then
+      begin
+        Head := NodeDeque.Head;
+        Curr := Head.Next;
+        Garbage := [NodeDeque, Head, Curr];
+
+        while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+        begin
+          ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
+          if (itemID <> ID) then
+            break();
+
+          Result += [X, Y];
+
+          Curr := Curr.Next;
+          Garbage += Curr;
+        end;
+      end;
+    end;
+  end;
+
+  Garbage.Free;
+  RFreeObject(R_EIOS, Items);
+end;
+
+(*
+RSGroundObject.GetMSByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Mainscreen coordinates of a specific object ID.
+
+Example:
+
+   Mouse.Move(RSGroundObject.GetMSByID(526)[0]);
+*)
+Function RSGroundObject.GetMSByID(itemID: Int32): Array of RSTile; static;
+var
+  I, W, H: Integer;
+  Tile, ResultTile: RSTile;
+  items: Array of RSTile;
+  Player: RSPlayer;
+begin
+  items := RSGroundObject.GetTileByID(itemID);
+  if (length(items) < 1) then
+    exit();
+
+  for I := 0 to length(items) - 1 do
+  begin
+    GetClientDimensions(W, H);
+    ResultTile := RSTile(items[I]).ToLocal.TileToMS;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+      Result += ResultTile;
+  end;
+end;
+
+(*
+RSGroundObject.GetMMByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Minimap coordinates of a specific object ID.
+
+Example:
+
+   Mouse.Move(RSGroundObject.GetMMByID(526)[0]);
+*)
+Function RSGroundObject.GetMMByID(itemID: Int32): Array of RSTile; static;
+var
+  I, W, H: Integer;
+  Tile, ResultTile: RSTile;
+  items: Array of RSTile;
+  Player: RSPlayer;
+begin
+  items := RSGroundObject.GetTileByID(itemID);
+  if (length(items) < 1) then
+    exit();
+
+  for I := 0 to length(items) - 1 do
+  begin
+    GetClientDimensions(W, H);
+    ResultTile := RSTile(items[I]).ToLocal.TileToMS;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+      Result += ResultTile;
+  end;
 end;
 
 Function RSGroundObject.GetItemsAt(X, Y: Int32): Array of RSGroundItem; static;
