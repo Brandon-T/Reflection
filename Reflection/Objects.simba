@@ -10,7 +10,7 @@ Example:
 *)
 Function R_GetMainscreenObjectByID(itemID: Int32): Array of RSTile; static;
 var
-  I, W, H: Integer;
+  i, w, h: Integer;
   ResultTile: RSTile;
   items: Array of RSTile;
 begin
@@ -18,11 +18,11 @@ begin
   if (length(items) < 1) then
     exit();
 
-  for I := 0 to length(items) - 1 do
+  for i := 0 to length(items) - 1 do
   begin
-    GetClientDimensions(W, H);
-    ResultTile := RSTile(items[I]).ToLocal.TileToMS;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+    GetClientDimensions(w, h);
+    ResultTile := RSTile(items[i]).ToLocal.TileToMS;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > w) or (ResultTile.Y < 0) or (ResultTile.Y > h))) then
       Result += ResultTile;
   end;
 end;
@@ -39,20 +39,19 @@ Example:
 *)
 Function R_GetMinimapObjectByID(itemID: Int32): Array of RSTile; static;
 var
-  I, W, H: Integer;
+  i, w, h: Integer;
   ResultTile: RSTile;
   items: Array of RSTile;
-  Player: RSPlayer;
 begin
   items := RSGroundObject.GetTileByID(itemID);
   if (length(items) < 1) then
     exit();
 
-  for I := 0 to length(items) - 1 do
+  for i := 0 to length(items) - 1 do
   begin
-    GetClientDimensions(W, H);
-    ResultTile := RSTile(items[I]).ToLocal.TileToMM;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+    GetClientDimensions(w, h);
+    ResultTile := RSTile(items[i]).ToLocal.TileToMM;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > w) or (ResultTile.Y < 0) or (ResultTile.Y > h))) then
       Result += ResultTile;
   end;
 end;
@@ -69,18 +68,44 @@ Example:
 *)
 Function R_IsObjectOnTile(itemID, X, Y: Int32): Boolean;
 var
-  I, W, H: Integer;
-  ResultTile: RSTile;
+  i: Integer;
   items: Array of RSGroundItem;
-  Player: RSPlayer;
 begin
   items := RSGroundObject.GetItemsAt(X, Y);
   if (length(items) < 1) then
     exit();
 
-  for I := 0 to length(items) - 1 do
+  for i := 0 to length(items) - 1 do
   begin
-    if (items[I].ID = itemID) then
+    if (items[i].ID = itemID) then
       exit(True);
   end;
 end;
+
+(*
+R_GetObjectStackSize
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the number count of items of a given ID
+ on a specific tile.
+
+Example:
+
+   writeln(R_GetObjectStackSize(314, player.Tile.X, player.Tile.Y));
+*)
+Function R_GetObjectStackSize(itemID, X, Y: Int32): Int32;
+var
+  i: Integer;
+  items: Array of RSGroundItem;
+begin
+  items := RSGroundObject.GetItemsAt(X, Y);
+  if (length(items) < 1) then
+    exit();
+
+  for i := 0 to length(items) - 1 do
+  begin
+    if (items[i].ID = itemID) then
+      exit(items[i].StackSize);
+  end;
+end;
+
