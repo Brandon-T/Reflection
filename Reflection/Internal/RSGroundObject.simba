@@ -139,10 +139,8 @@ begin
         while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
         begin
           ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
-          if (itemID <> ID) then
-            break();
-
-          Result += [X, Y];
+          if (itemID = ID) then
+            Result += [X, Y];
 
           Curr := Curr.Next;
           Garbage += Curr;
