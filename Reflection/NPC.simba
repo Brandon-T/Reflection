@@ -21,16 +21,6 @@ begin
   end;
 end;
 
-(*
-R_NPCIsVisible
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns True if NPC is visible on screen.
-
-Example:
-
-   writeln(R_NPCIsVisible('Chicken'));
-*)
 Function R_NPCIsVisible(Name: String): Boolean; overload;
 var
   npcs: Array of RSNPC;

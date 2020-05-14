@@ -1,111 +1,32 @@
 (*
-R_GetMainscreenObjectByID
+R_GetGameObjectID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the Mainscreen coordinates of a specific object ID.
+Returns the ID of the game object on the given global tile.
 
 Example:
 
-   Mouse.Move(R_GetMainscreenObjectByID(526)[0]);
-*)
-Function R_GetMainscreenObjectByID(itemID: Int32): Array of RSTile; static;
-var
-  i, w, h: Integer;
-  ResultTile: RSTile;
-  items: Array of RSTile;
-begin
-  items := RSGroundObject.GetTileByID(itemID);
-  if (length(items) < 1) then
-    exit();
+   writeln(R_GetGameObjectID(3187, 3293));
 
-  for i := 0 to length(items) - 1 do
-  begin
-    GetClientDimensions(w, h);
-    ResultTile := RSTile(items[i]).ToLocal.TileToMS;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > w) or (ResultTile.Y < 0) or (ResultTile.Y > h))) then
-      Result += ResultTile;
-  end;
+*)
+Function R_GetGameObjectID(X, Y: Int32): Int32;
+begin
+  Result := RSObject.Get(RSObjectType.Game_Object, X, Y).Definition.ID;
 end;
 
 (*
-R_GetMinimapObjectByID
+R_GetGameObjectName
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the Minimap coordinates of a specific object ID.
+Returns the Name of the game object on the given global tile.
 
 Example:
 
-   Mouse.Move(R_GetMinimapObjectByID(526)[0]);
+   writeln(R_GetGameObjectName(3187, 3293));
+
 *)
-Function R_GetMinimapObjectByID(itemID: Int32): Array of RSTile; static;
-var
-  i, w, h: Integer;
-  ResultTile: RSTile;
-  items: Array of RSTile;
+Function R_GetGameObjectName(X, Y: Int32): String;
 begin
-  items := RSGroundObject.GetTileByID(itemID);
-  if (length(items) < 1) then
-    exit();
-
-  for i := 0 to length(items) - 1 do
-  begin
-    GetClientDimensions(w, h);
-    ResultTile := RSTile(items[i]).ToLocal.TileToMM;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > w) or (ResultTile.Y < 0) or (ResultTile.Y > h))) then
-      Result += ResultTile;
-  end;
-end;
-
-(*
-R_IsObjectOnTile
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the True if object is on a specific tile.
-
-Example:
-
-   writeln(R_IsObjectOnTile(314, player.Tile.X, player.Tile.Y));
-*)
-Function R_IsObjectOnTile(itemID, X, Y: Int32): Boolean;
-var
-  i: Integer;
-  items: Array of RSGroundItem;
-begin
-  items := RSGroundObject.GetItemsAt(X, Y);
-  if (length(items) < 1) then
-    exit();
-
-  for i := 0 to length(items) - 1 do
-  begin
-    if (items[i].ID = itemID) then
-      exit(True);
-  end;
-end;
-
-(*
-R_GetObjectStackSize
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the number count of items of a given ID
- on a specific tile.
-
-Example:
-
-   writeln(R_GetObjectStackSize(314, player.Tile.X, player.Tile.Y));
-*)
-Function R_GetObjectStackSize(itemID, X, Y: Int32): Int32;
-var
-  i: Integer;
-  items: Array of RSGroundItem;
-begin
-  items := RSGroundObject.GetItemsAt(X, Y);
-  if (length(items) < 1) then
-    exit();
-
-  for i := 0 to length(items) - 1 do
-  begin
-    if (items[i].ID = itemID) then
-      exit(items[i].StackSize);
-  end;
+  Result := RSObject.Get(RSObjectType.Game_Object, X, Y).Definition.Name;
 end;
 
