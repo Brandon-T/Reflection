@@ -1,0 +1,58 @@
+(*
+R_GetMainscreenObjectByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Mainscreen coordinates of a specific object ID.
+
+Example:
+
+   Mouse.Move(R_GetMainscreenObjectByID(526)[0]);
+*)
+Function R_GetMainscreenObjectByID(itemID: Int32): Array of RSTile; static;
+var
+  I, W, H: Integer;
+  ResultTile: RSTile;
+  items: Array of RSTile;
+begin
+  items := RSGroundObject.GetTileByID(itemID);
+  if (length(items) < 1) then
+    exit();
+
+  for I := 0 to length(items) - 1 do
+  begin
+    GetClientDimensions(W, H);
+    ResultTile := RSTile(items[I]).ToLocal.TileToMS;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+      Result += ResultTile;
+  end;
+end;
+
+(*
+R_GetMinimapObjectByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Minimap coordinates of a specific object ID.
+
+Example:
+
+   Mouse.Move(R_GetMinimapObjectByID(526)[0]);
+*)
+Function R_GetMinimapObjectByID(itemID: Int32): Array of RSTile; static;
+var
+  I, W, H: Integer;
+  ResultTile: RSTile;
+  items: Array of RSTile;
+  Player: RSPlayer;
+begin
+  items := RSGroundObject.GetTileByID(itemID);
+  if (length(items) < 1) then
+    exit();
+
+  for I := 0 to length(items) - 1 do
+  begin
+    GetClientDimensions(W, H);
+    ResultTile := RSTile(items[I]).ToLocal.TileToMM;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+      Result += ResultTile;
+  end;
+end;
