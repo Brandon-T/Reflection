@@ -56,3 +56,31 @@ begin
       Result += ResultTile;
   end;
 end;
+
+(*
+R_IsObjectOnTile
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the True if object is on a specific tile.
+
+Example:
+
+   writeln(R_IsObjectOnTile(314, player.Tile.X, player.Tile.Y));
+*)
+Function R_IsObjectOnTile(itemID, X, Y: Int32): Boolean;
+var
+  I, W, H: Integer;
+  ResultTile: RSTile;
+  items: Array of RSGroundItem;
+  Player: RSPlayer;
+begin
+  items := RSGroundObject.GetItemsAt(X, Y);
+  if (length(items) < 1) then
+    exit();
+
+  for I := 0 to length(items) - 1 do
+  begin
+    if (items[I].ID = itemID) then
+      exit(True);
+  end;
+end;

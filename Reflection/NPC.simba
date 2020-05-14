@@ -1,0 +1,173 @@
+(*
+R_NPCIsVisible
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns True if NPC is visible on screen.
+
+Example:
+
+   writeln(R_NPCIsVisible(1173));
+*)
+Function R_NPCIsVisible(ID: Int32): Boolean;
+var
+  npcs: Array of RSNPC;
+  i: Integer;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.ID = ID) then
+      exit(True);
+  end;
+end;
+
+(*
+R_NPCIsVisible
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns True if NPC is visible on screen.
+
+Example:
+
+   writeln(R_NPCIsVisible('Chicken'));
+*)
+Function R_NPCIsVisible(Name: String): Boolean; overload;
+var
+  npcs: Array of RSNPC;
+  i: Integer;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.Name = Name) then
+      exit(True);
+  end;
+end;
+
+(*
+R_NPCGetCombatLevel
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the combat level of the given NPC if they are on screen
+  or 0 if the NPC is not on screen.
+
+Example:
+
+   writeln(R_NPCGetCombatLevel(1173));
+*)
+Function R_NPCGetCombatLevel(ID: Int32): Int32;
+var
+  npcs: Array of RSNPC;
+  i: Integer;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.ID = ID) then
+      exit(npcs[i].Definition.CombatLevel);
+  end;
+end;
+
+Function R_NPCGetCombatLevel(Name: String): Int32; overload;
+var
+  npcs: Array of RSNPC;
+  i: Integer;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.Name = Name) then
+      exit(npcs[i].Definition.CombatLevel);
+  end;
+end;
+
+(*
+R_NPCGetName
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the name of the given NPC if they are on screen.
+
+Example:
+
+   writeln(R_NPCGetName(3114));
+*)
+Function R_NPCGetName(ID: Int32): String;
+var
+  npcs: Array of RSNPC;
+  i: Integer;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.ID = ID) then
+      exit(npcs[i].Definition.Name);
+  end;
+end;
+
+(*
+R_NPCGetID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the ID of the given NPC if they are on screen.
+
+Example:
+
+   writeln(R_NPCGetID('Chicken'));
+*)
+Function R_NPCGetID(Name: String): TIntegerArray;
+var
+  npcs: Array of RSNPC;
+  i, id: Integer;
+  ids: TIntegerArray;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    id := npcs[i].Definition.ID;
+    if ((npcs[i].Definition.Name = Name) and (not (ids.Find(id) > -1))) then
+      ids += (id);
+  end;
+  Result := ids;
+end;
+
+(*
+R_NPCGetActions
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the actions of the given NPC if they are on screen.
+
+Example:
+
+   writeln(R_NPCGetActions(3114));
+*)
+Function R_NPCGetActions(ID: Int32): TStringArray;
+var
+  npcs: Array of RSNPC;
+  i, j: Integer;
+  actions: TStringArray;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.ID = ID) then
+    begin
+      exit(npcs[i].Definition.Actions);
+    end;
+  end;
+end;
+
+Function R_NPCGetActions(Name: String): TStringArray; overload;
+var
+  npcs: Array of RSNPC;
+  i, j: Integer;
+  actions: TStringArray;
+begin
+  npcs := RSClient.AllNPCs;
+  for i := 0 to length(npcs) - 1 do
+  begin
+    if (npcs[i].Definition.Name = Name) then
+    begin
+      exit(npcs[i].Definition.Actions);
+    end;
+  end;
+end;
