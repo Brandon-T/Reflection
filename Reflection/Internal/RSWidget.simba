@@ -1,4 +1,5 @@
 {$include_once RSStructures.simba}
+{$include_once RSHashTable.simba}
 {$include_once RSIterableHashTable.simba}
 {$include_once RSWidgetNode.simba}
 {$include_once RSText.simba}
@@ -21,7 +22,7 @@ end;
 Function RSWidget.ParentID: Int32; constref;
 var
   I: Int32;
-  HashTable: RSIterableHashTable;
+  HashTable: RSHashTable;
   Head, Current: RSNode;
   HeadUID, CurrentUID: Int64;
   Garbage: RSTypeArray;
