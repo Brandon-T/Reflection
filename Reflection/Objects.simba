@@ -11,7 +11,7 @@ Example:
 Function R_GetMainscreenObjectByID(itemID: Int32): Array of RSTile; static;
 var
   I, W, H: Integer;
-  Tile, ResultTile: RSTile;
+  ResultTile: RSTile;
   items: Array of RSTile;
 begin
   items := RSGroundObject.GetTileByID(itemID);
@@ -40,7 +40,7 @@ Example:
 Function R_GetMinimapObjectByID(itemID: Int32): Array of RSTile; static;
 var
   I, W, H: Integer;
-  Tile, ResultTile: RSTile;
+  ResultTile: RSTile;
   items: Array of RSTile;
   Player: RSPlayer;
 begin
