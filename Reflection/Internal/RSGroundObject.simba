@@ -155,66 +155,6 @@ begin
   RFreeObject(R_EIOS, Items);
 end;
 
-(*
-RSGroundObject.GetMSByID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the Mainscreen coordinates of a specific object ID.
-
-Example:
-
-   Mouse.Move(RSGroundObject.GetMSByID(526)[0]);
-*)
-Function RSGroundObject.GetMSByID(itemID: Int32): Array of RSTile; static;
-var
-  I, W, H: Integer;
-  Tile, ResultTile: RSTile;
-  items: Array of RSTile;
-  Player: RSPlayer;
-begin
-  items := RSGroundObject.GetTileByID(itemID);
-  if (length(items) < 1) then
-    exit();
-
-  for I := 0 to length(items) - 1 do
-  begin
-    GetClientDimensions(W, H);
-    ResultTile := RSTile(items[I]).ToLocal.TileToMS;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
-      Result += ResultTile;
-  end;
-end;
-
-(*
-RSGroundObject.GetMMByID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the Minimap coordinates of a specific object ID.
-
-Example:
-
-   Mouse.Move(RSGroundObject.GetMMByID(526)[0]);
-*)
-Function RSGroundObject.GetMMByID(itemID: Int32): Array of RSTile; static;
-var
-  I, W, H: Integer;
-  Tile, ResultTile: RSTile;
-  items: Array of RSTile;
-  Player: RSPlayer;
-begin
-  items := RSGroundObject.GetTileByID(itemID);
-  if (length(items) < 1) then
-    exit();
-
-  for I := 0 to length(items) - 1 do
-  begin
-    GetClientDimensions(W, H);
-    ResultTile := RSTile(items[I]).ToLocal.TileToMM;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
-      Result += ResultTile;
-  end;
-end;
-
 Function RSGroundObject.GetItemsAt(X, Y: Int32): Array of RSGroundItem; static;
 var
   ID, Stack: Int32;
