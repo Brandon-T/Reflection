@@ -274,7 +274,7 @@ var
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
@@ -297,7 +297,7 @@ var
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
@@ -330,7 +330,7 @@ var
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
@@ -353,7 +353,7 @@ var
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
@@ -387,7 +387,7 @@ var
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;

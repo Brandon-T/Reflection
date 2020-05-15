@@ -1,0 +1,15 @@
+(*
+R_MainscreenBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the pixel coordinates that bound the viewable screen.
+
+Example:
+
+   if (R_MainscreenBounds.Contains([X, Y]) then
+      ...
+*)
+Function R_MainscreenBounds(): TBox;
+begin
+  Result := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+end;

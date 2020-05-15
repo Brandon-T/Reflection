@@ -113,7 +113,7 @@ var
   Definition: RSObjectDefinition;
 begin
   GameObjects := RSObject.GetGameObjectOnScreen;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(GameObjects) do
   begin
     Definition := GameObjects[i].Definition;
@@ -134,7 +134,7 @@ var
   Definition: RSObjectDefinition;
 begin
   GameObjects := RSObject.GetGameObjectOnScreen;
-  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  MSBounds := R_MainscreenBounds;
   for I := 0 to High(GameObjects) do
   begin
     Definition := GameObjects[i].Definition;
@@ -145,5 +145,4 @@ begin
   end;
   RSTypeArray(GameObjects).Free;
 end;
-
 
