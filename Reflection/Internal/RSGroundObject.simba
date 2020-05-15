@@ -90,7 +90,7 @@ Example:
 
   Writeln(RSGroundObject.GetTileByID(526));
 *)
-Function RSGroundObject.GetTileByID(itemID: Int32): Array of RSTile; static;
+Function RSGroundObject.GetTileByID(ItemID: Int32): Array of RSTile; static;
 var
   Tile: RSTile;
   Plane: Int32;
@@ -138,8 +138,7 @@ begin
 
         while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
         begin
-          ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
-          if (itemID = ID) then
+          if ItemID = RGetInt(R_EIOS, Curr.ref, ITEM_ID) then
             Result += [X, Y];
 
           Curr := Curr.Next;

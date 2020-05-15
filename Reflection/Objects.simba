@@ -10,8 +10,15 @@ Example:
 
 *)
 Function R_GetGameObjectID(X, Y: Int32): Int32;
+var
+  GameObject: RSObject;
+  Definition: RSObjectDefinition;
 begin
-  Result := RSObject.Get(RSObjectType.Game_Object, X, Y).Definition.ID;
+  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
+  Definition := GameObject.Definition;
+  Result := Definition.ID;
+  Definition.Free;
+  GameObject.Free;
 end;
 
 (*
@@ -26,7 +33,14 @@ Example:
 
 *)
 Function R_GetGameObjectName(X, Y: Int32): String;
+var
+  GameObject: RSObject;
+  Definition: RSObjectDefinition;
 begin
-  Result := RSObject.Get(RSObjectType.Game_Object, X, Y).Definition.Name;
+  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
+  Definition := GameObject.Definition;
+  Result := Definition.Name;
+  Definition.Free;
+  GameObject.Free;
 end;
 

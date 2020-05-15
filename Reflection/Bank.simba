@@ -628,7 +628,7 @@ begin
 
   Widget := RSWidget.Get(R_BANK_CLOSE.Group, R_BANK_CLOSE.Child, R_BANK_CLOSE.Index);
 
-  if Widget.ref <> then
+  if Widget.ref <> nil then
   begin
     Mouse.Click(Widget.Bounds, MOUSE_LEFT);
     Widget.Free;
