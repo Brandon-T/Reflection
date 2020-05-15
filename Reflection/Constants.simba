@@ -131,6 +131,7 @@ const //Widgets
   R_BANK_CONTAINER_CHILD: RWidget =                 [R_INTERFACE_BANK, 2];
   R_BANK_CLOSE: RWidget =                           [R_INTERFACE_BANK, 2, 3];
   R_BANK_TITLE_BAR: RWidget =                       [R_INTERFACE_BANK, 3];
+  R_BANK_HELP_CONTAINER: RWidget =                  [R_INTERFACE_BANK, 4];
   R_BANK_CAPACITY_USED: RWidget =                   [R_INTERFACE_BANK, 5];
   R_BANK_CAPACITY_SEPARATOR: RWidget =              [R_INTERFACE_BANK, 6];
   R_BANK_CAPACITY_CONTAINER: RWidget =              [R_INTERFACE_BANK, 7];
