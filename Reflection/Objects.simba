@@ -62,7 +62,7 @@ var
   GameObjects: Array of RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObjects := RSObject.GetGameObjectOnScreen;
+  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
 
   for I := 0 to High(GameObjects) do
   begin
@@ -80,7 +80,7 @@ var
   GameObjects: Array of RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObjects := RSObject.GetGameObjectOnScreen;
+  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
 
   for I := 0 to High(GameObjects) do
   begin
@@ -112,7 +112,7 @@ var
   GameObjects: Array of RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObjects := RSObject.GetGameObjectOnScreen;
+  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
   MSBounds := R_MainscreenBounds;
   for I := 0 to High(GameObjects) do
   begin
@@ -133,7 +133,7 @@ var
   GameObjects: Array of RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObjects := RSObject.GetGameObjectOnScreen;
+  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
   MSBounds := R_MainscreenBounds;
   for I := 0 to High(GameObjects) do
   begin

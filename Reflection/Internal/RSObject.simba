@@ -42,9 +42,9 @@ Returns an array of RSObjects that are visible on screen.
 
 Example:
 
-   Mouse.Move(RSObject.GetGameObjectOnScreen());
+   Mouse.Move(RSObject.GetGameObjectOnScreen(GAME_OBJECT));
 *)
-Function RSObject.GetGameObjectOnScreen(): Array of RSObject; static;
+Function RSObject.GetAllObjectOnScreen(ObjectType: RSObjectType): Array of RSObject; static;
 var
   BaseX, BaseY, MinX, MinY, MaxX, MaxY, X, Y: Int32;
   Region: RSRegion;
@@ -69,7 +69,12 @@ begin
       Tile := Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
       if ((Tile.GameObject.ref <> nil)) then
       begin
-        Result += Tile.GameObject;
+        case ObjectType of
+          GAME_OBJECT: Result += Tile.GameObject;
+          WALL_DECORATION: Result += Tile.WallDecoration;
+          BOUNDARY_OBJECT: Result += Tile.BoundaryObject;
+          FLOOR_DECORATION: Result += Tile.GroundDecoration;
+        end;
         Tile.Free;
       end;
     end;
