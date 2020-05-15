@@ -427,6 +427,35 @@ begin
   RFreeObject(R_EIOS, Widgets);
 end;
 
+Function RSWidget.IsValid(Group, Child: Int32): Boolean; static; overload;
+var
+  Widgets: Pointer;
+  WidgetsSize: SizeUInt;
+  WidgetInterfaces: Pointer;
+  Widget: RSWidget;
+begin
+  WidgetsSize := 0;
+  Widgets := RGetArray(R_EIOS, nil, WidgetsSize, CLIENT_WIDGETS);
+  if Widgets = nil then
+    Exit;
+
+  if Group < WidgetsSize then
+  begin
+    WidgetInterfaces := RGetObjectArray(R_EIOS, Widgets, Group);
+    if WidgetInterfaces <> nil then
+    begin
+      Widget.ref := RGetObjectArray(R_EIOS, WidgetInterfaces, Child);
+      if Widget.ref <> nil then
+      begin
+        Result := not Widget.IsHidden;
+        Widget.Free;
+      end;
+      RFreeObject(R_EIOS, WidgetInterfaces);
+    end;
+  end;
+  RFreeObject(R_EIOS, Widgets);
+end;
+
 Function RSWidget.Widgets: Array of Array of RSWidget; static;
 var
   Widgets: Pointer;
