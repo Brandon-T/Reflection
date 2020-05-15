@@ -619,4 +619,22 @@ begin
   Result := True; //TODO: Check if the mode actually changed by checking button spriteId..
 end;
 
+Function R_BankScreen_Close: Boolean;
+var
+  Widget: RSWidget;
+begin
+  if not R_BankScreen then
+    Exit(True);
+
+  Widget := RSWidget.Get(R_BANK_CLOSE.Group, R_BANK_CLOSE.Child, R_BANK_CLOSE.Index);
+
+  if Widget.ref = nil then
+    Exit(False);
+
+  Mouse.Move(Widget.Bounds);
+  Wait(50 + RandomRange(0, 50));
+  Mouse.Click(MOUSE_LEFT);
+  Widget.Free;
+  Result := True;
+end;    
 
