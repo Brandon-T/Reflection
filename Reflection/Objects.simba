@@ -44,3 +44,106 @@ begin
   GameObject.Free;
 end;
 
+(*
+R_GetAllVisibleGameObjectTiles
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the global tiles of an object with a specific name that is visible
+  on the minimap.
+
+Example:
+
+   writeln(R_GetAllVisibleGameObjectTiles(1276));
+
+*)
+Function R_GetAllVisibleGameObjectTiles(ItemID: Int32): Array of RSTile;
+var
+  I: Integer;
+  GameObjects: Array of RSObject;
+  Definition: RSObjectDefinition;
+begin
+  GameObjects := RSObject.GetGameObjectOnScreen;
+
+  for I := 0 to High(GameObjects) do
+  begin
+    Definition := GameObjects[i].Definition;
+    if (Definition.ID = ItemID) then
+      Result += GameObjects[i].Tile;
+    Definition.Free;
+  end;
+  RSTypeArray(GameObjects).Free;
+end;
+
+Function R_GetAllVisibleGameObjectTiles(Name: String): Array of RSTile; overload;
+var
+  I: Integer;
+  GameObjects: Array of RSObject;
+  Definition: RSObjectDefinition;
+begin
+  GameObjects := RSObject.GetGameObjectOnScreen;
+
+  for I := 0 to High(GameObjects) do
+  begin
+    Definition := GameObjects[i].Definition;
+    if (Definition.Name = Name) then
+      Result += GameObjects[i].Tile;
+    Definition.Free;
+  end;
+  RSTypeArray(GameObjects).Free;
+end;
+
+(*
+R_GetMainscreenGameObjectTiles
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the global tiles of an object with a specific name that is viewable
+  on the Mainscreen.
+
+Example:
+
+   Mouse.Move(R_GetMainscreenGameObjectTiles(1276)[0].ToLocal.TileToMS);;
+
+*)
+Function R_GetMainscreenGameObjectTiles(ItemID: Int32): Array of RSTile;
+var
+  I, W, H: Integer;
+  Tile: RSTile;
+  MSBounds: TBox;
+  GameObjects: Array of RSObject;
+  Definition: RSObjectDefinition;
+begin
+  GameObjects := RSObject.GetGameObjectOnScreen;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(GameObjects) do
+  begin
+    Definition := GameObjects[i].Definition;
+    Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
+    if ((Definition.ID = ItemID) and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Result += GameObjects[i].Tile;
+    Definition.Free;
+  end;
+  RSTypeArray(GameObjects).Free;
+end;
+
+Function R_GetMainscreenGameObjectTiles(Name: String): Array of RSTile; overload;
+var
+  I, W, H: Integer;
+  Tile: RSTile;
+  MSBounds: TBox;
+  GameObjects: Array of RSObject;
+  Definition: RSObjectDefinition;
+begin
+  GameObjects := RSObject.GetGameObjectOnScreen;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(GameObjects) do
+  begin
+    Definition := GameObjects[i].Definition;
+    Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
+    if ((Definition.Name = Name) and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Result += GameObjects[i].Tile;
+    Definition.Free;
+  end;
+  RSTypeArray(GameObjects).Free;
+end;
+
+

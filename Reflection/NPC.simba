@@ -2,7 +2,7 @@
 R_NPCIsVisible
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns True if NPC is visible on screen.
+Returns True if NPC is visible on the minimap.
 
 Example:
 
@@ -47,8 +47,8 @@ end;
 R_NPCGetCombatLevel
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the combat level of the given NPC if they are on screen
-  or 0 if the NPC is not on screen.
+Returns the combat level of the given NPC if they are visible on
+  the minimap or 0 if the NPC is not visible.
 
 Example:
 
@@ -102,7 +102,8 @@ end;
 R_NPCGetName
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the name of the given NPC if they are on screen.
+Returns the name of the given NPC if they are visible on
+  the minimap.
 
 Example:
 
@@ -125,7 +126,8 @@ end;
 R_NPCGetID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the ID of the given NPC if they are on screen.
+Returns the ID of the given NPC if they are visible on
+  the minimap.
 
 Example:
 
@@ -152,7 +154,8 @@ end;
 R_NPCGetActions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the actions of the given NPC if they are on screen.
+Returns the actions of the given NPC if they are visible on
+  the minimap.
 
 Example:
 
@@ -200,4 +203,200 @@ begin
     Definition.Free;
   end;
   RSTypeArray(NPCs).Free;
+end;
+
+(*
+R_NPCGetTile
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Tile of the given NPC if they are visible on
+  the minimap.
+
+Example:
+
+   writeln(R_NPCGetTile('Chicken'));
+*)
+Function R_NPCGetTile(Name: String): Array of RSTile;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: Array of RSTile;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    if ((Definition.Name = Name)) then
+      Tiles += NPCs[I].Tile;
+    Definition.Free;
+  end;
+  Result := Tiles;
+  RSTypeArray(NPCs).Free;
+end;
+
+Function R_NPCGetTile(ID: Int32): Array of RSTile; overload;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: Array of RSTile;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    if ((Definition.ID = ID)) then
+      Tiles += NPCs[I].Tile;
+    Definition.Free;
+  end;
+  Result := Tiles;
+  RSTypeArray(NPCs).Free;
+end;
+
+(*
+R_NPCGetTileMS
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Tile of the given NPC if they are on screen.
+
+Example:
+
+   writeln(R_NPCGetTileMS('Chicken'));
+*)
+Function R_NPCGetTileMS(Name: String): Array of RSTile;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: Array of RSTile;
+  Tile: RSTile;
+  MSBounds: TBox;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Tile := NPCs[I].LocalTile.TileToMS;
+    if ((Definition.Name = Name)  and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Tiles += NPCs[I].Tile;
+    Definition.Free;
+  end;
+  Result := Tiles;
+  RSTypeArray(NPCs).Free;
+end;
+
+Function R_NPCGetTileMS(ID: Int32): Array of RSTile;  overload;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: Array of RSTile;
+  Tile: RSTile;
+  MSBounds: TBox;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Tile := NPCs[I].LocalTile.TileToMS;
+    if ((Definition.ID = ID)  and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Tiles += NPCs[I].Tile;
+    Definition.Free;
+  end;
+  Result := Tiles;
+  RSTypeArray(NPCs).Free;
+end;
+
+(*
+R_NPCGetMSCoords
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Pixel Coordinates of the given NPC if they are on screen.
+
+Example:
+
+   writeln(R_NPCGetMSCoords('Chicken'));
+*)
+Function R_NPCGetMSCoords(Name: String): TPointArray;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: TPointArray;
+  Tile: RSTile;
+  MSBounds: TBox;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Tile := NPCs[I].LocalTile.TileToMS;
+    if ((Definition.Name = Name)  and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Tiles.Append(Tile);
+    Definition.Free;
+  end;
+  Result := Tiles;
+  RSTypeArray(NPCs).Free;
+end;
+
+Function R_NPCGetMSCoords(ID: Int32): TPointArray; overload;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: TPointArray;
+  Tile: RSTile;
+  MSBounds: TBox;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Tile := NPCs[I].LocalTile.TileToMS;
+    if ((Definition.ID = ID)  and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Tiles.Append(Tile);
+    Definition.Free;
+  end;
+  Result := Tiles;
+  RSTypeArray(NPCs).Free;
+end;
+
+(*
+R_NPCGetMSCoordsSort
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Pixel Coordinates of the given NPC if they are on screen
+  as a sorted array from the middle of the screen.
+
+Example:
+
+   writeln(R_NPCGetMSCoordsSort('Chicken'));
+*)
+Function R_NPCGetMSCoordsSort(Name: String): TPointArray;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: TPointArray;
+  Tile: RSTile;
+  MSBounds: TBox;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  MSBounds := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Tile := NPCs[I].LocalTile.TileToMS;
+    if ((Definition.Name = Name)  and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Tiles.Append(Tile);
+    Definition.Free;
+  end;
+  Tiles.sort(MSBounds.Middle);
+  RSTypeArray(NPCs).Free;
+  Result := Tiles;
 end;
