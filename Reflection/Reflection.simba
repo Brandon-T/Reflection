@@ -1,14 +1,17 @@
 {$include_once Bank.simba}
-{$include_once Inventory.simba}
-{$include_once Skills.simba}
+{$include_once Chat.simba}
 {$include_once Equipment.simba}
 {$include_once GameTab.simba}
-{$include_once Chat.simba}
+{$include_once Ground.simba}
+{$include_once Inventory.simba}
 {$include_once Menu.simba}
-{$include_once Timing.simba}
-{$include_once Walking.simba}
 {$include_once Model.simba}
 {$include_once Mouse.simba}
+{$include_once NPC.simba}
+{$include_once Objects.simba}
+{$include_once Skills.simba}
+{$include_once Timing.simba}
+{$include_once Walking.simba}
 
 begin
   RSetup;

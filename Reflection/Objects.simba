@@ -1,0 +1,32 @@
+(*
+R_GetGameObjectID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the ID of the game object on the given global tile.
+
+Example:
+
+   writeln(R_GetGameObjectID(3187, 3293));
+
+*)
+Function R_GetGameObjectID(X, Y: Int32): Int32;
+begin
+  Result := RSObject.Get(RSObjectType.Game_Object, X, Y).Definition.ID;
+end;
+
+(*
+R_GetGameObjectName
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Name of the game object on the given global tile.
+
+Example:
+
+   writeln(R_GetGameObjectName(3187, 3293));
+
+*)
+Function R_GetGameObjectName(X, Y: Int32): String;
+begin
+  Result := RSObject.Get(RSObjectType.Game_Object, X, Y).Definition.Name;
+end;
+

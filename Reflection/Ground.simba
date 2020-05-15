@@ -1,0 +1,111 @@
+(*
+R_GetMainscreenGroundItemByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Mainscreen coordinates of a specific item ID.
+
+Example:
+
+   Mouse.Move(R_GetMainscreenGroundItemByID(526)[0]);
+*)
+Function R_GetMainscreenGroundItemByID(itemID: Int32): Array of RSTile;
+var
+  i, w, h: Integer;
+  ResultTile: RSTile;
+  items: Array of RSTile;
+begin
+  items := RSGroundObject.GetTileByID(itemID);
+  if (length(items) < 1) then
+    exit();
+
+  for i := 0 to length(items) - 1 do
+  begin
+    GetClientDimensions(w, h);
+    ResultTile := RSTile(items[i]).ToLocal.TileToMS;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > w) or (ResultTile.Y < 0) or (ResultTile.Y > h))) then
+      Result += ResultTile;
+  end;
+end;
+
+(*
+R_GetMinimapGroundItemByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Minimap coordinates of a specific item ID.
+
+Example:
+
+   Mouse.Move(R_GetMinimapGroundItemByID(526)[0]);
+*)
+Function R_GetMinimapGroundItemByID(itemID: Int32): Array of RSTile;
+var
+  i, w, h: Integer;
+  ResultTile: RSTile;
+  items: Array of RSTile;
+begin
+  items := RSGroundObject.GetTileByID(itemID);
+  if (length(items) < 1) then
+    exit();
+
+  for i := 0 to length(items) - 1 do
+  begin
+    GetClientDimensions(w, h);
+    ResultTile := RSTile(items[i]).ToLocal.TileToMM;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > w) or (ResultTile.Y < 0) or (ResultTile.Y > h))) then
+      Result += ResultTile;
+  end;
+end;
+
+(*
+R_IsGroundItemOnTile
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the True if ground item is on a specific tile.
+
+Example:
+
+   writeln(R_IsGroundItemOnTile(314, player.Tile.X, player.Tile.Y));
+*)
+Function R_IsGroundItemOnTile(itemID, X, Y: Int32): Boolean;
+var
+  i: Integer;
+  items: Array of RSGroundItem;
+begin
+  items := RSGroundObject.GetItemsAt(X, Y);
+  if (length(items) < 1) then
+    exit();
+
+  for i := 0 to length(items) - 1 do
+  begin
+    if (items[i].ID = itemID) then
+      exit(True);
+  end;
+end;
+
+(*
+R_GetGroundItemStackSize
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the number count of ground items of a given ID
+ on a specific tile.
+
+Example:
+
+   writeln(R_GetGroundItemStackSize(314, player.Tile.X, player.Tile.Y));
+*)
+Function R_GetGroundItemStackSize(itemID, X, Y: Int32): Int32;
+var
+  i: Integer;
+  items: Array of RSGroundItem;
+begin
+  items := RSGroundObject.GetItemsAt(X, Y);
+  if (length(items) < 1) then
+    exit();
+
+  for i := 0 to length(items) - 1 do
+  begin
+    if (items[i].ID = itemID) then
+      exit(items[i].StackSize);
+  end;
+end;
+
