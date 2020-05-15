@@ -15,15 +15,46 @@ var
   Items: Array of RSTile;
 begin
   Items := RSGroundObject.GetTileByID(ItemID);
-  if Length(Items) < 1 then
+  if High(Items) < 1 then
     Exit;
 
-  for I := 0 to Length(Items) - 1 do
+  for I := 0 to High(Items) do
   begin
     GetClientDimensions(W, H);
     ResultTile := RSTile(Items[i]).ToLocal.TileToMS;
     if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
       Result += ResultTile;
+  end;
+
+  RSTypeArray(Items).Free;
+end;
+
+(*
+R_GetMainscreenGroundItemCoordsByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Mainscreen coordinates of a specific item ID.
+
+Example:
+
+   Mouse.Move(R_GetMainscreenGroundItemCoordsByID(526)[0]);
+*)
+Function R_GetMainscreenGroundItemCoordsByID(ItemID: Int32): TPointArray;
+var
+  I, W, H: Integer;
+  ResultTile: RSTile;
+  Items: Array of RSTile;
+begin
+  Items := RSGroundObject.GetTileByID(ItemID);
+  if High(Items) = -1 then
+    Exit;
+
+  for I := 0 to High(Items) do
+  begin
+    GetClientDimensions(W, H);
+    ResultTile := RSTile(Items[i]).ToLocal.TileToMS;
+    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
+      Result += ResultTile.ToLocal.TileToMS;
   end;
 
   RSTypeArray(Items).Free;
