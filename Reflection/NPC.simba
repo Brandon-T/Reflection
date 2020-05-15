@@ -400,3 +400,38 @@ begin
   RSTypeArray(NPCs).Free;
   Result := Tiles;
 end;
+
+
+(*
+R_NPCGetMSCoordsClosest
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the Pixel Coordinates of the closest given NPC if they are on screen.
+
+Example:
+
+   writeln(R_NPCGetMSCoordsClosest('Chicken'));
+*)
+Function R_NPCGetMSCoordsClosest(Name: String): TPoint;
+var
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+  Tiles: TPointArray;
+  Tile: RSTile;
+  MSBounds: TBox;
+  I: Integer;
+begin
+  NPCs := RSClient.AllNPCs;
+  MSBounds := R_MainscreenBounds;
+  for I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Tile := NPCs[I].LocalTile.TileToMS;
+    if ((Definition.Name = Name)  and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+      Tiles.Append(Tile);
+    Definition.Free;
+  end;
+  Tiles.sort(MSBounds.Middle);
+  Result := Tiles[0];
+  RSTypeArray(NPCs).Free;
+end;
