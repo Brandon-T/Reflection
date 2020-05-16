@@ -14,8 +14,8 @@ const
 
 {Node: ga}
 Node_UID: THook =                                 ['ga', 'ct', 'J', 1];
-Node_Prev: THook =                                ['ga', 'ca', 'Lga;', 1];
-Node_Next: THook =                                ['ga', 'cf', 'Lga;', 1];
+Node_Prev: THook =                                ['ga', 'cf', 'Lga;', 1];
+Node_Next: THook =                                ['ga', 'ca', 'Lga;', 1];
 
 {NodeDeque: jh}
 NodeDeque_Head: THook =                           ['jh', 'x', 'Lga;', 1];
@@ -319,7 +319,7 @@ Widget_Text: THook =                              ['he', 'cc', 'Ljava/lang/Strin
 Widget_WidgetID: THook =                          ['he', 'b', 'I', -957641141];
 Widget_ParentID: THook =                          ['he', 'au', 'I', 1237608307];
 Widget_Parent: THook =                            ['he', 'du', 'Lhe;', 1];
-Widget_TextureID: THook =                         ['he', 'bo', 'I', -1011748949];
+Widget_TextureID: THook =                         ['he', 'bc', 'I', 66057751];
 Widget_ItemID: THook =                            ['he', 'ek', 'I', -1761852993];
 Widget_InvIDs: THook =                            ['he', 'em', '[I', 1];
 Widget_StackSizes: THook =                        ['he', 'ez', '[I', 1];

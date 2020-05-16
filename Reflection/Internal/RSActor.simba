@@ -104,7 +104,7 @@ begin
 
   Next := Head.Next;
 
-  if Next.ref <> nil then
+  if (Next.ref <> nil) and RIObjectIsInstanceOf(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST.cls) then
   begin
     CombatInfoHolder.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST);
     if CombatInfoHolder.ref = nil then
@@ -145,7 +145,7 @@ begin
 
   Next := Head.Next;
 
-  if Next.ref <> nil then
+  if (Next.ref <> nil) and RIObjectIsInstanceOf(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST.cls) then
   begin
     CombatInfoHolder.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFOLIST);
     if CombatInfoHolder.ref = nil then
@@ -187,7 +187,7 @@ begin
 
   Next := Head.Next;
 
-  if Next.ref <> nil then
+  if (Next.ref <> nil) and RIObjectIsInstanceOf(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFO2.cls) then
   begin
     CombatInfo.ref := RGetObject(R_EIOS, Next.ref, COMBATINFOHOLDER_COMBATINFO2);
     if CombatInfo.ref <> nil then

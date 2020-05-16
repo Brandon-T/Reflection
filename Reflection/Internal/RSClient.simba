@@ -126,8 +126,7 @@ begin
     end;
   end;
 
-  if J > 0 then
-    SetLength(Result, J - 1);
+  SetLength(Result, J);
 end;
 
 Function RSClient.AllPlayers: Array of RSPlayer; static;
@@ -155,8 +154,7 @@ begin
     end;
   end;
 
-  if J > 0 then
-    SetLength(Result, J - 1);
+  SetLength(Result, J);
 end;
 
 Function RSClient.AnimationFrameCache: RSCache; static;

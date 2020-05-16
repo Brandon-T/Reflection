@@ -29,16 +29,21 @@ end;
 
 Function R_GetPlayers: Array of TRSPlayer;
 var
-  LocalPlayer: RSPlayer;
+  I: Int32;
+  Players: Array of RSPlayer;
   Definition: RSPlayerDefinition;
 begin
-  LocalPlayer := RSPlayer.Me;
-  Definition := LocalPlayer.Definition;
-  Result.Name := LocalPlayer.Name;
-  Result.Tile := LocalPlayer.Tile;
-  Result.Destination := LocalPlayer.Destination;
-  Result.CombatLevel := LocalPlayer.CombatLevel;
-  Result.Equipment := Definition.Equipment;
-  Definition.Free;
-  LocalPlayer.Free;
+  Players := RSPlayer.AllPlayers;
+  SetLength(Result, Length(Players));
+  for I := 0 to high(Players) do
+  begin
+    Definition := Players[I].Definition;
+    Result[I].Name := Players[I].Name;
+    Result[I].Tile := Players[I].Tile;
+    Result[I].Destination := Players[I].Destination;
+    Result[I].CombatLevel := Players[I].CombatLevel;
+    Result[I].Equipment := [];
+    Definition.Free;
+  end;
+  RSTypeArray(Players).Free;
 end;

@@ -14,7 +14,7 @@ var
   NPCs: Pointer;
   NPCsArray: Array of Pointer;
   Indices: Array of Int32;
-  I, NPCsSize: SizeUInt;
+  I, NPCsSize, Actual: SizeUInt;
 begin
   Indices := RSClient.NPCIndices;
   if Length(Indices) < 1 then
@@ -32,8 +32,13 @@ begin
 
   for I := 0 to High(Indices) do
   begin
-    Result[I].ref := NPCsArray[Indices[I]];
+    if NPCsArray[Indices[I]] <> nil then
+    begin
+      Result[I].ref := NPCsArray[Indices[I]];
+      Inc(Actual);
+    end;
   end;
+  SetLength(Result, Actual);
 end;
 
 Function RSNPC.Model: RSModel; constref;

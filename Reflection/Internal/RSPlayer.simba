@@ -17,7 +17,7 @@ var
   Players: Pointer;
   PlayersArray: Array of Pointer;
   Indices: Array of Int32;
-  I, PlayersSize: SizeUInt;
+  I, PlayersSize, Actual: SizeUInt;
 begin
   Indices := RSClient.PlayerIndices;
   if Length(Indices) < 1 then
@@ -35,8 +35,13 @@ begin
 
   for I := 0 to High(Indices) do
   begin
-    Result[I].ref := PlayersArray[Indices[I]];
+    if PlayersArray[Indices[I]] <> nil then
+    begin
+      Result[I].ref := PlayersArray[Indices[I]];
+      Inc(Actual);
+    end;
   end;
+  SetLength(Result, Actual);
 end;
 
 Function RSPlayer.Name: String; constref;

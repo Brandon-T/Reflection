@@ -73,12 +73,14 @@ end;
 
 Procedure RFreeObject(eios: Pointer; instance: Pointer);
 begin
-  RIReleaseObject(eios, instance);
+  if instance <> nil then
+    RIReleaseObject(eios, instance);
 end;
 
 Procedure RFreeObjects(eios: Pointer; constref instances: array of Pointer);
 begin
-  RIReleaseObjects(eios, instances);
+  if Length(instances) > 0 then
+    RIReleaseObjects(eios, instances);
 end;
 
 Function RObjectsEqual(eios: Pointer; first, second: Pointer): Boolean;
