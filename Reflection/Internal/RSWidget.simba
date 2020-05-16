@@ -31,6 +31,9 @@ begin
   if Result > 0 then
     Exit;
 
+  //if (Self.ID shr 16) = RSWidget.RootInterface() then
+  //  Exit(-1);
+
   HashTable.ref := RGetObject(R_EIOS, nil, CLIENT_WIDGETNODECACHE);
   if HashTable.ref = nil then
   begin
@@ -153,25 +156,20 @@ end;
 
 Function RSWidget.IsHidden: Boolean; constref;
 var
-  ParentID: Int32;
-  Parent: RSWidget;
+  Par: RSWidget;
 begin
   if RGetBool(R_EIOS, ref, WIDGET_ISHIDDEN) then
     Exit(True);
 
-  ParentID := self.ParentID;
-  if ParentID = -1 then
+  Par := self.Parent();
+  if Par.ref <> nil then
   begin
-    Exit(False);
-  end;
-
-  Parent := RSWidget.GetParent(ParentID);
-  if Parent.ref <> nil then
-  begin
-    Result := Parent.IsHidden;
-    Parent.Free;
+    Result := Par.IsHidden;
+    Par.Free;
     Exit;
   end;
+
+  Result := self.GroupID <> RSWidget.RootInterface();
 end;
 
 Function RSWidget.Cycle: Int32;
@@ -411,7 +409,7 @@ begin
   RFreeObject(R_EIOS, Widgets);
 end;
 
-Function RSWidget.IsValid(Index: SizeUInt): Boolean; static;
+{Function RSWidget.IsValid(Index: SizeUInt): Boolean; static;
 var
   Widgets: Pointer;
   WidgetsSize: SizeUInt;
@@ -425,35 +423,15 @@ begin
     Result := RGetBoolArray(R_EIOS, Widgets, Index);
   end;
   RFreeObject(R_EIOS, Widgets);
-end;
+end;}
 
-Function RSWidget.IsValid(Group, Child: Int32): Boolean; static; overload;
+Function RSWidget.IsValid(Group, Child: Int32; Index: Int32 = -1): Boolean; static;
 var
-  Widgets: Pointer;
-  WidgetsSize: SizeUInt;
-  WidgetInterfaces: Pointer;
   Widget: RSWidget;
 begin
-  WidgetsSize := 0;
-  Widgets := RGetArray(R_EIOS, nil, WidgetsSize, CLIENT_WIDGETS);
-  if Widgets = nil then
-    Exit;
-
-  if Group < WidgetsSize then
-  begin
-    WidgetInterfaces := RGetObjectArray(R_EIOS, Widgets, Group);
-    if WidgetInterfaces <> nil then
-    begin
-      Widget.ref := RGetObjectArray(R_EIOS, WidgetInterfaces, Child);
-      if Widget.ref <> nil then
-      begin
-        Result := not Widget.IsHidden;
-        Widget.Free;
-      end;
-      RFreeObject(R_EIOS, WidgetInterfaces);
-    end;
-  end;
-  RFreeObject(R_EIOS, Widgets);
+  Widget := RSWidget.Get(Group, Child, Index);
+  Result := (Widget.ref <> nil) and not Widget.IsHidden;
+  Widget.Free;
 end;
 
 Function RSWidget.Widgets: Array of Array of RSWidget; static;

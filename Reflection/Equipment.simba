@@ -85,7 +85,7 @@ var
   Widget: RSWidget;
 begin
   { Bank }
-  if RSWidget.IsValid(R_INTERFACE_BANK) then
+  if RSWidget.IsValid(R_BANK_WORN_ITEMS.Group, R_BANK_WORN_ITEMS.Child) then
   begin
     Widget := RSWidget.Get(R_BANK_WORN_ITEMS.Group, R_BANK_WORN_ITEMS.Child, 0);
     if Widget.ref <> nil then
@@ -97,13 +97,13 @@ begin
   end;
 
   { Main Screen }
-  if RSWidget.IsValid(R_INTERFACE_MAIN_EQUIPMENT) then
+  if RSWidget.IsValid(R_MAIN_EQUIPMENT_CONTAINER.Group, R_MAIN_EQUIPMENT_CONTAINER.Child) then
   begin
     Exit(True);
   end;
 
   { Game Tab }
-  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT) then
+  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
   begin
     if RSClient.IsResizeable then
     begin
@@ -146,7 +146,7 @@ var
     Garbage += Widget;
   end;
 begin
-  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT) then
+  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
   begin
     Result := [
       Find(R_INTERFACE_EQUIPMENT_HELMET, EQUIPMENT_HELMET),
@@ -165,7 +165,7 @@ begin
     Exit;
   end;
 
-  if RSWidget.IsValid(R_INTERFACE_BANK) then
+  if RSWidget.IsValid(R_BANK_CONTAINER.Group, R_BANK_CONTAINER.Child) then
   begin
     Result := [
       Find(R_BANK_EQUIPMENT_HELMET, EQUIPMENT_HELMET),
@@ -184,7 +184,7 @@ begin
     Exit;
   end;
 
-  if RSWidget.IsValid(R_INTERFACE_MAIN_EQUIPMENT) then
+  if RSWidget.IsValid(R_MAIN_EQUIPMENT_CONTAINER.Group, R_MAIN_EQUIPMENT_CONTAINER.Child) then
   begin
     Result := [
       Find(R_MAIN_EQUIPMENT_HELMET, EQUIPMENT_HELMET),
@@ -224,7 +224,7 @@ var
     Garbage += Widget;
   end;
 begin
-  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT) then
+  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
   begin
     Interfaces := [R_INTERFACE_EQUIPMENT_HELMET,
                    R_INTERFACE_EQUIPMENT_CAPE,
@@ -242,7 +242,7 @@ begin
     Exit;
   end;
 
-  if RSWidget.IsValid(R_INTERFACE_BANK) then
+  if RSWidget.IsValid(R_BANK_CONTAINER.Group, R_BANK_CONTAINER.Child) then
   begin
     Interfaces := [R_BANK_EQUIPMENT_HELMET,
                    R_BANK_EQUIPMENT_CAPE,
@@ -260,7 +260,7 @@ begin
     Exit;
   end;
 
-  if RSWidget.IsValid(R_INTERFACE_MAIN_EQUIPMENT) then
+  if RSWidget.IsValid(R_MAIN_EQUIPMENT_CONTAINER.Group, R_MAIN_EQUIPMENT_CONTAINER.Child) then
   begin
     Interfaces := [R_MAIN_EQUIPMENT_HELMET,
                    R_MAIN_EQUIPMENT_CAPE,

@@ -37,7 +37,7 @@ type
 
 Function R_BankScreen: Boolean;
 begin
-  Result := RSWidget.IsValid(R_INTERFACE_BANK);
+  Result := RSWidget.IsValid(R_BANK_CONTAINER.Group, R_BANK_CONTAINER.Child);
 end;
 
 Function R_WaitBankScreen(timeout: UInt32): Boolean;
@@ -47,7 +47,7 @@ end;
 
 Function R_PinScreen: Boolean;
 begin
-  Result := RSWidget.IsValid(R_INTERFACE_PINSCREEN);
+  Result := RSWidget.IsValid(R_BANK_PIN_CONTAINER.Group, R_BANK_PIN_CONTAINER.Child);
 end;
 
 Function R_WaitPinScreen(timeout: UInt32): Boolean;
@@ -57,7 +57,7 @@ end;
 
 Function R_DepositBox: Boolean;
 begin
-  Result := RSWidget.IsValid(R_INTERFACE_DEPOSITBOX);
+  Result := RSWidget.IsValid(R_DEPOSITBOX_CONTAINER.Group, R_DEPOSITBOX_CONTAINER.Child);
 end;
 
 Function R_WaitDepositBox(timeout: UInt32): Boolean;
