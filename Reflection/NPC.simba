@@ -33,14 +33,23 @@ end;
 Function R_NPCIsVisible(Name: String): Boolean; overload;
 var
   npcs: Array of RSNPC;
-  i: Integer;
+  Definition: RSNPCDefinition;
+  I: Integer;
 begin
-  npcs := RSClient.AllNPCs;
-  for i := 0 to length(npcs) - 1 do
+  NPCs := RSClient.AllNPCs;
+  for I := 0 to High(NPCs) do
   begin
-    if (npcs[i].Definition.Name = Name) then
-      exit(True);
+    Definition := NPCs[I].Definition;
+    if Definition.Name = Name then
+    begin
+      Result := Definition.IsVisible;
+      Definition.Free;
+      RSTypeArray(NPCs).Free;
+      Exit;
+    end;
+    Definition.Free;
   end;
+  RSTypeArray(NPCs).Free;
 end;
 
 (*
@@ -112,14 +121,23 @@ Example:
 Function R_NPCGetName(ID: Int32): String;
 var
   npcs: Array of RSNPC;
-  i: Integer;
+  Definition: RSNPCDefinition;
+  I: Integer;
 begin
-  npcs := RSClient.AllNPCs;
-  for i := 0 to length(npcs) - 1 do
+  NPCs := RSClient.AllNPCs;
+  for I := 0 to High(NPCs) do
   begin
-    if (npcs[i].Definition.ID = ID) then
-      exit(npcs[i].Definition.Name);
+    Definition := NPCs[I].Definition;
+    if Definition.ID = ID then
+    begin
+      Result := Definition.Name;
+      Definition.Free;
+      RSTypeArray(NPCs).Free;
+      Exit;
+    end;
+    Definition.Free;
   end;
+  RSTypeArray(NPCs).Free;
 end;
 
 (*
