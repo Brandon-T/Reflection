@@ -9,7 +9,8 @@ Example:
    if (R_MainscreenBounds.Contains([X, Y]) then
       ...
 *)
-Function R_MainscreenBounds(): TBox;
+Function R_MainscreenBounds(Resizable: Boolean = False): TBox;
 begin
-  Result := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+  if (Resizable) then Result := RSWidget.Get(R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT[0], R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT[1]).bounds
+  else Result := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
 end;
