@@ -1,4 +1,4 @@
-type TNPC = record
+type TRSNPC = record
     Name: String;
     Id: Int32;
     Tile: RSTile;
@@ -17,11 +17,11 @@ Example:
 
    writeln(R_GetAllNPCs);
 *)
-Function R_GetAllNPCs(): Array of TNPC;
+Function R_GetAllNPCs(): Array of TRSNPC;
 var
   NPCs: Array of RSNPC;
   Definition: RSNPCDefinition;
-  NPC: TNPC;
+  NPC: TRSNPC;
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
@@ -52,11 +52,11 @@ Example:
 
    writeln(R_GetNPCs(1173));
 *)
-Function R_GetNPCs(ID: Int32): Array of TNPC;
+Function R_GetNPCs(ID: Int32): Array of TRSNPC;
 var
   NPCs: Array of RSNPC;
   Definition: RSNPCDefinition;
-  NPC: TNPC;
+  NPC: TRSNPC;
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
@@ -80,11 +80,11 @@ begin
   RSTypeArray(NPCs).Free;
 end;
 
-Function R_GetNPCs(Name: String): Array of TNPC; overload;
+Function R_GetNPCs(Name: String): Array of TRSNPC; overload;
 var
   NPCs: Array of RSNPC;
   Definition: RSNPCDefinition;
-  NPC: TNPC;
+  NPC: TRSNPC;
   I: Integer;
 begin
   NPCs := RSClient.AllNPCs;
@@ -175,7 +175,7 @@ Example:
 *)
 Function R_NPCGetMSCoordsSort(ID: Int32): TPointArray;
 var
-  NPCs: Array of TNPC;
+  NPCs: Array of TRSNPC;
   I: Integer;
   Tiles: TPointArray;
 begin
@@ -189,7 +189,7 @@ end;
 
 Function R_NPCGetMSCoordsSort(Name: String): TPointArray; overload;
 var
-  NPCs: Array of TNPC;
+  NPCs: Array of TRSNPC;
   I: Integer;
   Tiles: TPointArray;
 begin

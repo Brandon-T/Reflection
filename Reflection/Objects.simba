@@ -1,234 +1,181 @@
-(*
-R_GetGameObjectID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the ID of the game object on the given global tile.
-
-Example:
-
-   writeln(R_GetGameObjectID(3187, 3293));
-
-*)
-Function R_GetGameObjectID(X, Y: Int32): Int32;
-var
-  GameObject: RSObject;
-  Definition: RSObjectDefinition;
-begin
-  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
-  Definition := GameObject.Definition;
-  Result := Definition.ID;
-  Definition.Free;
-  GameObject.Free;
+type TRSObject = record
+    Name: String;
+    Id: Int32;
+    Tile: RSTile;
+    MSCoord: TPoint;
 end;
 
 (*
-R_GetGameObjectName
+R_GetAllObjects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the Name of the game object on the given global tile.
+Returns the all objects visible as a TRSObject.
 
 Example:
 
-   writeln(R_GetGameObjectName(3187, 3293));
+   writeln(R_GetAllObjects);
 
 *)
-Function R_GetGameObjectName(X, Y: Int32): String;
-var
-  GameObject: RSObject;
-  Definition: RSObjectDefinition;
-begin
-  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
-  Definition := GameObject.Definition;
-  Result := Definition.Name;
-  Definition.Free;
-  GameObject.Free;
-end;
-
-(*
-R_GetAllVisibleGameObjectTiles
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the global tiles of an object with a specific name that is visible
-  on the minimap.
-
-Example:
-
-   writeln(R_GetAllVisibleGameObjectTiles(1276));
-
-*)
-Function R_GetAllVisibleGameObjectTiles(ItemID: Int32): Array of RSTile;
+Function R_GetAllObjects: Array of TRSObject;
 var
   I: Integer;
   GameObjects: Array of RSObject;
   Definition: RSObjectDefinition;
+  Obj: TRSObject;
+  MSPoint: TPoint;
 begin
   GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
 
   for I := 0 to High(GameObjects) do
   begin
     Definition := GameObjects[i].Definition;
-    if (Definition.ID = ItemID) then
-      Result += GameObjects[i].Tile;
+    MSPoint := RSTile(GameObjects[I].Tile).ToLocal.TileToMS;
+    Obj.Name := Definition.Name;
+    Obj.ID := Definition.ID;
+    Obj.Tile := GameObjects[I].Tile;
+    if (MSPoint.InBox(R_MainscreenBounds)) then
+      Obj.MSCoord := MSPoint
+    else Obj.MSCoord := [-1,-1];
+    Result += Obj;
     Definition.Free;
   end;
   RSTypeArray(GameObjects).Free;
 end;
 
-Function R_GetAllVisibleGameObjectTiles(Name: String): Array of RSTile; overload;
+(*
+R_GetObject
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns a TRSObject for every object visible that matches the specified
+  information.
+
+Example:
+
+   writeln(R_GetObject(1332));
+
+*)
+Function R_GetObject(ID: Int32): Array of TRSObject;
 var
   I: Integer;
   GameObjects: Array of RSObject;
   Definition: RSObjectDefinition;
+  Obj: TRSObject;
+  MSPoint: TPoint;
 begin
   GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
 
   for I := 0 to High(GameObjects) do
   begin
     Definition := GameObjects[i].Definition;
+    MSPoint := RSTile(GameObjects[I].Tile).ToLocal.TileToMS;
+    if (Definition.ID = ID) then
+    begin
+      Obj.Name := Definition.Name;
+      Obj.ID := Definition.ID;
+      Obj.Tile := GameObjects[I].Tile;
+      if (MSPoint.InBox(R_MainscreenBounds)) then
+        Obj.MSCoord := MSPoint
+      else Obj.MSCoord := [-1,-1];
+      Result += Obj;
+    end;
+    Definition.Free;
+  end;
+  RSTypeArray(GameObjects).Free;
+end;
+
+Function R_GetObject(Name: String): Array of TRSObject; overload;
+var
+  I: Integer;
+  GameObjects: Array of RSObject;
+  Definition: RSObjectDefinition;
+  Obj: TRSObject;
+  MSPoint: TPoint;
+begin
+  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
+
+  for I := 0 to High(GameObjects) do
+  begin
+    Definition := GameObjects[i].Definition; 
+    MSPoint := RSTile(GameObjects[I].Tile).ToLocal.TileToMS;
     if (Definition.Name = Name) then
-      Result += GameObjects[i].Tile;
+    begin
+      Obj.Name := Definition.Name;
+      Obj.ID := Definition.ID;
+      Obj.Tile := GameObjects[I].Tile;
+      if (MSPoint.InBox(R_MainscreenBounds)) then
+        Obj.MSCoord := MSPoint
+      else Obj.MSCoord := [-1,-1];
+      Result += Obj;
+    end;
     Definition.Free;
   end;
   RSTypeArray(GameObjects).Free;
 end;
 
 (*
-R_GetMSGameObjectTiles
+R_GetObjectAt
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the global tiles of an object with a specific name that is viewable
-  on the Mainscreen.
+Returns the TRSObject on the given global tile.
 
 Example:
 
-   Mouse.Move(R_GetMSGameObjectTiles(1276)[0].ToLocal.TileToMS);;
+   writeln(R_GetObjectAt(RSPlayer.Me.Tile.X, RSPlayer.Me.Tile.Y));
 
 *)
-Function R_GetMSGameObjectTiles(ItemID: Int32): Array of RSTile;
+Function R_GetObjectAt(X, Y: Int32): TRSObject;
 var
-  I, W, H: Integer;
-  Tile: RSTile;
-  MSBounds: TBox;
-  GameObjects: Array of RSObject;
+  GameObject: RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
-  MSBounds := R_MainscreenBounds;
-  for I := 0 to High(GameObjects) do
-  begin
-    Definition := GameObjects[i].Definition;
-    Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.ID = ItemID) and Tile.InBox(MSBounds)) then
-      Result += GameObjects[i].Tile;
-    Definition.Free;
-  end;
-  RSTypeArray(GameObjects).Free;
-end;
-
-Function R_GetMSGameObjectTiles(Name: String): Array of RSTile; overload;
-var
-  I, W, H: Integer;
-  Tile: RSTile;
-  MSBounds: TBox;
-  GameObjects: Array of RSObject;
-  Definition: RSObjectDefinition;
-begin
-  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
-  MSBounds := R_MainscreenBounds;
-  for I := 0 to High(GameObjects) do
-  begin
-    Definition := GameObjects[i].Definition;
-    Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.Name = Name) and Tile.InBox(MSBounds)) then
-      Result += GameObjects[i].Tile;
-    Definition.Free;
-  end;
-  RSTypeArray(GameObjects).Free;
-end;
-
-
-(*
-R_GetMSGameObjectCoords
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the screen coordinates of an object with a specific name that is viewable
-  on the Mainscreen.
-
-Example:
-
-   Mouse.Move(R_GetMSGameObjectCoords(1276)[0].ToLocal.TileToMS);;
-
-*)
-Function R_GetMSGameObjectCoords(ItemID: Int32): TPointArray;
-var
-  I, W, H: Integer;
-  Tile: RSTile;
-  MSBounds: TBox;
-  GameObjects: Array of RSObject;
-  Definition: RSObjectDefinition;
-begin
-  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
-  MSBounds := R_MainscreenBounds;
-  for I := 0 to High(GameObjects) do
-  begin
-    Definition := GameObjects[i].Definition;
-    Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.ID = ItemID) and Tile.InBox(MSBounds)) then
-      Result += Tile;
-    Definition.Free;
-  end;
-  RSTypeArray(GameObjects).Free;
-end;
-
-Function R_GetMSGameObjectCoords(Name: String): TPointArray; overload;
-var
-  I, W, H: Integer;
-  Tile: RSTile;
-  MSBounds: TBox;
-  GameObjects: Array of RSObject;
-  Definition: RSObjectDefinition;
-begin
-  GameObjects := RSObject.GetAllObjectOnScreen(GAME_OBJECT);
-  MSBounds := R_MainscreenBounds;
-  for I := 0 to High(GameObjects) do
-  begin
-    Definition := GameObjects[i].Definition;
-    Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.Name = Name) and Tile.InBox(MSBounds)) then
-      Result += Tile;
-    Definition.Free;
-  end;
-  RSTypeArray(GameObjects).Free;
+  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
+  Definition := GameObject.Definition;
+  Result.Id := Definition.ID;
+  Result.Name := Definition.Name;
+  Result.Tile := [X,Y];
+  Result.MSCoord := RSTile([X,Y]).ToLocal.TileToMS;
+  Definition.Free;
+  GameObject.Free;
 end;
 
 (*
-R_GetMSGameObjectCoordsSorted
+R_GetSortedObjectMSCoords
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the sorted screen coordinates of an object with a specific name that is
+Returns the sorted screen coordinates of an object with a specific name/ID that is
   viewable on the Mainscreen.
 
 Example:
 
-   Mouse.Move(R_GetMSGameObjectCoordsSorted(1276)[0].ToLocal.TileToMS);;
+   Mouse.Move(R_GetSortedObjectMSCoords(1276)[0]);
 
 *)
-Function R_GetMSGameObjectCoordsSorted(ItemID: Int32): TPointArray;
+
+Function R_GetSortedObjectMSCoords(ID: Int32): TPointArray;
 var
-  Coords: TPointArray;
+  Objs: Array of TRSObject;
+  I: Integer;
+  Tiles: TPointArray;
 begin
-  Coords := R_GetMSGameObjectCoords(ItemID);
-  Coords.Sort(R_MainscreenBounds.Middle);
-  Result := Coords;
+  Objs := R_GetObject(ID);
+  for I := 0 to HIGH(Objs) do
+    if Objs[I].MSCoord.X <> -1 then
+      Tiles += Objs[I].MSCoord;
+  Tiles.sort(R_MainscreenBounds.Middle);
+  Result := Tiles;
 end;
 
-Function R_GetMSGameObjectCoordsSorted(Name: String): TPointArray; overload;
+Function R_GetSortedObjectMSCoords(Name: String): TPointArray; overload;
 var
-  Coords: TPointArray;
+  Objs: Array of TRSObject;
+  I: Integer;
+  Tiles: TPointArray;
 begin
-  Coords := R_GetMSGameObjectCoords(Name);
-  Coords.Sort(R_MainscreenBounds.Middle);
-  Result := Coords;
+  Objs := R_GetObject(Name);
+  for I := 0 to HIGH(Objs) do
+    if Objs[I].MSCoord.X <> -1 then
+      Tiles += Objs[I].MSCoord;
+  Tiles.sort(R_MainscreenBounds.Middle);
+  Result := Tiles;
 end;
-
 
