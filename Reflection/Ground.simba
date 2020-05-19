@@ -16,14 +16,15 @@ var
   MSBounds: TBox;
 begin
   Items := RSGroundObject.GetTileByID(ItemID);
-  MSBounds := R_MainscreenBounds;
   if High(Items) < 1 then
     Exit;
+
+  MSBounds := R_MainscreenBounds;
 
   for I := 0 to High(Items) do
   begin
     ResultTile := RSTile(Items[i]).ToLocal.TileToMS;
-    if (not ((ResultTile.X > MSBounds.X1) and (ResultTile.X < MSBounds.X2) and (ResultTile.Y > MSBounds.Y1) and (ResultTile.Y < MSBounds.Y2))) then
+    if (not ResultTile.InBox(MSBounds)) then
       Result += ResultTile;
   end;
   RSTypeArray(Items).Free;
@@ -53,7 +54,7 @@ begin
   for I := 0 to High(Items) do
   begin
     ResultTile := RSTile(Items[i]).ToLocal.TileToMS;
-    if (not ((ResultTile.X > MSBounds.X1) and (ResultTile.X < MSBounds.X2) and (ResultTile.Y > MSBounds.Y1) and (ResultTile.Y < MSBounds.Y2))) then
+    if (not ResultTile.InBox(MSBounds)) then
       Result += ResultTile.ToLocal.TileToMS;
   end;
 
@@ -84,7 +85,7 @@ begin
   for I := 0 to Length(items) - 1 do
   begin
     ResultTile := RSTile(Items[I]).ToLocal.TileToMM;
-    if (not ((ResultTile.X > MSBounds.X1) and (ResultTile.X < MSBounds.X2) and (ResultTile.Y > MSBounds.Y1) and (ResultTile.Y < MSBounds.Y2))) then
+    if (not ResultTile.InBox(MSBounds)) then
       Result += ResultTile;
   end;
 
