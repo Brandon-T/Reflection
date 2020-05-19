@@ -118,7 +118,7 @@ begin
   begin
     Definition := GameObjects[i].Definition;
     Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.ID = ItemID) and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+    if ((Definition.ID = ItemID) and Tile.InBox(MSBounds)) then
       Result += GameObjects[i].Tile;
     Definition.Free;
   end;
@@ -139,7 +139,7 @@ begin
   begin
     Definition := GameObjects[i].Definition;
     Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.Name = Name) and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+    if ((Definition.Name = Name) and Tile.InBox(MSBounds)) then
       Result += GameObjects[i].Tile;
     Definition.Free;
   end;
@@ -173,7 +173,7 @@ begin
   begin
     Definition := GameObjects[i].Definition;
     Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.ID = ItemID) and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+    if ((Definition.ID = ItemID) and Tile.InBox(MSBounds)) then
       Result += Tile;
     Definition.Free;
   end;
@@ -194,7 +194,7 @@ begin
   begin
     Definition := GameObjects[i].Definition;
     Tile := RSTile(GameObjects[i].LocalTile).TileToMS;
-    if ((Definition.Name = Name) and (Tile.X > MSBounds.X1) and (Tile.X < MSBounds.X2) and (Tile.Y > MSBounds.Y1) and (Tile.Y < MSBounds.Y2)) then
+    if ((Definition.Name = Name) and Tile.InBox(MSBounds)) then
       Result += Tile;
     Definition.Free;
   end;
