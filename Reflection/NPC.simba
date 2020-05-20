@@ -4,6 +4,7 @@ type TRSNPC = record
     Tile: RSTile;
     CombatLevel: Int32;
     Actions: TStringArray;
+    AnimationID: Int32;
     MSCoord: TPoint;
 end;
 
@@ -33,6 +34,7 @@ begin
     NPC.CombatLevel := Definition.CombatLevel;
     NPC.Tile := NPCs[I].Tile;
     NPC.Actions := Definition.Actions;
+    NPC.AnimationID := NPCs[I].AnimationID;
     if (NPCs[I].LocalTile.TileToMS.InBox(R_MainscreenBounds)) then
       NPC.MSCoord := NPCs[I].LocalTile.TileToMS
     else NPC.MSCoord := [-1,-1];
@@ -70,6 +72,7 @@ begin
       NPC.CombatLevel := Definition.CombatLevel;
       NPC.Tile := NPCs[I].Tile;
       NPC.Actions := Definition.Actions;
+      NPC.AnimationID := NPCs[I].AnimationID;
       if (NPCs[I].LocalTile.TileToMS.InBox(R_MainscreenBounds)) then
         NPC.MSCoord := NPCs[I].LocalTile.TileToMS
       else NPC.MSCoord := [-1,-1];
@@ -98,6 +101,7 @@ begin
       NPC.CombatLevel := Definition.CombatLevel;
       NPC.Tile := NPCs[I].Tile;
       NPC.Actions := Definition.Actions;
+      NPC.AnimationID := NPCs[I].AnimationID;
       if (NPCs[I].LocalTile.TileToMS.InBox(R_MainscreenBounds)) then
         NPC.MSCoord := NPCs[I].LocalTile.TileToMS
       else NPC.MSCoord := [-1,-1];
