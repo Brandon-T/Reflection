@@ -3,6 +3,7 @@ type TRSNPC = record
     Id: Int32;
     Tile: RSTile;
     CombatLevel: Int32;
+    Health: Int32;
     Actions: TStringArray;
     AnimationID: Int32;
     MSCoord: TPoint;
@@ -32,6 +33,7 @@ begin
     NPC.Name := Definition.Name;
     NPC.ID := Definition.ID;
     NPC.CombatLevel := Definition.CombatLevel;
+    NPC.Health := NPCs[I].Health;
     NPC.Tile := NPCs[I].Tile;
     NPC.Actions := Definition.Actions;
     NPC.AnimationID := NPCs[I].AnimationID;
@@ -70,6 +72,7 @@ begin
       NPC.Name := Definition.Name;
       NPC.ID := Definition.ID;
       NPC.CombatLevel := Definition.CombatLevel;
+      NPC.Health := NPCs[I].Health;
       NPC.Tile := NPCs[I].Tile;
       NPC.Actions := Definition.Actions;
       NPC.AnimationID := NPCs[I].AnimationID;
@@ -99,6 +102,7 @@ begin
       NPC.Name := Definition.Name;
       NPC.ID := Definition.ID;
       NPC.CombatLevel := Definition.CombatLevel;
+      NPC.Health := NPCs[I].Health;
       NPC.Tile := NPCs[I].Tile;
       NPC.Actions := Definition.Actions;
       NPC.AnimationID := NPCs[I].AnimationID;
