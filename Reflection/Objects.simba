@@ -1,6 +1,7 @@
 type TRSObject = record
     Name: String;
     Id: Int32;
+    Model: RSModel;
     Tile: RSTile;
     MSCoord: TPoint;
 end;
@@ -32,6 +33,7 @@ begin
     MSPoint := RSTile(GameObjects[I].Tile).ToLocal.TileToMS;
     Obj.Name := Definition.Name;
     Obj.ID := Definition.ID;
+    Obj.Model := GameObjects[I].Model;
     Obj.Tile := GameObjects[I].Tile;
     if (MSPoint.InBox(R_MainscreenBounds)) then
       Obj.MSCoord := MSPoint
@@ -72,6 +74,7 @@ begin
     begin
       Obj.Name := Definition.Name;
       Obj.ID := Definition.ID;
+      Obj.Model := GameObjects[I].Model;
       Obj.Tile := GameObjects[I].Tile;
       if (MSPoint.InBox(R_MainscreenBounds)) then
         Obj.MSCoord := MSPoint
@@ -101,6 +104,7 @@ begin
     begin
       Obj.Name := Definition.Name;
       Obj.ID := Definition.ID;
+      Obj.Model := GameObjects[I].Model;
       Obj.Tile := GameObjects[I].Tile;
       if (MSPoint.InBox(R_MainscreenBounds)) then
         Obj.MSCoord := MSPoint
@@ -132,6 +136,7 @@ begin
   Definition := GameObject.Definition;
   Result.Id := Definition.ID;
   Result.Name := Definition.Name;
+  Result.Model := GameObject.Model;
   Result.Tile := [X,Y];
   Result.MSCoord := RSTile([X,Y]).ToLocal.TileToMS;
   Definition.Free;
