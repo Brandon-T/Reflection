@@ -2,6 +2,7 @@ type TRSNPC = record
     Name: String;
     Id: Int32;
     Tile: RSTile;
+    LocalTile: RSTile;
     CombatLevel: Int32;
     Health: Int32;
     Actions: TStringArray;
@@ -35,6 +36,7 @@ begin
     NPC.CombatLevel := Definition.CombatLevel;
     NPC.Health := NPCs[I].Health;
     NPC.Tile := NPCs[I].Tile;
+    NPC.LocalTile := NPCs[I].LocalTile;
     NPC.Actions := Definition.Actions;
     NPC.AnimationID := NPCs[I].AnimationID;
     if (NPCs[I].LocalTile.TileToMS.InBox(R_MainscreenBounds)) then
@@ -74,6 +76,7 @@ begin
       NPC.CombatLevel := Definition.CombatLevel;
       NPC.Health := NPCs[I].Health;
       NPC.Tile := NPCs[I].Tile;
+      NPC.LocalTile := NPCs[I].LocalTile;
       NPC.Actions := Definition.Actions;
       NPC.AnimationID := NPCs[I].AnimationID;
       if (NPCs[I].LocalTile.TileToMS.InBox(R_MainscreenBounds)) then
@@ -104,6 +107,7 @@ begin
       NPC.CombatLevel := Definition.CombatLevel;
       NPC.Health := NPCs[I].Health;
       NPC.Tile := NPCs[I].Tile;
+      NPC.LocalTile := NPCs[I].LocalTile;
       NPC.Actions := Definition.Actions;
       NPC.AnimationID := NPCs[I].AnimationID;
       if (NPCs[I].LocalTile.TileToMS.InBox(R_MainscreenBounds)) then
