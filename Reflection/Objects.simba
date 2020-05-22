@@ -142,7 +142,7 @@ begin
   Result.Name := Definition.Name;
   Result.Model := GameObject.Model;
   Result.Tile := [X,Y];
-  Obj.LocalTile := GameObjects.LocalTile;
+  Result.LocalTile := GameObject.LocalTile;
   Result.MSCoord := RSTile([X,Y]).ToLocal.TileToMS;
   Definition.Free;
   GameObject.Free;
