@@ -1,6 +1,6 @@
 # Reflection
 
-** Plugin Build Status **
+**Plugin Build Status:** <br />
 [![Windows-x86_64](https://github.com/Brandon-T/RemoteInput/workflows/Windows-x86_64/badge.svg)](https://github.com/Brandon-T/Reflection/releases/latest)
 [![Windows-i686](https://github.com/Brandon-T/RemoteInput/workflows/Windows-i686/badge.svg)](https://github.com/Brandon-T/Reflection/releases/latest)
 <br />
@@ -11,7 +11,7 @@
 [![Linux-aarch64](https://github.com/Brandon-T/RemoteInput/workflows/Linux-aarch64/badge.svg)](https://github.com/Brandon-T/Reflection/releases/latest)
 
 
-** Notes **
+**Notes:**
 - Includes Player Functions
 - Includes NPC Functions
 - Includes Model Rendering & Animations
