@@ -9,6 +9,7 @@ type
     Orientation: Int32;
     Health: Int32;
     InteractingIndex: Int32;
+    Visible: Boolean;
   end;
 
 
@@ -32,6 +33,7 @@ begin
     Result[I].Orientation := NPCs[I].Orientation;
     Result[I].Health := NPCs[I].Health;
     Result[I].InteractingIndex := NPCs[I].InteractingIndex;
+    Result[I].Visible := Definition.IsVisible;
     Definition.Free;
   end;
 
@@ -61,6 +63,7 @@ begin
       Result[J].Orientation := NPCs[I].Orientation;
       Result[J].Health := NPCs[I].Health;
       Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+      Result[J].Visible := Definition.IsVisible;
       Inc(J);
     end;
     Definition.Free;
@@ -93,6 +96,7 @@ begin
       Result[J].Orientation := NPCs[I].Orientation;
       Result[J].Health := NPCs[I].Health;
       Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+      Result[J].Visible := Definition.IsVisible;
       Inc(J);
     end;
     Definition.Free;
@@ -126,6 +130,7 @@ begin
       Result[J].Orientation := NPCs[I].Orientation;
       Result[J].Health := NPCs[I].Health;
       Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+      Result[J].Visible := Definition.IsVisible;
       Definition.Free;
       Inc(J);
     end;
