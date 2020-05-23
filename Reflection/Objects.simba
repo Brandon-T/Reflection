@@ -1,46 +1,85 @@
-(*
-R_GetGameObjectID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+type
+  TRSObject = record
+    ID: Int32;
+    Tile: RSTile;
+    ObjectType: RSObjectType;
+    Name: String;
+  end;
 
-Returns the ID of the game object on the given global tile.
-
-Example:
-
-   writeln(R_GetGameObjectID(3187, 3293));
-
-*)
-Function R_GetGameObjectID(X, Y: Int32): Int32;
+Function R_FindObject(ObjectType: RSObjectType; X, Y: Int32): TRSObject;
 var
-  GameObject: RSObject;
+  Obj: RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
-  Definition := GameObject.Definition;
-  Result := Definition.ID;
-  Definition.Free;
-  GameObject.Free;
+  Obj := RSObject.Get(ObjectType, X, Y);
+  if Obj.ref <> nil then
+  begin
+    Definition := Obj.Definition;
+    Result.ID := Obj.ID;
+    Result.Tile := Obj.Tile;
+    Result.ObjectType := ObjectType;
+
+    if Definition.ref <> nil then
+    begin
+      Result.Name := Definition.Name;
+      Definition.Free;
+    end;
+
+    Obj.Free;
+  end;
 end;
 
-(*
-R_GetGameObjectName
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the Name of the game object on the given global tile.
-
-Example:
-
-   writeln(R_GetGameObjectName(3187, 3293));
-
-*)
-Function R_GetGameObjectName(X, Y: Int32): String;
+Function R_FindObjects(ID: Int32; ObjectType: RSObjectType): Array of TRSObject; overload;
 var
-  GameObject: RSObject;
+  I, J: Int32;
+  Objects: Array of RSObject;
   Definition: RSObjectDefinition;
 begin
-  GameObject := RSObject.Get(RSObjectType.GAME_OBJECT, X, Y);
-  Definition := GameObject.Definition;
-  Result := Definition.Name;
-  Definition.Free;
-  GameObject.Free;
+  Objects := RSObject.Get(ObjectType);
+  SetLength(Result, Length(Objects));
+
+  For I := 0 to High(Objects) do
+  begin
+    If Objects[I].ID = ID then
+    begin
+      Definition := Objects[I].Definition;
+      Result[J].ID := ID;
+      Result[J].Tile := Objects[I].Tile;
+      Result[J].ObjectType := ObjectType;
+
+      if Definition.ref <> nil then
+      begin
+        Result[J].Name := Definition.Name;
+        Definition.Free;
+      end;
+      Inc(J);
+    end;
+  end;
+  RSTypeArray(Objects).Free;
+  SetLength(Result, J);
 end;
 
+Function R_FindObjects(ObjectType: RSObjectType): Array of TRSObject; overload;
+var
+  I: Int32;
+  Objects: Array of RSObject;
+  Definition: RSObjectDefinition;
+begin
+  Objects := RSObject.Get(ObjectType);
+  SetLength(Result, Length(Objects));
+
+  For I := 0 to High(Objects) do
+  begin
+    Definition := Objects[I].Definition;
+    Result[I].ID := Objects[I].ID;
+    Result[I].Tile := Objects[I].Tile;
+    Result[I].ObjectType := ObjectType;
+
+    if Definition.ref <> nil then
+    begin
+      Result[I].Name := Definition.Name;
+      Definition.Free;
+    end;
+  end;
+  RSTypeArray(Objects).Free;
+end;

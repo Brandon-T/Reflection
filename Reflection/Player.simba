@@ -9,6 +9,9 @@ type
     Destination: TPoint;
     CombatLevel: Int32;
     Equipment: Array of Int32;
+    AnimationId: Int32;
+    Health: Int32;
+    Orientation: Int32;
   end;
 
 Function R_GetMe: TRSPlayer;
@@ -23,6 +26,9 @@ begin
   Result.Destination := LocalPlayer.Destination;
   Result.CombatLevel := LocalPlayer.CombatLevel;
   Result.Equipment := Definition.Equipment;
+  Result.AnimationId := LocalPlayer.AnimationId;
+  Result.Health := LocalPlayer.Health;
+  Result.Orientation := LocalPlayer.Orientation;
   Definition.Free;
   LocalPlayer.Free;
 end;
@@ -43,7 +49,39 @@ begin
     Result[I].Destination := Players[I].Destination;
     Result[I].CombatLevel := Players[I].CombatLevel;
     Result[I].Equipment := [];
+    Result[I].AnimationId := Players[I].AnimationId;
+    Result[I].Health := Players[I].Health;
+    Result[I].Orientation := Players[I].Orientation;
     Definition.Free;
   end;
   RSTypeArray(Players).Free;
 end;
+
+Function R_GetAnimation: Int32;
+var
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Result := Me.AnimationId;
+  Me.Free;
+end;
+
+Function R_IsMoving: Boolean;
+var
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Result := Me.IsMoving;
+  Me.Free;
+end;
+
+Function R_GetDestination: RSTile;
+var
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Result := Me.Destination;
+  Me.Free;
+end;
+
+

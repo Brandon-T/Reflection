@@ -155,3 +155,122 @@ begin
 
   RSTypeArray(SkinsArray).Free;
 end;
+
+Function RSModel.FitsSingleTile: Boolean;
+begin
+  Result := RGetBool(R_EIOS, ref, MODEL_FITSSINGLETILE);
+end;
+
+Function RSModel.Height: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, RENDERABLE_MODELHEIGHT);
+end;
+
+Function RSModel.Bounds(LocalX, LocalY, LocalZ: Int32): Array of TVector;
+var
+  I: Int32;
+  Orientation: Int32;
+  xMin, xMax: Int32;
+  yMin, yMax: Int32;
+  zMin, zMax: Int32;
+  SinAngle, CosAngle: Int32;
+  Vertices: Array[0..3] of Array of Int32;
+  VX, VY, VZ: Int32;
+  xMid, yMid, zMid: Int32;
+  xMidOffset, yMidOffset, zMidOffset: Int32;
+
+  Height, BottomY, xzRadius: Int32;
+  MagXZSq, Radius, Diameter: Int32;
+
+  EX, EY, EZ: Int32;
+  X1, Y1, Z1, X2, Y2, Z2: Int32;
+begin
+  Vertices := self.RawVertices;
+
+  //Calculate Cylindrical Bounds
+	Height := 0;
+	BottomY := 0;
+	xzRadius := 0;
+
+  For I := 0 to Length(Vertices) - 1 do
+  begin
+    VX := Vertices[0][I];
+    VY := Vertices[1][I];
+    VZ := Vertices[2][I];
+
+    Height := max(Height, -VY);
+    BottomY := max(BottomY, VY);
+
+    MagXZSq := (VX * VX) + (VZ * VZ);
+    xzRadius := max(MagXZSq, xzRadius);
+  end;
+
+  xzRadius := Floor(Sqrt(xzRadius + 0.99));
+  Radius := Floor(Sqrt(((xzRadius * xzRadius) + (Height * Height)) + 0.99));
+  Diameter := Radius + Floor(Sqrt(((xzRadius * xzRadius) + (BottomY * BottomY)) + 0.99));
+
+
+  //Calculate Bounding Box..
+  Orientation := 0;
+  xMin := 0; xMax := 0;
+  yMin := 0; yMax := 0;
+  zMin := 0; zMax := 0;
+
+  SinAngle := SINE[Orientation];
+  CosAngle := COSINE[Orientation];
+
+  For I := 0 to Length(Vertices) - 1 do
+  begin
+    //Rotate
+    VX := Sar(((Vertices[0][I] * CosAngle) + (Vertices[2][I] * SinAngle)), 16); //X * COSINE[Orientation] + Z * SINE[Orientation] >> 16;
+    VY := Vertices[1][I];
+    VZ := Sar(((Vertices[2][I] * COSINE[Orientation]) - (Vertices[0][I] * SINE[Orientation])), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
+
+    //Bounds
+    xMin := min(xMin, VX);
+    xMax := max(xMax, VX);
+
+    yMin := min(yMin, VY);
+    yMax := max(yMax, VY);
+
+    zMin := min(zMin, VZ);
+    zMax := max(zMax, VZ);
+  end;
+
+  xMid := (xMax + xMin) div 2;
+  yMid := (yMax + yMin) div 2;
+  zMid := (zMax + zMin) div 2;
+  xMidOffset := (xMax - xMin + 1) div 2;
+  yMidOffset := (yMax - yMin + 1) div 2;
+  zMidOffset := (zMax - zMin + 1) div 2;
+
+  xMidOffset := max(xMidOffset, 32);
+  zMidOffset := max(zMidOffset, 32);
+
+  if (self.FitsSingleTile) then
+  begin
+    xMidOffset += 8;
+    zMidOffset += 8;
+  end;
+
+  //Calculate Projection
+  X1 := xMid;
+  Y1 := zMid;
+  Z1 := yMid;
+  EX := xMidOffset;
+  EY := zMidOffset;
+  EZ := yMidOffset;
+
+  X2 := X1 + EX;
+  Y2 := Y1 + EY;
+  Z2 := Z1 + EZ;
+
+  X1 -= EX;
+  Y1 -= EY;
+  Z1 -= EZ;
+
+  Result := [
+      [X1, Y1, Z1], [X2, Y1, Z1], [X1, Y2, Z1], [X2, Y2, Z1],
+      [X1, Y1, Z2], [X2, Y1, Z2], [X1, Y2, Z2], [X2, Y2, Z2]
+  ];
+end;

@@ -104,7 +104,7 @@ var
 begin
   Mask := 2;
 
-  for I := 0 to high(CACHED_VARP_MASKS) do
+  for I := 0 to High(CACHED_VARP_MASKS) do
   begin
     CACHED_VARP_MASKS[I] := Mask - 1;
     Mask += Mask;

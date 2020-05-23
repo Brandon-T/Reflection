@@ -33,6 +33,49 @@ begin
   Region.Free;
 end;
 
+Function RSObject.Get(ObjectType: RSObjectType): Array of RSObject; static; overload;
+var
+  X, Y: Int32;
+  BaseX, BaseY: Int32;
+  MinX, MinY: Int32;
+  MaxX, MaxY: Int32;
+  Region: RSRegion;
+  Tile: RSSceneTile;
+begin
+  Region := RSClient.Region;
+  if Region.ref = nil then
+    Exit;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+
+  MinX := BaseX;
+  MinY := BaseY;
+  MaxX := BaseX + 104;
+  MaxY := BaseY + 104;
+
+  For Y := MinY To MaxY - 1 do
+  begin
+    For X := MinX To MaxX - 1 do
+    begin
+      Tile := Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
+      if Tile.ref <> nil then
+      begin
+        case ObjectType of
+          GAME_OBJECT: Result += Tile.GameObject;
+          WALL_DECORATION: Result += Tile.WallDecoration;
+          BOUNDARY_OBJECT: Result += Tile.BoundaryObject;
+          FLOOR_DECORATION: Result += Tile.GroundDecoration;
+        end;
+
+        Tile.Free;
+      end;
+    end;
+  end;
+
+  Region.Free;
+end;
+
 Function RSObject.Hash: Int64; constref;
 begin
   case self.ObjectType of

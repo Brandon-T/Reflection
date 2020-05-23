@@ -1,203 +1,136 @@
-(*
-R_NPCIsVisible
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+type
+  TNPC = record
+    ID: Int32;
+    Name: String;
+    CombatLevel: Int32;
+    Actions: Array of String;
+    Tile: RSTile;
+    AnimationId: Int32;
+    Orientation: Int32;
+    Health: Int32;
+    InteractingIndex: Int32;
+  end;
 
-Returns True if NPC is visible on screen.
 
-Example:
-
-   writeln(R_NPCIsVisible(1173));
-*)
-Function R_NPCIsVisible(ID: Int32): Boolean;
+Function R_GetNPCs: Array of TNPC;
 var
+  I: Int32;
   NPCs: Array of RSNPC;
   Definition: RSNPCDefinition;
-  I: Integer;
 begin
-  NPCs := RSClient.AllNPCs;
-  for I := 0 to High(NPCs) do
+  NPCs := RSNPC.AllNPCs;
+  SetLength(Result, Length(NPCs));
+
+  For I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
-    if Definition.ID = ID then
+    Result[I].ID := Definition.ID;
+    Result[I].Name := Definition.Name;
+    Result[I].Actions := Definition.Actions;
+    Result[I].Tile := NPCs[I].Tile;
+    Result[I].AnimationID := NPCs[I].AnimationId;
+    Result[I].Orientation := NPCs[I].Orientation;
+    Result[I].Health := NPCs[I].Health;
+    Result[I].InteractingIndex := NPCs[I].InteractingIndex;
+    Definition.Free;
+  end;
+
+  RSTypeArray(NPCs).Free;
+end;
+
+Function R_GetNPCs(ID: Int32): Array of TNPC; overload;
+var
+  I, J: Int32;
+  NPCs: Array of RSNPC;
+  Definition: RSNPCDefinition;
+begin
+  NPCs := RSNPC.AllNPCs;
+  SetLength(Result, Length(NPCs));
+
+  For I := 0 to High(NPCs) do
+  begin
+    Definition := NPCs[I].Definition;
+    Result[J].ID := Definition.ID;
+
+    if Result[J].ID = ID then
     begin
-      Result := Definition.IsVisible;
-      Definition.Free;
-      RSTypeArray(NPCs).Free;
-      Exit;
+      Result[J].Name := Definition.Name;
+      Result[J].Actions := Definition.Actions;
+      Result[J].Tile := NPCs[I].Tile;
+      Result[J].AnimationID := NPCs[I].AnimationId;
+      Result[J].Orientation := NPCs[I].Orientation;
+      Result[J].Health := NPCs[I].Health;
+      Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+      Inc(J);
     end;
     Definition.Free;
   end;
+
   RSTypeArray(NPCs).Free;
+  SetLength(Result, J);
 end;
 
-Function R_NPCIsVisible(Name: String): Boolean; overload;
+Function R_GetNPCs(Name: String): Array of TNPC; overload;
 var
-  npcs: Array of RSNPC;
-  i: Integer;
-begin
-  npcs := RSClient.AllNPCs;
-  for i := 0 to length(npcs) - 1 do
-  begin
-    if (npcs[i].Definition.Name = Name) then
-      exit(True);
-  end;
-end;
-
-(*
-R_NPCGetCombatLevel
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the combat level of the given NPC if they are on screen
-  or 0 if the NPC is not on screen.
-
-Example:
-
-   writeln(R_NPCGetCombatLevel(1173));
-*)
-Function R_NPCGetCombatLevel(ID: Int32): Int32;
-var
+  I, J: Int32;
   NPCs: Array of RSNPC;
   Definition: RSNPCDefinition;
-  I: Integer;
 begin
-  NPCs := RSClient.AllNPCs;
-  for I := 0 to High(NPCs) do
+  NPCs := RSNPC.AllNPCs;
+  SetLength(Result, Length(NPCs));
+
+  For I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
-    if Definition.ID = ID then
+    Result[J].Name := Definition.Name;
+
+    if Result[J].Name = Name then
     begin
-      Result := Definition.CombatLevel;
-      Definition.Free;
-      RSTypeArray(NPCs).Free;
-      Exit;
+      Result[J].ID := Definition.ID;
+      Result[J].Actions := Definition.Actions;
+      Result[J].Tile := NPCs[I].Tile;
+      Result[J].AnimationID := NPCs[I].AnimationId;
+      Result[J].Orientation := NPCs[I].Orientation;
+      Result[J].Health := NPCs[I].Health;
+      Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+      Inc(J);
     end;
     Definition.Free;
   end;
+
   RSTypeArray(NPCs).Free;
+  SetLength(Result, J);
 end;
 
-Function R_NPCGetCombatLevel(Name: String): Int32; overload;
+Function R_GetNPCs(Tile: RSTile): Array of TNPC; overload;
 var
+  I, J: Int32;
   NPCs: Array of RSNPC;
   Definition: RSNPCDefinition;
-  I: Integer;
 begin
-  NPCs := RSClient.AllNPCs;
-  for I := 0 to High(NPCs) do
+  NPCs := RSNPC.AllNPCs;
+  SetLength(Result, Length(NPCs));
+
+  For I := 0 to High(NPCs) do
   begin
-    Definition := NPCs[I].Definition;
-    if Definition.Name = Name then
+    Result[J].Tile := NPCs[I].Tile;
+
+    if Result[J].Tile = Tile then
     begin
-      Result := Definition.CombatLevel;
+      Definition := NPCs[I].Definition;
+      Result[J].ID := Definition.ID;
+      Result[J].Name := Definition.Name;
+      Result[J].Actions := Definition.Actions;
+      Result[J].Tile := NPCs[I].Tile;
+      Result[J].AnimationID := NPCs[I].AnimationId;
+      Result[J].Orientation := NPCs[I].Orientation;
+      Result[J].Health := NPCs[I].Health;
+      Result[J].InteractingIndex := NPCs[I].InteractingIndex;
       Definition.Free;
-      RSTypeArray(NPCs).Free;
-      Exit;
+      Inc(J);
     end;
-    Definition.Free;
   end;
+
   RSTypeArray(NPCs).Free;
-end;
-
-(*
-R_NPCGetName
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the name of the given NPC if they are on screen.
-
-Example:
-
-   writeln(R_NPCGetName(3114));
-*)
-Function R_NPCGetName(ID: Int32): String;
-var
-  npcs: Array of RSNPC;
-  i: Integer;
-begin
-  npcs := RSClient.AllNPCs;
-  for i := 0 to length(npcs) - 1 do
-  begin
-    if (npcs[i].Definition.ID = ID) then
-      exit(npcs[i].Definition.Name);
-  end;
-end;
-
-(*
-R_NPCGetID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the ID of the given NPC if they are on screen.
-
-Example:
-
-   writeln(R_NPCGetID('Chicken'));
-*)
-Function R_NPCGetID(Name: String): TIntegerArray;
-var
-  NPCs: Array of RSNPC;
-  Definition: RSNPCDefinition;
-  I, ID: Integer;
-begin
-  NPCs := RSClient.AllNPCs;
-  for I := 0 to High(NPCs) do
-  begin
-    Definition := NPCs[I].Definition;
-    if ((Definition.Name = Name) and (not (Result.Find(Definition.ID) > -1))) then
-      Result += ID;
-    Definition.Free;
-  end;
-  RSTypeArray(NPCs).Free;
-end;
-
-(*
-R_NPCGetActions
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the actions of the given NPC if they are on screen.
-
-Example:
-
-   writeln(R_NPCGetActions(3114));
-*)
-Function R_NPCGetActions(ID: Int32): TStringArray;
-var
-  NPCs: Array of RSNPC;
-  Definition: RSNPCDefinition;
-  I, J: Integer;
-  Actions: TStringArray;
-begin
-  NPCs := RSClient.AllNPCs;
-  for I := 0 to High(NPCs) do
-  begin
-    Definition := NPCs[I].Definition;
-    if Definition.ID = ID then
-    begin
-      Result := Definition.Actions;
-      Definition.Free;
-      Exit;
-    end;
-    Definition.Free;
-  end;
-  RSTypeArray(NPCs).Free;
-end;
-
-Function R_NPCGetActions(Name: String): TStringArray; overload;
-var
-  NPCs: Array of RSNPC;
-  Definition: RSNPCDefinition;
-  I, J: Integer;
-  Actions: TStringArray;
-begin
-  NPCs := RSClient.AllNPCs;
-  for I := 0 to High(NPCs) do
-  begin
-    Definition := NPCs[I].Definition;
-    if Definition.Name = Name then
-    begin
-      Result := Definition.Actions;
-      Definition.Free;
-      Exit;
-    end;
-    Definition.Free;
-  end;
-  RSTypeArray(NPCs).Free;
+  SetLength(Result, J);
 end;
