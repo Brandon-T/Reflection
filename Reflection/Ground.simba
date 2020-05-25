@@ -8,10 +8,9 @@ Example:
 
    Mouse.Move(R_GetMainscreenGroundItemByID(526)[0]);
 *)
-Function R_GetMainscreenGroundItemByID(ItemID: Int32): Array of RSTile;
+Function R_GetGroundItem(ItemID: Int32): Array of RSTile;
 var
-  I, W, H: Integer;
-  ResultTile: RSTile;
+  I: Integer;
   Items: Array of RSTile;
 begin
   Items := RSGroundObject.GetTileByID(ItemID);
@@ -19,45 +18,9 @@ begin
     Exit;
 
   for I := 0 to Length(Items) - 1 do
-  begin
-    GetClientDimensions(W, H);
-    ResultTile := RSTile(Items[i]).ToLocal.TileToMS;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
-      Result += ResultTile;
-  end;
+    Result += RSTile(Items[i]);
 
-  RSTypeArray(Items).Free;
-end;
-
-(*
-R_GetMinimapGroundItemByID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Returns the Minimap coordinates of a specific item ID.
-
-Example:
-
-   Mouse.Move(R_GetMinimapGroundItemByID(526)[0]);
-*)
-Function R_GetMinimapGroundItemByID(ItemID: Int32): Array of RSTile;
-var
-  I, W, H: Integer;
-  ResultTile: RSTile;
-  Items: Array of RSTile;
-begin
-  Items := RSGroundObject.GetTileByID(ItemID);
-  if Length(Items) < 1 then
-    Exit;
-
-  for I := 0 to Length(items) - 1 do
-  begin
-    GetClientDimensions(W, H);
-    ResultTile := RSTile(Items[I]).ToLocal.TileToMM;
-    if (not ((ResultTile.X < 0) or (ResultTile.X > W) or (ResultTile.Y < 0) or (ResultTile.Y > H))) then
-      Result += ResultTile;
-  end;
-
-  RSTypeArray(Items).Free;
+  //RSTypeArray(Items).Free;
 end;
 
 (*
