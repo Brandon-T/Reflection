@@ -1,12 +1,12 @@
 (*
-R_GetMainscreenGroundItemByID
+R_GetGroundItem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the Mainscreen coordinates of a specific item ID.
+Returns the tile of a specific item ID.
 
 Example:
 
-   Mouse.Move(R_GetMainscreenGroundItemByID(526)[0]);
+  writeln(R_GetGroundItem(314)); //Displays tiles with feathers
 *)
 Function R_GetGroundItem(ItemID: Int32): Array of RSTile;
 var
