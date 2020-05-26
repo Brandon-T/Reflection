@@ -32,6 +32,8 @@ begin
 
   for I := 0 to High(Indices) do
   begin
+    if (Indices[I] > HIGH(NPCsArray)) then
+      Exit;
     if NPCsArray[Indices[I]] <> nil then
     begin
       Result[I].ref := NPCsArray[Indices[I]];

@@ -55,6 +55,11 @@ begin
   end;
 end;
 
+Function R_IsInventoryFull(): Boolean;
+begin
+  Result := R_InventoryCount = 28;
+end;
+
 Function R_CountInventoryItem(ID: Int32): Int32;
 var
   ItemNodeCache: RSHashTable;
