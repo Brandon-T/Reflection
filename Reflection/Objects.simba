@@ -55,7 +55,37 @@ begin
       Inc(J);
     end;
   end;
-  RSTypeArray(Objects).Free;
+  //RSTypeArray(Objects).Free;
+  SetLength(Result, J);
+end;
+
+Function R_FindObjects(IDs: TIntegerArray; ObjectType: RSObjectType): Array of TRSObject; overload;
+var
+  I, J: Int32;
+  Objects: Array of RSObject;
+  Definition: RSObjectDefinition;
+begin
+  Objects := RSObject.Get(ObjectType);
+  SetLength(Result, Length(Objects));
+
+  For I := 0 to High(Objects) do
+  begin
+    If IDs.Find(Objects[I].ID) > 0 then
+    begin
+      Definition := Objects[I].Definition;
+      Result[J].ID := Objects[I].ID;
+      Result[J].Tile := Objects[I].Tile;
+      Result[J].ObjectType := ObjectType;
+
+      if Definition.ref <> nil then
+      begin
+        Result[J].Name := Definition.Name;
+        Definition.Free;
+      end;
+      Inc(J);
+    end;
+  end;
+  //RSTypeArray(Objects).Free;
   SetLength(Result, J);
 end;
 
@@ -81,5 +111,5 @@ begin
       Definition.Free;
     end;
   end;
-  RSTypeArray(Objects).Free;
+  //RSTypeArray(Objects).Free;
 end;
