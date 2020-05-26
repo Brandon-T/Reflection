@@ -89,7 +89,7 @@ begin
 
   for Y := BaseY - Radius to BaseY + Radius do
   begin
-    for X := BaseX - Radius to BaseY + Radius do
+    for X := BaseX - Radius to BaseX + Radius do
     begin
       Tile := Region.SceneTile(Plane, X, Y);
       if Tile.ref <> nil then
