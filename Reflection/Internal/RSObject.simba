@@ -200,7 +200,7 @@ begin
         UID := RSAnimableNode(Entity.ref).Orientation + (Definition.ID shl 10);
       end else
         begin
-          UID := RSAnimableNode(Entity.ref).Orientation + (RSAnimableNode(Result.ref).Flags shl 3) + (Definition.ID shl 10);
+          UID := RSAnimableNode(Entity.ref).Orientation + (RSAnimableNode(Entity.ref).Flags shl 3) + (Definition.ID shl 10);
         end;
 
       Garbage += Entity;
