@@ -1,5 +1,0 @@
-* text=auto
-
-*.simba linguist-language=Pascal
-*.pas linguist-language=Pascal
-*.html linguist-detectable=false
