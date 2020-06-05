@@ -4,7 +4,7 @@ name=Reflection
 // The path to install into, from the working directory.
 directory=Includes
 // If true, files will be installed directly into the directory
-extract_in_directory=false
+extract_in_directory=true
 // collapse top level folders
 collapse=false
 // files not to install
