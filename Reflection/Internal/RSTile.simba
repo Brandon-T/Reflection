@@ -39,7 +39,7 @@ end;
   Converts a LOCAL Tile to a Global Tile within Instances.
   If the tile is not currently in an instance, returns the result of `ToGlobal`.
 *}
-Function RSTile.ToWorldTile: RSTile; constref;
+Function RSTile.LocalToWorldTile: RSTile; constref;
 var
   SceneX, SceneY: Int32;
   ChunkX, ChunkY: Int32;
@@ -63,13 +63,14 @@ begin
     Chunk := RSClient.RegionInstanceChunk(RSClient.Plane, ChunkX, ChunkY);
     Rotation := Sar(Chunk, 1) and $03;
 
-    ChunkX := (Sar(Chunk, 13) and $3FF) * 8;
+    ChunkX := (Sar(Chunk, 14) and $3FF) * 8;
     ChunkY := (Sar(Chunk, 3) and $7FF) * 8;
     Plane := Sar(Chunk, 24) and $03;
 
     P.X := ChunkX + (SceneX and 7);
     P.Y := ChunkY + (SceneY and 7);
 
+    //Rotate
     ChunkX := P.X and (not 7);
     ChunkY := P.Y and (not 7);
     Result.X := P.X and 7;
@@ -97,6 +98,78 @@ begin
   end;
 
   Result := self.ToGlobal;
+end;
+
+{*
+  Converts a WORLD Tile to a Local Tile within Instances.
+  If the tile is not currently in an instance, returns the result of `ToLocal`.
+*}
+Function RSTile.WorldToLocalTile: RSTile; constref;
+var
+  X, Y: Int32;
+  ChunkX, ChunkY: Int32;
+  Rotation: Int32;
+  Chunks: Array of Array of Int32;
+  P: RSTile;
+begin
+  if RSClient.IsRegionInstanced then
+  begin
+    Chunks := RSClient.RegionInstanceChunks(RSClient.Plane);
+    for X := 0 to high(Chunks) do
+    begin
+      for Y := 0 to high(Chunks[X]) do
+      begin
+        if Chunks[X][Y] < 0 then
+          continue;
+
+        Rotation := Sar(Chunks[X][Y], 1) and $03;
+        ChunkX := (Sar(Chunks[X][Y], 14) and $3FF) * 8;
+        ChunkY := (Sar(Chunks[X][Y], 3) and $7FF) * 8;
+
+        if ((self.X >= ChunkX) and (self.X < ChunkX + 8) and (self.Y >= ChunkY) and (self.Y < ChunkY + 8)) then
+        begin
+          //Technically, there can be more than one area where this tile is located in,
+          //However, we return the tile in the FIRST region.
+          P.X := RSClient.BaseX + (X * 8) + (self.X and 7);
+          P.Y := RSClient.BaseY + (Y * 8) + (self.Y and 7);
+
+          //Rotation
+					ChunkX := P.X and (not 7);
+          ChunkY := P.Y and (not 7);
+          Result.X := P.X and 7;
+          Result.Y := P.Y and 7;
+
+          if 4 - Rotation = 1 then
+          begin
+            Result := [ChunkX + Result.Y, ChunkY + (7 - Result.X)];
+            Result := Result.ToLocal;
+            Exit;
+          end;
+
+          if 4 - Rotation = 2 then
+          begin
+            Result := [ChunkX + (7 - Result.X), ChunkY + (7 - ChunkY)];
+            Result := Result.ToLocal;
+            Exit;
+          end;
+
+          if 4 - Rotation = 3 then
+          begin
+            Result := [ChunkX + (7 - Result.Y), ChunkY + Result.X];
+            Result := Result.ToLocal;
+            Exit;
+          end;
+
+          Exit(P.ToLocal);
+        end;
+      end;
+    end;
+
+    Result := [-1, -1];
+    Exit;
+  end;
+
+  Result := self.ToLocal;
 end;
 
 {* Converts a Local Tile to MM point *}
