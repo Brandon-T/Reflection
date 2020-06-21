@@ -1,6 +1,14 @@
 {$include_once Functions.simba}
 {$include_once Hooks.simba}
 
+type
+  RSRegionCacheNode = record
+    ID: Int32;
+    Instanced: Boolean;
+    TileSettings: array of array of array of UInt8;
+    TileHeights: array of array of array of Int32;
+  end;
+
 const
   SINGLEUNIT: Double = PI / 1024.0;
 
@@ -11,6 +19,8 @@ var
   SINE: array[0..2048] of Int32;
   COSINE: array[0..2048] of Int32;
 
+  CACHED_REGION_INDEX: Int32 := 0;
+  CACHED_REGION_NODES: Array[0..3] of RSRegionCacheNode := [[], [], [], []]; //0..3 = 4 Regions..
   CACHED_TILE_SETTINGS: array of array of array of UInt8;
   CACHED_TILE_HEIGHTS: array of array of array of Int32;
   CACHED_VARP_MASKS: array[0..32] of Int32;
@@ -111,3 +121,41 @@ begin
   end;
 end;
 {$ENDIF}
+
+Procedure UpdateRegionCache(X, Y: Int32);
+  Function FindRegion(ID: Int32; Instanced: Boolean): Int32;
+  var
+    I: Int32;
+  begin
+    for I := 0 to High(CACHED_REGION_NODES) do
+    begin
+      if (CACHED_REGION_NODES[I].ID > 0) and (CACHED_REGION_NODES[I].ID = ID) and (CACHED_REGION_NODES[I].Instanced = Instanced) then
+        Exit(I);
+    end;
+
+    Result := -1;
+  end;
+var
+  RegionID: Int32;
+  NodeIndex: Int32;
+begin
+  RegionID := (Sar(X, 6) shl 8) or Sar(Y, 6);
+
+  NodeIndex := FindRegion(RegionID, False);
+  if NodeIndex = -1 then
+  begin
+    RInitializeTileSettings;
+    RInitializeTileHeights;
+
+    CACHED_REGION_NODES[CACHED_REGION_INDEX].ID := RegionID;
+    CACHED_REGION_NODES[CACHED_REGION_INDEX].Instanced := False;
+    CACHED_REGION_NODES[CACHED_REGION_INDEX].TileSettings := CACHED_TILE_SETTINGS;
+    CACHED_REGION_NODES[CACHED_REGION_INDEX].TileHeights := CACHED_TILE_HEIGHTS;
+    CACHED_REGION_INDEX := (CACHED_REGION_INDEX + 1) mod Length(CACHED_REGION_NODES);
+    writeln('cached tile info');
+    Exit;
+  end;
+
+  CACHED_TILE_SETTINGS := CACHED_REGION_NODES[NodeIndex].TileSettings;
+  CACHED_TILE_HEIGHTS := CACHED_REGION_NODES[NodeIndex].TileHeights;
+end;

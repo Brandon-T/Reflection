@@ -45,7 +45,27 @@ begin
   RFreeObject(R_EIOS, Actions);
 end;
 
-Function RSItemDefinition.Cache: RSCache; static;
+Function RSItemDefinition.DefinitionCache: RSCache; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, ITEMDEFINITION_CACHE);
+end;
+
+Function RSItemDefinition.Get(ID: Int32): RSItemDefinition; static;
+var
+  Cache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSItemDefinition.DefinitionCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
 end;

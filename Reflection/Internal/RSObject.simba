@@ -15,9 +15,11 @@ begin
   if Region.ref = nil then
     Exit;
 
-  BaseX := X - RSClient.BaseX;
-  BaseY := Y - RSClient.BaseY;
-  Tile := Region.SceneTile(RSClient.Plane, BaseX, BaseY);
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+  UpdateSceneTilesCache(X, Y);
+
+  Tile := CACHED_SCENE_TILES[RSClient.Plane][X - BaseX][Y - BaseY]; //Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
   if Tile.ref <> nil then
   begin
     case ObjectType of
@@ -27,7 +29,7 @@ begin
       FLOOR_DECORATION: Result := Tile.GroundDecoration;
     end;
 
-    Tile.Free;
+    //Tile.Free;
   end;
 
   Region.Free;
@@ -35,12 +37,13 @@ end;
 
 Function RSObject.Get(ObjectType: RSObjectType): Array of RSObject; static; overload;
 var
-  X, Y: Int32;
+  I, X, Y: Int32;
   BaseX, BaseY: Int32;
   MinX, MinY: Int32;
   MaxX, MaxY: Int32;
   Region: RSRegion;
   Tile: RSSceneTile;
+  Tiles: Array of Array of RSSceneTile;
 begin
   Region := RSClient.Region;
   if Region.ref = nil then
@@ -54,25 +57,28 @@ begin
   MaxX := BaseX + 104;
   MaxY := BaseY + 104;
 
+  UpdateSceneTilesCache(BaseX, BaseY);
+  Tiles := CACHED_SCENE_TILES[RSClient.Plane]; //Tiles := Region.SceneTiles(RSClient.Plane);
+  SetLength(Result, 104 * 104);
+
   For Y := MinY To MaxY - 1 do
   begin
     For X := MinX To MaxX - 1 do
     begin
-      Tile := Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
+      Tile := Tiles[X - BaseX][Y - BaseY];
       if Tile.ref <> nil then
       begin
         case ObjectType of
-          GAME_OBJECT: Result += Tile.GameObject;
-          WALL_DECORATION: Result += Tile.WallDecoration;
-          BOUNDARY_OBJECT: Result += Tile.BoundaryObject;
-          FLOOR_DECORATION: Result += Tile.GroundDecoration;
+          GAME_OBJECT: Result[I] := Tile.GameObject;
+          WALL_DECORATION: Result[I] := Tile.WallDecoration;
+          BOUNDARY_OBJECT: Result[I] := Tile.BoundaryObject;
+          FLOOR_DECORATION: Result[I] := Tile.GroundDecoration;
         end;
-
-        Tile.Free;
       end;
     end;
   end;
 
+  //RSTypeArray(Tiles).Free;
   Region.Free;
 end;
 

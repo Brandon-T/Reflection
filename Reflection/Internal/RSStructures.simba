@@ -117,21 +117,8 @@ begin
 end;
 
 Procedure RSTypeArray.Free;
-var
-  I, J: Integer;
-  Arr: Array of Pointer;
+type
+  PPointerArray = Array of Pointer;
 begin
-  SetLength(Arr, Length(self));
-  for I := 0 to High(self) do
-  begin
-    if self[I].ref <> nil then
-    begin
-      Arr[J] := self[I].ref;
-      self[I].ref := nil;
-      Inc(J);
-    end;
-  end;
-
-  SetLength(Arr, J);
-  RFreeObjects(R_EIOS, Arr);
+  RFreeObjects(R_EIOS, PPointerArray(self));
 end;

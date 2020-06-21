@@ -25,16 +25,19 @@ begin
   For I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
-    Result[I].ID := Definition.ID;
-    Result[I].Name := Definition.Name;
-    Result[I].Actions := Definition.Actions;
-    Result[I].Tile := NPCs[I].Tile;
-    Result[I].AnimationID := NPCs[I].AnimationId;
-    Result[I].Orientation := NPCs[I].Orientation;
-    Result[I].Health := NPCs[I].Health;
-    Result[I].InteractingIndex := NPCs[I].InteractingIndex;
-    Result[I].Visible := Definition.IsVisible;
-    Definition.Free;
+    if Definition.ref <> nil then
+    begin
+      Result[I].ID := Definition.ID;
+      Result[I].Name := Definition.Name;
+      Result[I].Actions := Definition.Actions;
+      Result[I].Tile := NPCs[I].Tile;
+      Result[I].AnimationID := NPCs[I].AnimationId;
+      Result[I].Orientation := NPCs[I].Orientation;
+      Result[I].Health := NPCs[I].Health;
+      Result[I].InteractingIndex := NPCs[I].InteractingIndex;
+      Result[I].Visible := Definition.IsVisible;
+      Definition.Free;
+    end;
   end;
 
   RSTypeArray(NPCs).Free;
@@ -52,21 +55,24 @@ begin
   For I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
-    Result[J].ID := Definition.ID;
-
-    if Result[J].ID = ID then
+    if Definition.ref <> nil then
     begin
-      Result[J].Name := Definition.Name;
-      Result[J].Actions := Definition.Actions;
-      Result[J].Tile := NPCs[I].Tile;
-      Result[J].AnimationID := NPCs[I].AnimationId;
-      Result[J].Orientation := NPCs[I].Orientation;
-      Result[J].Health := NPCs[I].Health;
-      Result[J].InteractingIndex := NPCs[I].InteractingIndex;
-      Result[J].Visible := Definition.IsVisible;
-      Inc(J);
+      Result[J].ID := Definition.ID;
+
+      if Result[J].ID = ID then
+      begin
+        Result[J].Name := Definition.Name;
+        Result[J].Actions := Definition.Actions;
+        Result[J].Tile := NPCs[I].Tile;
+        Result[J].AnimationID := NPCs[I].AnimationId;
+        Result[J].Orientation := NPCs[I].Orientation;
+        Result[J].Health := NPCs[I].Health;
+        Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+        Result[J].Visible := Definition.IsVisible;
+        Inc(J);
+      end;
+      Definition.Free;
     end;
-    Definition.Free;
   end;
 
   RSTypeArray(NPCs).Free;
@@ -85,21 +91,24 @@ begin
   For I := 0 to High(NPCs) do
   begin
     Definition := NPCs[I].Definition;
-    Result[J].Name := Definition.Name;
-
-    if Result[J].Name = Name then
+    if Definition.ref <> nil then
     begin
-      Result[J].ID := Definition.ID;
-      Result[J].Actions := Definition.Actions;
-      Result[J].Tile := NPCs[I].Tile;
-      Result[J].AnimationID := NPCs[I].AnimationId;
-      Result[J].Orientation := NPCs[I].Orientation;
-      Result[J].Health := NPCs[I].Health;
-      Result[J].InteractingIndex := NPCs[I].InteractingIndex;
-      Result[J].Visible := Definition.IsVisible;
-      Inc(J);
+      Result[J].Name := Definition.Name;
+
+      if Result[J].Name = Name then
+      begin
+        Result[J].ID := Definition.ID;
+        Result[J].Actions := Definition.Actions;
+        Result[J].Tile := NPCs[I].Tile;
+        Result[J].AnimationID := NPCs[I].AnimationId;
+        Result[J].Orientation := NPCs[I].Orientation;
+        Result[J].Health := NPCs[I].Health;
+        Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+        Result[J].Visible := Definition.IsVisible;
+        Inc(J);
+      end;
+      Definition.Free;
     end;
-    Definition.Free;
   end;
 
   RSTypeArray(NPCs).Free;
@@ -122,17 +131,20 @@ begin
     if Result[J].Tile = Tile then
     begin
       Definition := NPCs[I].Definition;
-      Result[J].ID := Definition.ID;
-      Result[J].Name := Definition.Name;
-      Result[J].Actions := Definition.Actions;
-      Result[J].Tile := NPCs[I].Tile;
-      Result[J].AnimationID := NPCs[I].AnimationId;
-      Result[J].Orientation := NPCs[I].Orientation;
-      Result[J].Health := NPCs[I].Health;
-      Result[J].InteractingIndex := NPCs[I].InteractingIndex;
-      Result[J].Visible := Definition.IsVisible;
-      Definition.Free;
-      Inc(J);
+      if Definition.ref <> nil then
+      begin
+        Result[J].ID := Definition.ID;
+        Result[J].Name := Definition.Name;
+        Result[J].Actions := Definition.Actions;
+        Result[J].Tile := NPCs[I].Tile;
+        Result[J].AnimationID := NPCs[I].AnimationId;
+        Result[J].Orientation := NPCs[I].Orientation;
+        Result[J].Health := NPCs[I].Health;
+        Result[J].InteractingIndex := NPCs[I].InteractingIndex;
+        Result[J].Visible := Definition.IsVisible;
+        Definition.Free;
+        Inc(J);
+      end;
     end;
   end;
 

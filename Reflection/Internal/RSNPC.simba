@@ -14,9 +14,13 @@ var
   NPCs: Pointer;
   NPCsArray: Array of Pointer;
   Indices: Array of Int32;
-  I, NPCsSize, Actual: SizeUInt;
+  I, NPCsSize, Actual, Count: SizeUInt;
 begin
-  Indices := RSClient.NPCIndices;
+  Count := RSClient.NPCCount;
+  if Count < 1 then
+    Exit;
+
+  Indices := RSClient.NPCIndices(Count);
   if Length(Indices) < 1 then
     Exit;
 
@@ -25,16 +29,16 @@ begin
   if NPCs = nil then
     Exit;
 
-  NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
+  NPCsArray := RGetObjectArray(R_EIOS, NPCs, Indices);
   RFreeObject(R_EIOS, NPCs);
 
   SetLength(Result, Length(Indices));
 
-  for I := 0 to High(Indices) do
+  for I := 0 to Count - 1 do
   begin
-    if NPCsArray[Indices[I]] <> nil then
+    if NPCsArray[I] <> nil then
     begin
-      Result[I].ref := NPCsArray[Indices[I]];
+      Result[Actual].ref := NPCsArray[I];
       Inc(Actual);
     end;
   end;

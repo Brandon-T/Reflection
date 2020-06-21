@@ -19,7 +19,7 @@ var
   HashTable: RSIterableHashTable;
   Garbage: RSTypeArray;
 begin
-  Cache := RSItemDefinition.Cache;
+  Cache := RSItemDefinition.DefinitionCache;
   if Cache.ref <> nil then
   begin
     HashTable := Cache.HashTable;

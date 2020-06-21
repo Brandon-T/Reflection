@@ -10,6 +10,15 @@ begin
   result := base div (1 shl shift);
 end;}
 
+{*
+  Returns the ID of the region that contains this tile.
+  Does NOT work with LOCAL tile (Global & Base only).
+*}
+Function RSTile.RegionID: Int32; constref;
+begin
+  Result := (Sar(X, 6) shl 8) or Sar(Y, 6);
+end;
+
 Function RSTile.ToLocal: RSTile; constref;
   Function sal(base: Int32; shift: byte): Int32;
   begin
@@ -24,6 +33,70 @@ Function RSTile.ToGlobal: RSTile; constref;
 begin
   Result.X := RSClient.BaseX + self.X div 128;
   Result.Y := RSClient.BaseY + self.Y div 128;
+end;
+
+{*
+  Converts a LOCAL Tile to a Global Tile within Instances.
+  If the tile is not currently in an instance, returns the result of `ToGlobal`.
+*}
+Function RSTile.ToWorldTile: RSTile; constref;
+var
+  SceneX, SceneY: Int32;
+  ChunkX, ChunkY: Int32;
+  Chunk, Rotation, Plane: Int32;
+  P: RSTile;
+begin
+  if RSClient.IsRegionInstanced then
+  begin
+    SceneX := Sar(self.X, 7);
+    SceneY := Sar(self.Y, 7);
+
+    ChunkX := SceneX div 8;
+		ChunkY := SceneY div 8;
+
+    if (ChunkX >= 13) or (ChunkY >= 13) then
+    begin
+      Result := [-1, -1];
+      Exit;
+    end;
+
+    Chunk := RSClient.RegionInstanceChunk(RSClient.Plane, ChunkX, ChunkY);
+    Rotation := Sar(Chunk, 1) and $03;
+
+    ChunkX := (Sar(Chunk, 13) and $3FF) * 8;
+    ChunkY := (Sar(Chunk, 3) and $7FF) * 8;
+    Plane := Sar(Chunk, 24) and $03;
+
+    P.X := ChunkX + (SceneX and 7);
+    P.Y := ChunkY + (SceneY and 7);
+
+    ChunkX := P.X and (not 7);
+    ChunkY := P.Y and (not 7);
+    Result.X := P.X and 7;
+    Result.Y := P.Y and 7;
+
+    if 4 - Rotation = 1 then
+    begin
+      Result := [ChunkX + Result.Y, ChunkY + (7 - Result.X)];
+      Exit;
+    end;
+
+    if 4 - Rotation = 2 then
+    begin
+      Result := [ChunkX + (7 - Result.X), ChunkY + (7 - ChunkY)];
+      Exit;
+    end;
+
+    if 4 - Rotation = 3 then
+    begin
+      Result := [ChunkX + (7 - Result.Y), ChunkY + Result.X];
+      Exit;
+    end;
+
+    Exit(P);
+  end;
+
+  Result := self.ToGlobal;
 end;
 
 {* Converts a Local Tile to MM point *}
@@ -130,6 +203,8 @@ var
   xSize, ySize: Int32;
   var1, var2, var3, var4: Int32;
 begin
+  UpdateRegionCache(RSClient.BaseX, RSClient.BaseY);
+
   xSize := Sar(self.x, 7);
   ySize := Sar(self.y, 7);
 
@@ -140,8 +215,8 @@ begin
       Inc(plane);
     end;
 
-    var1 := self.x and 127;
-    var2 := self.y and 127;
+    var1 := self.X and 127;
+    var2 := self.Y and 127;
     var3 := Sar(((var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize]) + ((128 - var1) * CACHED_TILE_HEIGHTS[plane][xSize][ySize])), 7);
     var4 := Sar(((CACHED_TILE_HEIGHTS[plane][xSize][ySize + 1] * (128 - var1)) + (var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize + 1])), 7);
 

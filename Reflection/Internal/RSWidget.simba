@@ -409,22 +409,6 @@ begin
   RFreeObject(R_EIOS, Widgets);
 end;
 
-{Function RSWidget.IsValid(Index: SizeUInt): Boolean; static;
-var
-  Widgets: Pointer;
-  WidgetsSize: SizeUInt;
-begin
-  WidgetsSize := 0;
-  Widgets := RGetArray(R_EIOS, nil, WidgetsSize, CLIENT_VALIDWIDGETS);
-  if Widgets = nil then
-    Exit;
-  if Index < WidgetsSize then
-  begin
-    Result := RGetBoolArray(R_EIOS, Widgets, Index);
-  end;
-  RFreeObject(R_EIOS, Widgets);
-end;}
-
 Function RSWidget.IsValid(Group, Child: Int32; Index: Int32 = -1): Boolean; static;
 var
   Widget: RSWidget;

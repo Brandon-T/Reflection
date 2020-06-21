@@ -20,11 +20,13 @@ end;
 
 Function RSClient.GetTileSettings(X, Y, Z: Int32): UInt8; static;
 begin
+  UpdateRegionCache(X, Y);
   Result := CACHED_TILE_SETTINGS[X][Y][Z];
 end;
 
 Function RSClient.GetTileHeights(X, Y, Z: Int32): Int32; static;
 begin
+  UpdateRegionCache(X, Y);
   Result := CACHED_TILE_HEIGHTS[X][Y][Z];
 end;
 
@@ -73,7 +75,21 @@ begin
   Result := RGetInt(R_EIOS, nil, CLIENT_MAPANGLE);
 end;
 
-Function RSClient.NPCIndices: Array of Int32; static;
+Function RSClient.NPCIndices(NPCCount: Int32): Array of Int32; static;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_NPCINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, Min(NPCCount, IndicesSize));
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSClient.NPCIndices: Array of Int32; static; overload;
 var
   Indices: Pointer;
   IndicesSize: SizeUInt;
@@ -87,7 +103,26 @@ begin
   RFreeObject(R_EIOS, Indices);
 end;
 
-Function RSClient.PlayerIndices: Array of Int32; static;
+Function RSClient.NPCCount: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_NPCCOUNT);
+end;
+
+Function RSClient.PlayerIndices(PlayerCount: Int32): Array of Int32; static;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_PLAYERINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, Min(PlayerCount, IndicesSize));
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSClient.PlayerIndices: Array of Int32; static; overload;
 var
   Indices: Pointer;
   IndicesSize: SizeUInt;
@@ -99,6 +134,11 @@ begin
 
   Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
   RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSClient.PlayerCount: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_PLAYERCOUNT);
 end;
 
 Function RSClient.AllNPCs: Array of RSNPC; static;
@@ -170,6 +210,23 @@ end;
 Function RSClient.Region: RSRegion; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_REGION);
+end;
+
+Function RSClient.IsRegionInstanced: Boolean; static;
+begin
+  Result := RGetBool(R_EIOS, nil, CLIENT_ISREGIONINSTANCED);
+end;
+
+Function RSClient.RegionInstanceChunk(Plane, ChunkX, ChunkY: Int32): Int32; static;
+var
+  Chunks: Pointer;
+begin
+  Chunks := RGetArray(R_EIOS, nil, CLIENT_REGIONINSTANCES);
+  if Chunks = nil then
+    Exit(-1);
+
+  Result := RGetIntArray3D(R_EIOS, Chunks, Plane, ChunkX, ChunkY);
+  RFreeObject(R_EIOS, Chunks);
 end;
 
 Function RSClient.IsResizeable: Boolean; static;

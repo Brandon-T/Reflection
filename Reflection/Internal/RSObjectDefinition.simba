@@ -52,6 +52,20 @@ begin
   Result := RGetString(R_EIOS, ref, OBJECTDEFINITION_NAME);
 end;
 
+Function RSObjectDefinition.Actions: Array of String; constref;
+var
+  Actions: Pointer;
+  ActionsSize: SizeUInt;
+begin
+  ActionsSize := 0;
+  Actions := RGetArray(R_EIOS, ref, ActionsSize, OBJECTDEFINITION_ACTIONS);
+  if Actions = nil then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Actions, 0, ActionsSize);
+  RFreeObject(R_EIOS, Actions);
+end;
+
 Function RSObjectDefinition.Transformations: Array of Integer; constref;
 var
   IDs: Pointer;

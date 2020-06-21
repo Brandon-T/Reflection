@@ -76,16 +76,6 @@ begin
   Result := RGetInt(R_EIOS, ref, ACTOR_INTERACTINGINDEX);
 end;
 
-Function RSActor.CombatCycle: Int32; constref;
-begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_COMBATCYCLE);
-end;
-
-Function RSActor.IsInCombat: Boolean; constref;
-begin
-  Result := self.CombatCycle > RSClient.LoopCycle;
-end;
-
 Function RSActor.Health: Int32; constref;
 var
   CombatInfoList, CombatInfoHolder: RSCombatInfoList;
@@ -206,4 +196,37 @@ begin
   Result := (self.Health / self.HealthScale) * 100.0;
 end;
 
+Function RSActor.IsInCombat: Boolean; constref;
+begin
+  Result := (self.InteractingIndex <> -1) or (self.Health <> -1);
+end;
 
+Function RSActor.GetInteracting: RSActor; constref;
+var
+  Index: Int32;
+  Actors: Pointer;
+begin
+  Index := self.InteractingIndex;
+  if (Index = -1) or (Index = 65535) then
+    Exit;
+
+  if Index < 32768 then
+  begin
+    Actors := RGetObject(R_EIOS, nil, CLIENT_LOCALNPCS);
+    if Actors <> nil then
+    begin
+      Result.ref := RGetObjectArray(R_EIOS, Actors, Index);
+      RFreeObject(R_EIOS, Actors);
+      Exit;
+    end;
+  end else
+    begin
+      Actors := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYERS);
+      if Actors <> nil then
+      begin
+        Result.ref := RGetObjectArray(R_EIOS, Actors, Index - 32768);
+        RFreeObject(R_EIOS, Actors);
+        Exit;
+      end;
+    end;
+end;
