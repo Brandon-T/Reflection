@@ -14,13 +14,9 @@ var
   NPCs: Pointer;
   NPCsArray: Array of Pointer;
   Indices: Array of Int32;
-  I, NPCsSize, Actual, Count: SizeUInt;
+  I, NPCsSize, Actual: SizeUInt;
 begin
-  Count := RSClient.NPCCount;
-  if Count < 1 then
-    Exit;
-
-  Indices := RSClient.NPCIndices(Count);
+  Indices := RSClient.NPCIndices;
   if Length(Indices) < 1 then
     Exit;
 
@@ -32,9 +28,9 @@ begin
   NPCsArray := RGetObjectArray(R_EIOS, NPCs, Indices);
   RFreeObject(R_EIOS, NPCs);
 
-  SetLength(Result, Length(Indices));
+  SetLength(Result, Length(NPCsArray));
 
-  for I := 0 to Count - 1 do
+  for I := 0 to Length(NPCsArray) - 1 do
   begin
     if NPCsArray[I] <> nil then
     begin
@@ -94,7 +90,7 @@ begin
       Garbage += [HashTable, AnimationCache];
     end;
 
-    if (MovementId <> -1) and (not self.isIdle) and ((MovementId <> self.CurrentSequenceId) or (IdleSequence.ref = nil)) then
+    if (MovementId <> -1) and ((MovementId <> self.CurrentSequenceId) or (IdleSequence.ref = nil)) then
     begin
       AnimationCache := RSAnimationSequence.AnimationSequenceCache;
       if AnimationCache.ref <> nil then

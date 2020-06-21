@@ -229,6 +229,30 @@ begin
   RFreeObject(R_EIOS, Chunks);
 end;
 
+Function RSClient.RegionInstanceChunks(Plane: Int32): Array of Array of Int32; static;
+var
+  Chunks: Pointer;
+  I: SizeUInt;
+  SX: Pointer;
+  SY: Array of Pointer;
+type
+  RSSceneTileArray = Array of RSSceneTile;
+begin
+  Chunks := RGetArray(R_EIOS, nil, CLIENT_REGIONINSTANCES);
+  SX := RGetObjectArray(R_EIOS, Chunks, Plane);
+  RFreeObject(R_EIOS, Chunks);
+
+  SY := RGetObjectArray(R_EIOS, SX, 0, RGetArraySize(R_EIOS, SX));
+  SetLength(Result, Length(SY));
+
+  for I := 0 to High(SY) do
+  begin
+    Result[I] := RGetIntArray(R_EIOS, SY[I], 0, RGetArraySize(R_EIOS, SY[I]));
+  end;
+
+  RFreeObjects(R_EIOS, SY);
+end;
+
 Function RSClient.IsResizeable: Boolean; static;
 var
   W, H: Int32;

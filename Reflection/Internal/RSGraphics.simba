@@ -26,12 +26,12 @@ begin
   self.LineTo(Point(poly.C.X, poly.C.Y), Point(poly.A.X, poly.A.Y), Colour);
 end;
 
-Procedure TMufasaBitmap.DrawModel(constref model: RSModel; tile: RSTile; orientation: Int32; Colour: TColor);
+Procedure TMufasaBitmap.DrawModel(constref model: RSModel; tile: RSTile; tileHeight: Int32; orientation: Int32; Colour: TColor);
 var
   i: Int32;
   triangles: Array of T2DTriangle;
 begin
-  triangles := model.Project(tile.X, tile.Y, tile.GetHeight(), orientation);
+  triangles := model.Project(tile.X, tile.Y, tileHeight, orientation);
 
   for i := 0 to high(triangles) do
   begin
@@ -39,12 +39,12 @@ begin
   end;
 end;
 
-Procedure TMufasaBitmap.DrawModel(constref model: RSAnimatedModel; tile: RSTile; orientation: Int32; Colour: TColor); overload;
+Procedure TMufasaBitmap.DrawModel(constref model: RSAnimatedModel; tile: RSTile; tileHeight: Int32; orientation: Int32; Colour: TColor); overload;
 var
   i: Int32;
   triangles: Array of T2DTriangle;
 begin
-  triangles := model.Project(tile.X, tile.Y, tile.GetHeight(), orientation);
+  triangles := model.Project(tile.X, tile.Y, tileHeight, orientation);
 
   for i := 0 to high(triangles) do
   begin
@@ -56,13 +56,15 @@ Procedure TMufasaBitmap.DrawPlayer(constref player: RSPlayer; animated: Boolean;
 var
   model: RSModel;
   animatedModel: RSAnimatedModel;
+  tile: RSTile;
 begin
   if Animated then
   begin
     animatedModel := player.AnimatedModel;
     if animatedModel.ref <> nil then
     begin
-      self.DrawModel(animatedModel, player.LocalTile, player.Orientation, colour);
+      tile := player.LocalTile;
+      self.DrawModel(animatedModel, tile, tile.GetHeight(), player.Orientation, colour);
       animatedModel.Free;
     end;
   end else
@@ -70,7 +72,8 @@ begin
       model := Player.Model;
       if model.ref <> nil then
       begin
-        self.DrawModel(model, player.LocalTile, player.Orientation, colour);
+        tile := player.LocalTile;
+        self.DrawModel(model, tile, tile.GetHeight(), player.Orientation, colour);
         model.Free;
       end;
     end;
@@ -80,13 +83,53 @@ Procedure TMufasaBitmap.DrawNPC(constref npc: RSNPC; animated: Boolean; Colour: 
 var
   model: RSModel;
   animatedModel: RSAnimatedModel;
+  definition: RSNPCDefinition;
+  modelTileSize: Int32;
+  tile: RSTile;
+  heightTile: RSTile;
+  modelScale: TVector;
+  shouldScale: Boolean;
+  vertices: Array of TVector;
+  projectedVertices: Array of TPoint;
 begin
+  modelTileSize := 1;
+  shouldScale := false;
+
+  definition := npc.Definition;
+  if definition.ref <> nil then
+  begin
+    modelTileSize := definition.ModelTileSize;
+    modelScale := definition.ModelScale;
+    shouldScale := (modelScale.X <> 128) and (modelScale.Y <> 128);
+    definition.Free;
+  end;
+
   if Animated then
   begin
     animatedModel := npc.AnimatedModel;
     if model.ref <> nil then
     begin
-      self.DrawModel(animatedModel, npc.LocalTile, npc.Orientation, colour);
+      tile := npc.LocalTile;
+      heightTile := tile;
+
+      if modelTileSize > 0 then
+      begin
+        heightTile.X += (modelTileSize * 64) - 64;
+        heightTile.Y += (modelTileSize * 64) - 64;
+      end;
+
+      if shouldScale then
+      begin
+        vertices := animatedModel.Vertices;
+        RSModel.scale(vertices, modelScale);
+        projectedVertices := Project(vertices, tile.X, tile.Y, heightTile.GetHeight(), npc.Orientation);
+        vertices := [];
+
+        self._DrawPolygon(projectedVertices, Colour);
+      end else
+        begin
+          self.DrawModel(animatedModel, tile, heightTile.GetHeight(), npc.Orientation, colour);
+        end;
       animatedModel.Free;
     end;
   end else
@@ -94,7 +137,27 @@ begin
       model := npc.Model;
       if model.ref <> nil then
       begin
-        self.DrawModel(model, npc.LocalTile, npc.Orientation, colour);
+        tile := npc.LocalTile;
+        heightTile := tile;
+
+        if modelTileSize > 0 then
+        begin
+          heightTile.X += (modelTileSize * 64) - 64;
+          heightTile.Y += (modelTileSize * 64) - 64;
+        end;
+
+        if shouldScale then
+        begin
+          vertices := model.Vertices;
+          RSModel.scale(vertices, modelScale);
+          projectedVertices := Project(vertices, tile.X, tile.Y, heightTile.GetHeight(), npc.Orientation);
+          vertices := [];
+
+          self._DrawPolygon(projectedVertices, Colour);
+        end else
+          begin
+            self.DrawModel(model, tile, heightTile.GetHeight(), npc.Orientation, colour);
+          end;
         model.Free;
       end;
     end;

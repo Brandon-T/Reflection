@@ -277,6 +277,9 @@ NPCDefinition_CombatLevel: THook =                ['jz', 'x', 'I', 1641745369];
 NPCDefinition_Visible: THook =                    ['jz', 'f', 'Z', 1];
 NPCDefinition_ModelCache: THook =                 ['jz', 'j', 'Lec;', 1];
 NPCDefinition_Transformations: THook =            ['jz', 'ax', '[I', 1];
+NPCDefinition_ModelTileSize: THook =              ['jz', 'n', 'I', 784542157];
+NPCDefinition_ModelScaleWidth: THook =            ['jz', 'b', 'I', 610196697];
+NPCDefinition_ModelScaleHeight: THook =           ['jz', 'i', 'I', -689457805];
 
 {NPC: cv}
 NPC_Definition: THook =                           ['cv', 'm', 'Ljz;', 1];
@@ -372,10 +375,10 @@ Client_Revision: THook =                          ['client', '190', 'I', 1];
 Client_Client: THook =                            ['client', 'au', 'Lclient;', 1];
 Client_LocalNPCs: THook =                         ['client', 'fc', '[Lcv;', 1];
 Client_NPCIndices: THook =                        ['client', 'fp', '[I', 1];
-Client_NPCCount: THook =                          ['N/A', 'N/A', 'N/A', 1];
+Client_NPCCount: THook =                          ['client', 'ft', 'I', 2041291171];
 Client_LocalPlayers: THook =                      ['client', 'ku', '[Lby;', 1];
 Client_PlayerIndices: THook =                     ['cd', 'n', '[I', 1];
-Client_PlayerCount: THook =                       ['N/A', 'NA', 'N/A', 1];
+Client_PlayerCount: THook =                       ['client', 'g', 'I', -1356497417];
 Client_LocalPlayer: THook =                       ['bw', 'kf', 'Lby;', 1];
 Client_PlayerIndex: THook =                       ['client', 'kx', 'I', -2104761709];
 Client_LoopCycle: THook =                         ['client', 'cv', 'I', 1130810935];

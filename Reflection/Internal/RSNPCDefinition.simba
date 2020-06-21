@@ -67,6 +67,18 @@ begin
   RFreeObject(R_EIOS, Transformations);
 end;
 
+Function RSNPCDefinition.ModelTileSize: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, NPCDEFINITION_MODELTILESIZE);
+end;
+
+Function RSNPCDefinition.ModelScale: TVector; constref;
+begin
+  Result.X := RGetInt(R_EIOS, ref, NPCDEFINITION_MODELSCALEWIDTH);
+  Result.Y := RGetInt(R_EIOS, ref, NPCDEFINITION_MODELSCALEHEIGHT);
+  Result.Z := Result.X;
+end;
+
 Function RSNPCDefinition.ModelCache: RSCache; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, NPCDEFINITION_MODELCACHE);

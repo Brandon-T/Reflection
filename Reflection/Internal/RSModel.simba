@@ -274,3 +274,27 @@ begin
       [X1, Y1, Z2], [X2, Y1, Z2], [X1, Y2, Z2], [X2, Y2, Z2]
   ];
 end;
+
+Procedure RSModel.Scale(var Vertices: Array[0..3] of Array of Int32; Scales: TVector); static;
+var
+  I: Int32;
+begin
+  for I := 0 to high(Vertices[0]) do
+  begin
+    Vertices[0][I] := (Vertices[0][I] * Scales.X) div 128;
+    Vertices[1][I] := (Vertices[1][I] * Scales.X) div 128;
+    Vertices[2][I] := (Vertices[2][I] * Scales.X) div 128;
+  end;
+end;
+
+Procedure RSModel.Scale(var Vertices: Array of TVector; Scales: TVector); static; overload;
+var
+  I: Int32;
+begin
+  for I := 0 to high(Vertices) do
+  begin
+    Vertices[I].X := (Vertices[I].X * Scales.X) div 128;
+    Vertices[I].Y := (Vertices[I].Y * Scales.Y) div 128;
+    Vertices[I].Z := (Vertices[I].Z * Scales.Z) div 128;
+  end;
+end;
