@@ -11,7 +11,7 @@ type
 var
   CACHE_SCENE_TERMINATE: Boolean := False;
   CACHED_SCENE_INDEX: Int32 := 0;
-  CACHED_SCENE_NODES: Array[0..3] of RSSceneCacheNode := [[], [], [], []]; //0..3 = 4 Regions..
+  CACHED_SCENE_NODES: Array[0..0] of RSSceneCacheNode := [[]]; //0..3 = 4 Regions..
   CACHED_SCENE_TILES: Array of Array of Array of RSSceneTile;
 
 Procedure ReleaseSceneTilesCache(Index: Int32);
@@ -33,7 +33,7 @@ Procedure ReleaseAllSceneTilesCache();
     begin
       ReleaseSceneTilesCache(I);
     end;
-    CACHED_SCENE_NODES := [[], [], [], []];
+    CACHED_SCENE_NODES := [[]];
   end;
 
 Procedure UpdateSceneTilesCache(X, Y: Int32);
@@ -54,6 +54,11 @@ var
   NodeIndex: Int32;
   Region: RSRegion;
 begin
+  while(IsClientLoading) do
+  begin
+    Wait(300);
+  end;
+
   if Not CACHE_SCENE_TERMINATE then
   begin
     CACHE_SCENE_TERMINATE := True;

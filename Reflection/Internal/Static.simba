@@ -20,7 +20,7 @@ var
   COSINE: array[0..2048] of Int32;
 
   CACHED_REGION_INDEX: Int32 := 0;
-  CACHED_REGION_NODES: Array[0..3] of RSRegionCacheNode := [[], [], [], []]; //0..3 = 4 Regions..
+  CACHED_REGION_NODES: Array[0..0] of RSRegionCacheNode := [[]]; //0..3 = 4 Regions..
   CACHED_TILE_SETTINGS: array of array of array of UInt8;
   CACHED_TILE_HEIGHTS: array of array of array of Int32;
   CACHED_VARP_MASKS: array[0..32] of Int32;
@@ -122,6 +122,14 @@ begin
 end;
 {$ENDIF}
 
+Function IsClientLoading: Boolean;
+var
+  GameState: Int32;
+begin
+  GameState := RGetInt(R_EIOS, nil, CLIENT_GAMESTATE);
+  Result := (Gamestate = 25) or (GameState = 40) or (GameState = 45) or RGetBool(R_EIOS, nil, CLIENT_ISLOADING);
+end;
+
 Procedure UpdateRegionCache(X, Y: Int32);
   Function FindRegion(ID: Int32; Instanced: Boolean): Int32;
   var
@@ -139,6 +147,11 @@ var
   RegionID: Int32;
   NodeIndex: Int32;
 begin
+  while(IsClientLoading) do
+  begin
+    Wait(300);
+  end;
+
   RegionID := (Sar(X, 6) shl 8) or Sar(Y, 6);
 
   NodeIndex := FindRegion(RegionID, False);

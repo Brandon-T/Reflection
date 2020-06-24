@@ -57,7 +57,7 @@ begin
   MaxX := BaseX + 104;
   MaxY := BaseY + 104;
 
-  UpdateSceneTilesCache(BaseX, BaseY);
+  UpdateSceneTilesCache(BaseX + 52, BaseY + 52);
   Tiles := CACHED_SCENE_TILES[RSClient.Plane]; //Tiles := Region.SceneTiles(RSClient.Plane);
   SetLength(Result, 104 * 104);
 

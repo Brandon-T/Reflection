@@ -95,6 +95,7 @@ type
   RSObject = record(RSType)
     ObjectType: RSObjectType;
   end;
+  RSObjectArray = array of RSObject;
 
   RSItemDefinition = type RSType;
 
@@ -121,4 +122,15 @@ type
   PPointerArray = Array of Pointer;
 begin
   RFreeObjects(R_EIOS, PPointerArray(self));
+end;
+
+Procedure RSObjectArray.Free;
+var
+  I: Int32;
+  Garbage: Array of Pointer;
+begin
+  SetLength(Garbage, Length(self));
+  for I := 0 to high(self) do
+    Garbage[I] := self[I].ref;
+  RFreeObjects(R_EIOS, Garbage);
 end;

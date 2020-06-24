@@ -18,6 +18,11 @@ begin
   Result := RGetInt(R_EIOS, nil, CLIENT_GAMESTATE);
 end;
 
+Function RSClient.IsLoading: Boolean; static;
+begin
+  Result := IsClientLoading;
+end;
+
 Function RSClient.GetTileSettings(X, Y, Z: Int32): UInt8; static;
 begin
   UpdateRegionCache(X, Y);
