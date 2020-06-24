@@ -130,6 +130,7 @@ begin
   Result := (Gamestate = 25) or (GameState = 40) or (GameState = 45) or RGetBool(R_EIOS, nil, CLIENT_ISLOADING);
 end;
 
+{$IFDEF USE_REGION_CACHING}
 Procedure UpdateRegionCache(X, Y: Int32);
   Function FindRegion(ID: Int32; Instanced: Boolean): Int32;
   var
@@ -171,3 +172,4 @@ begin
   CACHED_TILE_SETTINGS := CACHED_REGION_NODES[NodeIndex].TileSettings;
   CACHED_TILE_HEIGHTS := CACHED_REGION_NODES[NodeIndex].TileHeights;
 end;
+{$ENDIF}

@@ -17,9 +17,14 @@ begin
 
   BaseX := RSClient.BaseX;
   BaseY := RSClient.BaseY;
-  UpdateSceneTilesCache(X, Y);
 
-  Tile := CACHED_SCENE_TILES[RSClient.Plane][X - BaseX][Y - BaseY]; //Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
+  {$IFDEF USE_REGION_CACHING}
+  UpdateSceneTilesCache(X, Y);
+  Tile := CACHED_SCENE_TILES[RSClient.Plane][X - BaseX][Y - BaseY];
+  {$ELSE}
+  Tile := Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
+  {$ENDIF}
+
   if Tile.ref <> nil then
   begin
     case ObjectType of
@@ -29,7 +34,9 @@ begin
       FLOOR_DECORATION: Result := Tile.GroundDecoration;
     end;
 
-    //Tile.Free;
+    {$IFNDEF USE_REGION_CACHING}
+    Tile.Free;
+    {$ENDIF}
   end;
 
   Region.Free;
@@ -57,8 +64,12 @@ begin
   MaxX := BaseX + 104;
   MaxY := BaseY + 104;
 
+  {$IFDEF USE_REGION_CACHING}
   UpdateSceneTilesCache(BaseX + 52, BaseY + 52);
-  Tiles := CACHED_SCENE_TILES[RSClient.Plane]; //Tiles := Region.SceneTiles(RSClient.Plane);
+  Tiles := CACHED_SCENE_TILES[RSClient.Plane];
+  {$ELSE}
+  Tiles := Region.SceneTiles(RSClient.Plane);
+  {$ENDIF}
   SetLength(Result, 104 * 104);
 
   For Y := MinY To MaxY - 1 do
@@ -78,7 +89,9 @@ begin
     end;
   end;
 
-  //RSTypeArray(Tiles).Free;
+  {$IFNDEF USE_REGION_CACHING}
+  RSTypeArray(Tiles).Free;
+  {$ENDIF}
   Region.Free;
 end;
 

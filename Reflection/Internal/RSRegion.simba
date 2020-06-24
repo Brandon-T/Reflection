@@ -14,6 +14,7 @@ var
   CACHED_SCENE_NODES: Array[0..0] of RSSceneCacheNode := [[]]; //0..3 = 4 Regions..
   CACHED_SCENE_TILES: Array of Array of Array of RSSceneTile;
 
+{$IFDEF USE_REGION_CACHING}
 Procedure ReleaseSceneTilesCache(Index: Int32);
 var
   I, J: Int32;
@@ -92,6 +93,7 @@ begin
 
   CACHED_SCENE_TILES := CACHED_SCENE_NODES[NodeIndex].SceneTiles;
 end;
+{$ENDIF}
 
 Function RSRegion.SceneTiles: Array of Array of Array of RSSceneTile; constref;
 var

@@ -397,7 +397,9 @@ var
     Exit(0);
   end;
 begin
+  {$IFDEF USE_REGION_CACHING}
   UpdateRegionCache(self.X, self.Y);
+  {$ENDIF}
 
   xSize := Sar(self.X, 7);
   ySize := Sar(self.Y, 7);

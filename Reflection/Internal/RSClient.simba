@@ -25,13 +25,17 @@ end;
 
 Function RSClient.GetTileSettings(X, Y, Z: Int32): UInt8; static;
 begin
+  {$IFDEF USE_REGION_CACHING}
   UpdateRegionCache(X, Y);
+  {$ENDIF}
   Result := CACHED_TILE_SETTINGS[X][Y][Z];
 end;
 
 Function RSClient.GetTileHeights(X, Y, Z: Int32): Int32; static;
 begin
+  {$IFDEF USE_REGION_CACHING}
   UpdateRegionCache(X, Y);
+  {$ENDIF}
   Result := CACHED_TILE_HEIGHTS[X][Y][Z];
 end;
 
