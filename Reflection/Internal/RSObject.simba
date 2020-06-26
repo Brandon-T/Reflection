@@ -51,6 +51,7 @@ var
   Region: RSRegion;
   Tile: RSSceneTile;
   Tiles: Array of Array of RSSceneTile;
+  Garbage: RSTypeArray;
 begin
   Region := RSClient.Region;
   if Region.ref = nil then
@@ -71,6 +72,7 @@ begin
   Tiles := Region.SceneTiles(RSClient.Plane);
   {$ENDIF}
   SetLength(Result, 104 * 104);
+  SetLength(Garbage, 104 * 104);
 
   For Y := MinY To MaxY - 1 do
   begin
@@ -85,12 +87,20 @@ begin
           BOUNDARY_OBJECT: Result[I] := Tile.BoundaryObject;
           FLOOR_DECORATION: Result[I] := Tile.GroundDecoration;
         end;
+        if (Result[I].ref <> nil) then
+        begin
+          Garbage[I] := Tile;
+          Inc(I);
+        end;
       end;
     end;
   end;
 
+  SetLength(Result, I);
+  SetLength(Garbage, I);
+
   {$IFNDEF USE_REGION_CACHING}
-  RSTypeArray(Tiles).Free;
+  Garbage.Free;
   {$ENDIF}
   Region.Free;
 end;

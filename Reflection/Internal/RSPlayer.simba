@@ -37,7 +37,7 @@ begin
 
   SetLength(Result, Length(PlayersArray));
 
-  for I := 0 to Length(PlayersArray) - 1 do
+  for I := 0 to High(PlayersArray) do
   begin
     if PlayersArray[I] <> nil then
     begin
