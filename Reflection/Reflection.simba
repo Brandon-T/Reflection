@@ -3,6 +3,7 @@
 {$include_once Equipment.simba}
 {$include_once GameTab.simba}
 {$include_once Ground.simba}
+{$include_once Interfaces.simba}
 {$include_once Inventory.simba}
 {$include_once Menu.simba}
 {$include_once Model.simba}

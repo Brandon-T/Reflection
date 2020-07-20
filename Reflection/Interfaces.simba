@@ -1,0 +1,199 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once Menu.simba}
+{$include_once Inventory.simba}
+{$include_once Mouse.simba}
+{$include_once Timing.simba}
+
+Function R_WidgetIsHidden(Constant: RWidget): Boolean;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(Constant.Group, Constant.Child);
+  if Widget.ref = nil then
+    Exit(False);
+
+  Result := Widget.IsHidden;
+  Widget.Free;
+end;
+
+(*
+MAGIC SPELL BOOK
+~~~~~~~~~~~~~~~~
+
+Valid spells are located in Constants.simba
+  Ex: R_SPELL_VARROCK_TELEPORT
+
+*)
+
+Function R_SpellBook: Boolean;
+begin
+  Result := RSWidget.IsValid(R_SPELLBOOK_CONTAINER.Group, R_SPELLBOOK_CONTAINER.Child);
+end;
+
+Function R_WaitSpellBook(timeout: UInt32): Boolean;
+begin
+  Result := R_WaitFunction(timeout, 50, @R_SpellBook);
+end;
+
+Function R_CastSpell(Spell: RWidget): Boolean;
+var
+  SpellWidget: RSWidget;
+begin
+  if (not R_SpellBook) or R_WidgetIsHidden(Spell) then
+    Exit(False);
+
+  SpellWidget := RSWidget.Get(Spell.Group, Spell.Child);
+  if SpellWidget.ref = nil then
+    Exit(False);
+
+  Mouse.Click(SpellWidget.Bounds, MOUSE_LEFT);
+  SpellWidget.Free;
+  Result := True;
+end;
+
+
+(*
+EMOTES
+~~~~~~~~~~~~~~~~
+
+All valid emotes are in Constants.simba
+  Ex: R_EMOTE_CLAP
+
+*)
+
+Function R_Emotes: Boolean;
+begin
+  Result := RSWidget.IsValid(R_EMOTE_CONTAINER.Group, R_EMOTE_CONTAINER.Child);
+end;
+
+Function R_WaitEmotes(timeout: UInt32): Boolean;
+begin
+  Result := R_WaitFunction(timeout, 50, @R_Emotes);
+end;
+
+Function R_DoEmote(Emote: RWidget): Boolean;
+var
+  EmoteWidget: RSWidget;
+begin
+  if (not R_Emotes) or R_WidgetIsHidden(Emote) then
+    Exit(False);
+
+  EmoteWidget := RSWidget.Get(Emote.Group, Emote.Child);
+  if EmoteWidget.ref = nil then
+    Exit(False);
+
+  Mouse.Click(EmoteWidget.Bounds, MOUSE_LEFT);
+  EmoteWidget.Free;
+  Result := True;
+end;
+
+
+(*
+ANVIL
+~~~~~~~~~~~~~~~~
+
+All valid anvil item actions are in Constants.simba
+  Ex: R_ANVIL_SMITH_DAGGER
+
+*)
+
+Function R_AnvilScreen: Boolean;
+begin
+  Result := RSWidget.IsValid(R_ANVIL_CONTAINER.Group, R_ANVIL_CONTAINER.Child);
+end;
+
+Function R_WaitAnvilScreen(timeout: UInt32): Boolean;
+begin
+  Result := R_WaitFunction(timeout, 50, @R_AnvilScreen);
+end;
+
+Function R_SmithAnvil(SmithObject: RWidget): Boolean;
+var
+  AnvilWidget: RSWidget;
+begin
+  if (not R_AnvilScreen) or (R_WidgetIsHidden(SmithObject)) then
+    Exit(False);
+
+  AnvilWidget := RSWidget.Get(SmithObject.Group, SmithObject.Child);
+  if AnvilWidget.ref = nil then
+    Exit(False);
+
+  Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
+  AnvilWidget.Free;
+  Result := True;
+end;
+
+(*
+R_AnvilSetAmount
+~~~~~~~~~~~~~~~~
+
+  Chooses the amount of items to smith using the anvil.
+  Amount = 0: All
+*)
+Function R_AnvilSetAmount(Amount: Integer): Boolean;
+var
+  AnvilWidget, InputText: RSWidget;
+  T, Retries: Integer;
+begin
+  if (not R_AnvilScreen) or (R_WidgetIsHidden(R_ANVIL_CONTAINER)) then
+    Exit(False);
+
+  if ((Amount = 0) or (Amount = 1) or (Amount = 5) or (Amount = 10)) then
+  begin
+    Case Amount of
+      0: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_ALL.Group, R_ANVIL_AMOUNT_MAKE_ALL.Child);
+      1: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_1.Group, R_ANVIL_AMOUNT_MAKE_1.Child);
+      5: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_5.Group, R_ANVIL_AMOUNT_MAKE_5.Child);
+      10: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_10.Group, R_ANVIL_AMOUNT_MAKE_10.Child);
+    end;
+    if AnvilWidget.ref = nil then
+      Exit(False);
+
+    Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
+    Result := True;
+    AnvilWidget.Free;
+  end else
+  begin
+    AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_X.Group, R_ANVIL_AMOUNT_MAKE_X.Child);
+    if AnvilWidget.ref = nil then
+      Exit(False);
+
+    Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
+    if (RSWidget.Get(R_CHATBOX_INPUT_TITLE.Group, R_CHATBOX_INPUT_TITLE.Child).Text.Startswith("Enter amount:")) then
+    begin
+      InputText := RSWidget.Get(R_CHATBOX_INPUT_FULL.Group, R_CHATBOX_INPUT_FULL.Child);
+      if InputText.ref = nil then
+        Exit(False);
+
+      T := GetTickCount;
+      while (Retries < 3) and (GetTickCount - T < 5000) do
+      begin
+        if InputText.Text <> '*' then
+        begin
+          Keyboard.KeyDown(VK_BACK);
+          while InputText.Text <> '*' do
+          begin
+            Wait(50 + RandomRange(50, 100));
+          end;
+          Keyboard.KeyUp(VK_BACK);
+        end;
+
+        Keyboard.Send(IntToStr(Amount));
+        Result := InputText.Text = IntToStr(Amount) + '*';
+        if Result then
+        begin
+          Keyboard.PressKey(VK_ENTER);
+          InputText.Free;
+          AnvilWidget.Free;
+          Exit(True);
+        end;
+
+        Inc(Retries);
+      end;
+    end;
+    AnvilWidget.Free;
+  end;
+end;
+
+

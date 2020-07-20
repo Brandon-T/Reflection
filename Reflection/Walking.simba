@@ -28,3 +28,8 @@ begin
   Result.Btm   := Rect.SE;
   Result.Left  := Rect.SW;
 end;
+
+Function R_GetMidTile(Tile1, Tile2: RSTile): RSTile;
+begin
+  Result := Point(Round((Tile1.X + Tile2.X)/2), Round((Tile1.Y+Tile2.Y)/2));
+end;
