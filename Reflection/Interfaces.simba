@@ -33,7 +33,7 @@ end;
 
 Function R_WaitSpellBook(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_SpellBook);
+  Result := WaitUntil(R_SpellBook, 50, timeout);
 end;
 
 Function R_CastSpell(Spell: RWidget): Boolean;
@@ -69,7 +69,7 @@ end;
 
 Function R_WaitEmotes(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_Emotes);
+  Result := WaitUntil(R_Emotes, 50, timeout);
 end;
 
 Function R_DoEmote(Emote: RWidget): Boolean;
@@ -105,7 +105,7 @@ end;
 
 Function R_WaitAnvilScreen(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_AnvilScreen);
+  Result := WaitUntil(R_AnvilScreen, 50, timeout);
 end;
 
 Function R_SmithAnvil(SmithObject: RWidget): Boolean;
