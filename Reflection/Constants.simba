@@ -506,7 +506,7 @@ const //Widgets
   R_SPELL_WATER_SURGE: RWidget =                     [R_INTERFACE_SPELLBOOK, 67];
   R_SPELL_TELE_BLOCK: RWidget =                      [R_INTERFACE_SPELLBOOK, 68];
   R_SPELL_BOUNTY_TARGET_TELEPORT: RWidget =          [R_INTERFACE_SPELLBOOK, 69];
-  R_SPELL_LVL_6_ENCHANT: RWidget =                   [R_INTERFACE_SPELLBOOK, 60];
+  R_SPELL_LVL_6_ENCHANT: RWidget =                   [R_INTERFACE_SPELLBOOK, 70];
   R_SPELL_TELEOTHER_CAMELOT: RWidget =               [R_INTERFACE_SPELLBOOK, 71];
   R_SPELL_EARTH_SURGE: RWidget =                     [R_INTERFACE_SPELLBOOK, 72];
   R_SPELL_LVL_7_ENCHANT: RWidget =                   [R_INTERFACE_SPELLBOOK, 73];
