@@ -496,10 +496,10 @@ var
   Widget: RSWidget;
 begin
   ID := R_AnvilIDs[AnvilObject];
-  if (not R_AnvilScreen) or (R_WidgetIsHidden(SmithObject)) then
+  if (not R_AnvilScreen) or (R_WidgetIsHidden(ID)) then
     Exit(False);
 
-  Widget := RSWidget.Get(SmithObject.Group, SmithObject.Child);
+  Widget := RSWidget.Get(ID.Group, ID.Child);
   if Widget.ref <> nil then
   begin
     Mouse.Click(Widget.Bounds, MOUSE_LEFT);
