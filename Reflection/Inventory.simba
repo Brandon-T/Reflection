@@ -55,7 +55,7 @@ begin
   end;
 end;
 
-Function R_InventoryIsFull(): Boolean;
+Function R_IsInventoryFull(): Boolean;
 begin
   Result := R_InventoryCount = 28;
 end;
