@@ -532,7 +532,7 @@ const //Widgets
   R_PRAYER_BURST_OF_STRENGTH: RWidget =              [R_INTERFACE_PRAYER, 6];
   R_PRAYER_CLARITY_OF_THOUGHT: RWidget =             [R_INTERFACE_PRAYER, 7];
   R_PRAYER_ROCK_SKIN: RWidget =                      [R_INTERFACE_PRAYER, 8];
-  R_PRAYER_SUPERHIMAN_STRENGTH: RWidget =            [R_INTERFACE_PRAYER, 9];
+  R_PRAYER_SUPERHUMAN_STRENGTH: RWidget =            [R_INTERFACE_PRAYER, 9];
   R_PRAYER_IMPROVED_REFLEXES: RWidget =              [R_INTERFACE_PRAYER, 10];
   R_PRAYER_RAPID_RESTORE: RWidget =                  [R_INTERFACE_PRAYER, 11];
   R_PRAYER_RAPID_HEAL: RWidget =                     [R_INTERFACE_PRAYER, 12];
@@ -608,7 +608,7 @@ const //Widgets
   R_EMOTE_URI_TRANSFORM: RWidget =                   [R_INTERFACE_EMOTE, 1, 44];
   R_EMOTE_SMOOTH_DANCE: RWidget =                    [R_INTERFACE_EMOTE, 1, 45];
   R_EMOTE_CRAZY_DANCE: RWidget =                     [R_INTERFACE_EMOTE, 1, 46];
-  R_EMOTE_PERMIER_SHIELD: RWidget =                  [R_INTERFACE_EMOTE, 1, 47];
+  R_EMOTE_PREMIER_SHIELD: RWidget =                  [R_INTERFACE_EMOTE, 1, 47];
   R_EMOTE_EXPLORE: RWidget =                         [R_INTERFACE_EMOTE, 1, 48];
 
 
