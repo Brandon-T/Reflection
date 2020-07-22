@@ -90,6 +90,9 @@ var
 begin
   ID := R_GameTabIDs[Tab];
 
+  if R_IsGameTabOpen(Tab) then
+    Exit(True);
+
   Widget := RSWidget.Get(ID.Group, ID.Child);
   if Widget.ref <> nil then
   begin
