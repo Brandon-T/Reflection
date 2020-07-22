@@ -615,6 +615,81 @@ begin
 end;
 
 (*
+LOGOUT INTERFACE
+~~~~~~~~~~~~~~~~
+
+  Anything in the Logout Tab.
+*)
+Function R_Logout: Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
+    R_OpenGametab(GAMETAB_LOGOUT);
+  Wait(50, RandomRange(250, 692));
+
+  if (RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_LOGOUT_LOGOUT_BUTTON)) then
+  begin
+    Widget := RSWidget.Get(R_LOGOUT_LOGOUT_BUTTON.Group, R_LOGOUT_LOGOUT_BUTTON.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end else if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_LOGOUT_BUTTON)) then
+  begin
+    Widget := RSWidget.Get(R_WORLD_SWITCHER_LOGOUT_BUTTON.Group, R_WORLD_SWITCHER_LOGOUT_BUTTON.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end;
+end;
+
+Function R_CloseWorldSwitcher(): Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
+    R_OpenGametab(GAMETAB_LOGOUT);
+  Wait(50, RandomRange(250, 692));
+
+  if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_CLOSE)) then
+  begin
+    Widget := RSWidget.Get(R_WORLD_SWITCHER_CLOSE.Group, R_WORLD_SWITCHER_CLOSE.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end
+
+end;
+
+Function R_OpenWorldSwitcher: Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
+    R_OpenGametab(GAMETAB_LOGOUT);
+  Wait(50, RandomRange(250, 692));
+  if (not RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) or R_WidgetIsHidden(R_LOGOUT_WORLD_SWITCHER_BUTTON) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_LOGOUT_WORLD_SWITCHER_BUTTON.Group, R_LOGOUT_WORLD_SWITCHER_BUTTON.Child);
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+(*
 MAGIC SPELL BOOK
 ~~~~~~~~~~~~~~~~
 
@@ -677,7 +752,7 @@ begin
     Exit(False);
 
   Widget := RSWidget.Get(ID.Group, ID.Child);
-  if Widget.ref = nil then
+  if Widget.ref <> nil then
   begin
     Mouse.Click(Widget.Bounds, MOUSE_LEFT);
     Result := True;
