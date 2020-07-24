@@ -32,9 +32,6 @@ begin
 
   RInitializeConstants;
   RInitializeVarpMasks;
-
-  {$IFNDEF USE_REGION_CACHING}
   RInitializeTileSettings;
   RInitializeTileHeights;
-  {$ENDIF}
 end;
