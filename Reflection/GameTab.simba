@@ -83,6 +83,25 @@ begin
   end;
 end;
 
+Function R_OpenGameTab(Tab: Int32): Boolean;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  ID := R_GameTabIDs[Tab];
+
+  if R_IsGameTabOpen(Tab) then
+    Exit(True);
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
 Function R_GameTabBounds(Tab: Int32): TBox;
 var
   ID: RWidget;

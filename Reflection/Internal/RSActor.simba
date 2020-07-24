@@ -230,3 +230,18 @@ begin
       end;
     end;
 end;
+
+Function RSActor.InBox(Bounds: TBox): Boolean;
+var
+  Tile: RSTile;
+begin
+  Tile := self.Tile;
+  if (Tile.X >= Bounds.X1) and (Tile.Y <= Bounds.Y1) then
+    Result := ((Tile.X >= Bounds.X1) and (Tile.X <= Bounds.X2) and (Tile.Y <= Bounds.Y1) and (Tile.Y >= Bounds.Y2))
+  else if (Tile.X >= Bounds.X1) and (Tile.Y >= Bounds.Y1) then
+    Result := ((Tile.X >= Bounds.X1) and (Tile.X <= Bounds.X2) and (Tile.Y >= Bounds.Y1) and (Tile.Y <= Bounds.Y2))
+  else if (Tile.X <= Bounds.X1) and (Tile.Y <= Bounds.Y1) then
+    Result := ((Tile.X <= Bounds.X1) and (Tile.X >= Bounds.X2) and (Tile.Y <= Bounds.Y1) and (Tile.Y >= Bounds.Y2))
+  else if (Tile.X <= Bounds.X1) and (Tile.Y >= Bounds.Y1) then
+    Result := ((Tile.X <= Bounds.X1) and (Tile.X >= Bounds.X2) and (Tile.Y >= Bounds.Y1) and (Tile.Y <= Bounds.Y2));
+end;
