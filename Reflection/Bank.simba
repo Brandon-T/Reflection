@@ -439,7 +439,7 @@ begin
   Wait(50 + RandomRange(0, 50));
   Mouse.Click(MOUSE_LEFT);
   Widget.Free;
-  Result := True;
+  Result := R_InventoryCount = 0;
 end;
 
 Function R_DepositAll_Equipment: Boolean;

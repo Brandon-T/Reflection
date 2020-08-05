@@ -1,0 +1,61 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once Mouse.simba}
+{$include_once Menu.simba}
+{$include_once GameTab.simba}
+
+type
+  //Prayer
+  TStandardPrayer = (
+    THICK_SKIN = 5,
+    BURST_OF_STRENGTH,
+    CLARITY_OF_THOUGHT,
+    ROCK_SKIN,
+    SUPERHUMAN_STRENGTH,
+    IMPROVED_REFLEXES,
+    RAPID_RESTORE,
+    RAPID_HEAL,
+    PROTECT_ITEM,
+    STEEL_SKIN,
+    ULTIMATE_STRENGTH,
+    INCREDIBLE_REFLEXES,
+    PROTECT_FROM_MAGIC,
+    PROTECT_FORM_MISSILES,
+    PROTECT_FROM_MELEE,
+    RETRIBUTION,
+    REDEMPTION,
+    SMITE,
+    SHARP_EYE,
+    MYSTIC_WILL,
+    HAWK_EYE,
+    MYSTIC_LORE,
+    EAGLE_EYE,
+    MYSTIC_MIGHT,
+    CHIVALRY,
+    PIETY,
+    RIGOUR,
+    AUGURY,
+    PRESERVE
+  );
+
+Function R_ActivatePrayer(Prayer: TStandardPrayer): Boolean;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(R_PRAYER_CONTAINER.Group, Ord(Prayer));
+  if Widget.ref = nil then
+    Exit;
+
+  if not Widget.IsHidden then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Exit(True);
+  end;
+
+  Widget.Free;
+end;
+
+{Function R_IsPrayerSelected(): Boolean;
+begin
+ //Need the hook..
+end;}
