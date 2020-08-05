@@ -130,186 +130,21 @@ begin
   end;
 end;
 
-Function R_SpellIDs: Array of RWidget;
+Function R_WaitUntilVisible(Constant: RWidget; WaitTime: Int32 = 1000): Boolean;
+var
+  Widget: RSWidget;
+  T: Int32;
 begin
-  Result := [
-    R_SPELL_LUMBRIDGE_HOME_TELEPORT,
-    R_SPELL_WIND_STRIKE,
-    R_SPELL_CONFUSE,
-    R_SPELL_ENCHANT_CROSSBOW_BOLT,
-    R_SPELL_WATER_STRIKE,
-    R_SPELL_LVL_1_ENCHANT,
-    R_SPELL_EARTH_STRIKE,
-    R_SPELL_WEAKEN,
-    R_SPELL_FIRE_STRIKE,
-    R_SPELL_BONES_TO_BANANAS,
-    R_SPELL_WIND_BOLT,
-    R_SPELL_CURSE,
-    R_SPELL_BIND,
-    R_SPELL_LOW_LEVEL_ALCHEMY,
-    R_SPELL_WATER_BOLT,
-    R_SPELL_VARROCK_TELEPORT,
-    R_SPELL_LVL_2_ENCHANT,
-    R_SPELL_EARTH_BOLT,
-    R_SPELL_LUMBRIDGE_TELEPORT,
-    R_SPELL_TELEKINETIC_GRAB,
-    R_SPELL_FIRE_BOLT,
-    R_SPELL_FALADOR_TELEPORT,
-    R_SPELL_CRUMBLE_UNDEAD,
-    R_SPELL_TELEPORT_TO_HOUSE,
-    R_SPELL_WIND_BLAST,
-    R_SPELL_SUPERHEAT_ITEM,
-    R_SPELL_CAMELOT_TELEPORT,
-    R_SPELL_WATER_BLAST,
-    R_SPELL_LVL_3_ENCHANT,
-    R_SPELL_IBAN_BLAST,
-    R_SPELL_SNARE,
-    R_SPELL_MAGIC_DART,
-    R_SPELL_ARDOUGNE_TELEPORT,
-    R_SPELL_EARTH_BLAST,
-    R_SPELL_HIGH_LEVEL_ALCHEMY,
-    R_SPELL_CHARGE_WATER_ORB,
-    R_SPELL_LVL_4_ENCHANT,
-    R_SPELL_WATCHTOWER_TELEPORT,
-    R_SPELL_FIRE_BLAST,
-    R_SPELL_CHARGE_EARTH_ORB,
-    R_SPELL_BONES_TO_PEACHES,
-    R_SPELL_SARADOMIN_STRIKE,
-    R_SPELL_CLAWS_OF_GUTHIX,
-    R_SPELL_FLAMES_OF_ZAMORAK,
-    R_SPELL_TROLLHEIM_TELEPORT,
-    R_SPELL_WIND_WAVE,
-    R_SPELL_CHARGE_FIRE_ORB,
-    R_SPELL_TELEPORT_TO_APE_ATOLL,
-    R_SPELL_WATER_WAVE,
-    R_SPELL_CHARGE_AIR_ORB,
-    R_SPELL_VULNERABILITY,
-    R_SPELL_LVL_5_ENCHANT,
-    R_SPELL_TELEPORT_TO_KOUREND,
-    R_SPELL_EARTH_WAVE,
-    R_SPELL_ENFEEBLE,
-    R_SPELL_TELEOTHER_LUMBRIDGE,
-    R_SPELL_FIRE_WAVE,
-    R_SPELL_ENTANGLE,
-    R_SPELL_STUN,
-    R_SPELL_CHARGE,
-    R_SPELL_WIND_SURGE,
-    R_SPELL_TELEOTHER_FALADOR,
-    R_SPELL_WATER_SURGE,
-    R_SPELL_TELE_BLOCK,
-    R_SPELL_BOUNTY_TARGET_TELEPORT,
-    R_SPELL_LVL_6_ENCHANT,
-    R_SPELL_TELEOTHER_CAMELOT,
-    R_SPELL_EARTH_SURGE,
-    R_SPELL_LVL_7_ENCHANT,
-    R_SPELL_FIRE_SURGE,
-    R_SPELL_ICE_RUSH,
-    R_SPELL_ICE_BLITZ,
-    R_SPELL_ICE_BURST,
-    R_SPELL_ICE_BARRAGE,
-    R_SPELL_BLOOD_RUSH,
-    R_SPELL_BLOOD_BLITZ,
-    R_SPELL_BLOOD_BURST,
-    R_SPELL_BLOOD_BARRAGE,
-    R_SPELL_SMOKE_RUSH,
-    R_SPELL_SMOKE_BLITZ,
-    R_SPELL_SMOKE_BURST,
-    R_SPELL_SMOKE_BARRAGE,
-    R_SPELL_SHADOW_RUSH,
-    R_SPELL_SHADOW_BLITZ,
-    R_SPELL_SHADOW_BURST,
-    R_SPELL_SHADOW_BARRAGE,
-    R_SPELL_PADDEWWA_TELEPORT,
-    R_SPELL_SENNTISTEN_TELEPORT,
-    R_SPELL_KHARYRLL_TELEPORT,
-    R_SPELL_LASSAR_TELEPORT,
-    R_SPELL_DAREEYAK_TELEPORT,
-    R_SPELL_CARRALLANGER_TELEPORT,
-    R_SPELL_ANNAKARL_TELEPORT,
-    R_SPELL_GHORROCK_TELEPORT,
-    R_SPELL_EDGEVILLE_HOME_TELEPORT,
-    R_SPELL_LUNAR_HOME_TELEPORT,
-    R_SPELL_BAKE_PIE,
-    R_SPELL_CURE_PLANT,
-    R_SPELL_MONSTER_EXAMINE,
-    R_SPELL_NPC_CONTACT,
-    R_SPELL_CURE_OTHER,
-    R_SPELL_HUMIDIFY,
-    R_SPELL_MOONCLAN_TELEPORT,
-    R_SPELL_TELE_GROUP_MOONCLAN,
-    R_SPELL_CURE_ME,
-    R_SPELL_HUNTER_KIT,
-    R_SPELL_WATERBIRTH_TELEPORT,
-    R_SPELL_TELE_GROUP_WATERBIRTH,
-    R_SPELL_CURE_GROUP,
-    R_SPELL_STAT_SPY,
-    R_SPELL_BARBARIAN_TELEPORT,
-    R_SPELL_TELE_GROUP_BARBARIAN,
-    R_SPELL_SUPERGLASS_MAKE,
-    R_SPELL_TAN_LEATHER,
-    R_SPELL_KHAZARD_TELEPORT,
-    R_SPELL_TELE_GROUP_KHAZARD,
-    R_SPELL_DREAM,
-    R_SPELL_STRING_JEWELLERY,
-    R_SPELL_STAT_RESTORE_POT_SHARE,
-    R_SPELL_MAGIC_IMBUE,
-    R_SPELL_FERTILE_SOIL,
-    R_SPELL_BOOST_POTION_SHARE,
-    R_SPELL_FISHING_GUILD_TELEPORT,
-    R_SPELL_TELE_GROUP_FISHING_GUILD,
-    R_SPELL_PLANK_MAKE,
-    R_SPELL_CATHERBY_TELEPORT,
-    R_SPELL_TELE_GROUP_CATHERBY,
-    R_SPELL_RECHARGE_DRAGONSTONE,
-    R_SPELL_ICE_PLATEAU_TELEPORT,
-    R_SPELL_TELE_GROUP_ICE_PLATEAU,
-    R_SPELL_ENERGY_TRANSFER,
-    R_SPELL_HEAL_OTHER,
-    R_SPELL_VENGEANCE_OTHER,
-    R_SPELL_VENGEANCE,
-    R_SPELL_HEAL_GROUP,
-    R_SPELL_SPELLBOOK_SWAP,
-    R_SPELL_GEOMANCY,
-    R_SPELL_SPIN_FLAX,
-    R_SPELL_OURANIA_TELEPORT,
-    R_SPELL_ARCEUUS_HOME_TELEPORT,
-    R_SPELL_REANIMATE_GOBLIN,
-    R_SPELL_UNKNOWN_1,
-    R_SPELL_REANIMATE_MONKEY,
-    R_SPELL_REANIMATE_IMP,
-    R_SPELL_REANIMATE_MINOTAUR,
-    R_SPELL_UNKNOWN_2,
-    R_SPELL_REANIMATE_SCORPION,
-    R_SPELL_REANIMATE_BEAR,
-    R_SPELL_REANIMATE_UNICORN,
-    R_SPELL_REANIMATE_DOG,
-    R_SPELL_UNKNOWN_3,
-    R_SPELL_REANIMATE_CHAOS_DRUID,
-    R_SPELL_UNKNOWN_4,
-    R_SPELL_REANIMATE_GIANT,
-    R_SPELL_UNKNOWN_5,
-    R_SPELL_REANIMATE_OGRE,
-    R_SPELL_REANIMATE_ELF,
-    R_SPELL_REANIMATE_TROLL,
-    R_SPELL_UNKNOWN_6,
-    R_SPELL_REANIMATE_HORROR,
-    R_SPELL_REANIMATE_KALPHITE,
-    R_SPELL_UNKNOWN_7,
-    R_SPELL_REANIMATE_DAGANNOTH,
-    R_SPELL_REANIMATE_BLOODVELD,
-    R_SPELL_UNKNOWN_8,
-    R_SPELL_REANIMATE_TZHAAR,
-    R_SPELL_UNKNOWN_9,
-    R_SPELL_REANIMATE_DEMON,
-    R_SPELL_REANIMATE_AVIANSIE,
-    R_SPELL_UNKNOWN_10,
-    R_SPELL_UNKNOWN_11,
-    R_SPELL_REANIMATE_ABYSSAL,
-    R_SPELL_UNKNOWN_12,
-    R_SPELL_REANIMATE_DRAGON,
-    R_SPELL_BATTLEFRONT_TELEPORT,
-    R_SPELL_UNKNOWN_13
-  ];
+  Widget := RSWidget.Get(Constant.Group, Constant.Child);
+  if Widget.ref <> nil then
+  begin
+    T := GetTickCount;
+    repeat
+      Wait(50, RandomRange(100, 324));
+    until (not Widget.IsHidden) or ((GetTickCount - T) > WaitTime);
+    Result := Widget.IsHidden;
+    Widget.Free;
+  end;
 end;
 
 Function R_PrayerIDs: Array of RWidget;
@@ -436,115 +271,11 @@ begin
 end;
 
 (*
-LOGOUT INTERFACE
-~~~~~~~~~~~~~~~~
-
-  Anything in the Logout Tab.
-*)
-Function R_Logout: Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-
-  if (RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_LOGOUT_LOGOUT_BUTTON)) then
-  begin
-    Widget := RSWidget.Get(R_LOGOUT_LOGOUT_BUTTON.Group, R_LOGOUT_LOGOUT_BUTTON.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end else if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_LOGOUT_BUTTON)) then
-  begin
-    Widget := RSWidget.Get(R_WORLD_SWITCHER_LOGOUT_BUTTON.Group, R_WORLD_SWITCHER_LOGOUT_BUTTON.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end;
-end;
-
-Function R_CloseWorldSwitcher(): Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-
-  if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_CLOSE)) then
-  begin
-    Widget := RSWidget.Get(R_WORLD_SWITCHER_CLOSE.Group, R_WORLD_SWITCHER_CLOSE.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end
-
-end;
-
-Function R_OpenWorldSwitcher: Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-  if (not RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) or R_WidgetIsHidden(R_LOGOUT_WORLD_SWITCHER_BUTTON) then
-    Exit(False);
-
-  Widget := RSWidget.Get(R_LOGOUT_WORLD_SWITCHER_BUTTON.Group, R_LOGOUT_WORLD_SWITCHER_BUTTON.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
-end;
-
-(*
 MAGIC SPELL BOOK
 ~~~~~~~~~~~~~~~~
 
   Functions for using the spell book.
 *)
-
-Function R_SpellBook: Boolean;
-begin
-  Result := RSWidget.IsValid(R_SPELLBOOK_CONTAINER.Group, R_SPELLBOOK_CONTAINER.Child);
-end;
-
-Function R_WaitSpellBook(timeout: UInt32): Boolean;
-begin
-  Result := WaitUntil(R_SpellBook, 50, timeout);
-end;
-
-Function R_CastSpell(Spell: Int32): Boolean;
-var
-  ID: RWidget;
-  Widget: RSWidget;
-begin
-  ID := R_SpellIDs[Spell];
-  if (not R_SpellBook) or R_WidgetIsHidden(ID) then
-    Exit(False);
-
-  Widget := RSWidget.Get(ID.Group, ID.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
-end;
-
 
 (*
 EMOTES

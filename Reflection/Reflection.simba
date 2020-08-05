@@ -1,11 +1,12 @@
 {$include_once Bank.simba}
 {$include_once Chat.simba}
+{$include_once Combat.simba}
 {$include_once Equipment.simba}
 {$include_once GameTab.simba}
 {$include_once Ground.simba}
 {$include_once Interfaces.simba}
 {$include_once Inventory.simba}
-{$include_once Lobby.simba}
+{$include_once Login.simba}
 {$include_once Menu.simba}
 {$include_once Model.simba}
 {$include_once Mouse.simba}
