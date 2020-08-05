@@ -118,7 +118,7 @@ end;
 
 Function R_ClickToContinue: Boolean;
 var
-  NPCContinue, PlayerContinue: RSWidget;
+  NPCContinue, PlayerContinue, LevelUpContinue, DialogContinue: RSWidget;
 begin
   NPCContinue := RSWidget.Get(R_CHATBOX_NPC_CLICK_TO_CONTINUE.Group, R_CHATBOX_NPC_CLICK_TO_CONTINUE.Child);
   if NPCContinue.ref <> nil then
@@ -133,6 +133,22 @@ begin
   begin
     Mouse.Click(PlayerContinue.Bounds, MOUSE_LEFT);
     PlayerContinue.Free;
+    Exit(True);
+  end;
+
+  LevelUpContinue := RSWidget.Get(R_INTERFACE_LEVEL_UP_CONTINUE.Group, R_INTERFACE_LEVEL_UP_CONTINUE.Child);
+  if LevelUpContinue.ref <> nil then
+  begin
+    Mouse.Click(LevelUpContinue.Bounds, MOUSE_LEFT);
+    LevelUpContinue.Free;
+    Exit(True);
+  end;
+
+  DialogContinue := RSWidget.Get(R_INTERFACE_CHAT_DIALOG_CONTINUE.Group, R_INTERFACE_CHAT_DIALOG_CONTINUE.Child);
+  if DialogContinue.ref <> nil then
+  begin
+    Mouse.Click(DialogContinue.Bounds, MOUSE_LEFT);
+    DialogContinue.Free;
     Exit(True);
   end;
 end;
