@@ -118,38 +118,29 @@ end;
 
 Function R_ClickToContinue: Boolean;
 var
-  NPCContinue, PlayerContinue, LevelUpContinue, DialogContinue: RSWidget;
+  FoundWidget: RSWidget;
+  EachWidget : RWidget;
+  WidgetsToCheck : array of RWidget;
 begin
-  NPCContinue := RSWidget.Get(R_CHATBOX_NPC_CLICK_TO_CONTINUE.Group, R_CHATBOX_NPC_CLICK_TO_CONTINUE.Child);
-  if NPCContinue.ref <> nil then
-  begin
-    Mouse.Click(NPCContinue.Bounds, MOUSE_LEFT);
-    NPCContinue.Free;
-    Exit(True);
-  end;
 
-  PlayerContinue := RSWidget.Get(R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Group, R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Child);
-  if PlayerContinue.ref <> nil then
-  begin
-    Mouse.Click(PlayerContinue.Bounds, MOUSE_LEFT);
-    PlayerContinue.Free;
-    Exit(True);
-  end;
+  WidgetsToCheck := [
+    R_CHATBOX_NPC_CLICK_TO_CONTINUE,
+    R_CHATBOX_PLAYER_CLICK_TO_CONTINUE,
+    R_INTERFACE_LEVEL_UP_CONTINUE,
+    R_INTERFACE_CHAT_DIALOG_CONTINUE,
+    R_INTERFACE_NEW_ACTIONS_CONTINUE
+  ];
 
-  LevelUpContinue := RSWidget.Get(R_INTERFACE_LEVEL_UP_CONTINUE.Group, R_INTERFACE_LEVEL_UP_CONTINUE.Child);
-  if LevelUpContinue.ref <> nil then
-  begin
-    Mouse.Click(LevelUpContinue.Bounds, MOUSE_LEFT);
-    LevelUpContinue.Free;
-    Exit(True);
-  end;
-
-  DialogContinue := RSWidget.Get(R_INTERFACE_CHAT_DIALOG_CONTINUE.Group, R_INTERFACE_CHAT_DIALOG_CONTINUE.Child);
-  if DialogContinue.ref <> nil then
-  begin
-    Mouse.Click(DialogContinue.Bounds, MOUSE_LEFT);
-    DialogContinue.Free;
-    Exit(True);
+  for EachWidget in WidgetsToCheck do begin
+    FoundWidget := RSWidget.Get(EachWidget.Group, EachWidget.Child);
+    if FoundWidget.ref <> nil then begin
+      if Result then begin
+        Wait(216, Random(300, 626));
+      end;
+      Mouse.Click(FoundWidget.Bounds, MOUSE_LEFT);
+      FoundWidget.Free;
+      Result := True;
+    end;
   end;
 end;
 

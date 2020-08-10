@@ -117,3 +117,24 @@ begin
 
   Garbage.Free;
 end;
+
+function RSNPC.ToTPA(): TPointArray
+var
+  objModel: RSModel;
+  objTile: RSTile;
+  triangles: array of T2DTriangle;
+  points: TPointArray;
+  i: Int32;
+begin
+  objModel := Self.Model;
+  objTile := Self.LocalTile;
+  triangles := objModel.Project(objTile.X, objTile.Y, objTile.GetHeight(), 0);
+  objModel.free;
+  for i := 0 to high(triangles) do
+  begin
+    points += triangles[i].A;
+    points += triangles[i].B;
+    points += triangles[i].C;
+  end;
+  Result := points;
+end;
