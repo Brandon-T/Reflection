@@ -113,8 +113,7 @@ begin
   begin
     if (CheckWidget.TextureID = 1141) then
     begin
-      if (not R_IsGameTabOpen(GAMETAB_COMBAT)) then
-        R_OpenGameTab(GAMETAB_COMBAT);
+      R_OpenGameTab(GAMETAB_COMBAT);
 
       Mouse.Click(Widget.Bounds, MOUSE_LEFT);
       Wait(250, RandomRange(612, 1330));
