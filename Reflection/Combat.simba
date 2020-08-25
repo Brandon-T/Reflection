@@ -116,7 +116,7 @@ Sets the attack spell to the specified attack style.
 Example:
     R_SelectAttackSpell(WIND_STRIKE, False);
 *}
-Function R_SelectAttackSpell(Spell: Int32; Defensive: Boolean = False): Boolean;
+Function R_SelectAttackSpell(Spell: TAttackSpell; Defensive: Boolean = False): Boolean;
 var
   Widget, CheckWidget, SpellWidget: RSWidget;
 begin
