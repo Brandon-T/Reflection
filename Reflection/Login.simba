@@ -63,8 +63,7 @@ Function R_Logout: Boolean;
 var
   Widget: RSWidget;
 begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
+  R_OpenGametab(GAMETAB_LOGOUT);
   Wait(50, RandomRange(250, 692));
 
   if (RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_LOGOUT_LOGOUT_BUTTON)) then
@@ -100,8 +99,7 @@ Function R_CloseWorldSwitcher(): Boolean;
 var
   Widget: RSWidget;
 begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
+  R_OpenGametab(GAMETAB_LOGOUT);
   Wait(50, RandomRange(250, 692));
 
   if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_CLOSE)) then
@@ -129,8 +127,7 @@ Function R_OpenWorldSwitcher: Boolean;
 var
   Widget: RSWidget;
 begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
+  R_OpenGametab(GAMETAB_LOGOUT);
 
   Wait(50, RandomRange(250, 692));
 
