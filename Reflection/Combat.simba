@@ -6,6 +6,7 @@
 
 type
   TAttackSpell = (
+    CANCEL = 0,
     WIND_STRIKE = 1,
     WATER_STRIKE,
     EARTH_STRIKE,
