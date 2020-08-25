@@ -201,7 +201,6 @@ begin
         Exit(False);
 
       Mouse.Scroll(3, Direction);
-      writeln(R_WorldToBox(World));
     end;
 
     Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
