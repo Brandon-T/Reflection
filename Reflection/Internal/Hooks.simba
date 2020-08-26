@@ -384,6 +384,7 @@ Client_PlayerIndex: THook =                       ['client', 'ko', 'I', -1852431
 Client_LoopCycle: THook =                         ['client', 'cw', 'I', -925075011];
 Client_GameState: THook =                         ['client', 'bm', 'I', 1382758875];
 Client_LoginState: THook =                        ['cx', 'at', 'I', 662808535];
+Client_IsLoading: THook =                         ['client', 'ck', 'Z', 1];
 Client_CrossHairColor: THook =                    ['client', 'jl', 'I', -1707383795];
 Client_AnimationFrameCache: THook =               ['jm', 'i', 'Lel;', 1];
 Client_GroundItems: THook =                       ['client', 'kj', '[[[Lji;', 1];
