@@ -277,7 +277,7 @@ NPCDefinition_CombatLevel: THook =                ['jx', 'p', 'I', -442899961];
 NPCDefinition_Visible: THook =                    ['jx', 'e', 'Z', 1];
 NPCDefinition_ModelCache: THook =                 ['jx', 't', 'Lel;', 1];
 NPCDefinition_Transformations: THook =            ['jx', 'an', '[I', 1];
-NPCDefinition_ModelTileSize: THook =              ['jx', 'n', 'I', 784542157];	 //Broken :(
+NPCDefinition_ModelTileSize: THook =              ['jx', 'x', 'I', -1762851059];
 NPCDefinition_ModelScaleWidth: THook =            ['jx', 'b', 'I', -337235261];
 NPCDefinition_ModelScaleHeight: THook =           ['jx', 'l', 'I', -541213457];
 
