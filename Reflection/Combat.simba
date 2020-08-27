@@ -81,10 +81,10 @@ begin
   for I := 0 to High(WeaponStyles) do
   begin
     Widget := RSWidget.Get(WeaponStyles[I].Group, WeaponStyles[I].Child + 3);
-    CheckWidget := RSWidget.Get(WeaponStyles[I].Group, WeaponStyles[I].Child + 1, 0);
+    CheckWidget := RSWidget.Get(WeaponStyles[I].Group, WeaponStyles[I].Child + 1, 4);
     if (Widget.ref <> nil) and (CheckWidget.ref <> nil) and (Lowercase(Widget.Text) = Lowercase(Style)) then
     begin
-      if (CheckWidget.TextureID = 1141) then
+      if (CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
       begin
         if (not R_IsGameTabOpen(GAMETAB_COMBAT)) then
         begin
@@ -123,7 +123,7 @@ begin
   if Defensive then
   begin
     Widget := RSWidget.Get(R_COMBAT_SPELL_DEFENSIVE.Group, R_COMBAT_SPELL_DEFENSIVE.Child);
-    CheckWidget := RSWidget.Get(R_COMBAT_SPELL_DEFENSIVE.Group, R_COMBAT_SPELL_DEFENSIVE.Child, 0);
+    CheckWidget := RSWidget.Get(R_COMBAT_SPELL_DEFENSIVE.Group, R_COMBAT_SPELL_DEFENSIVE.Child, 4);
   end else
   begin
     Widget := RSWidget.Get(R_COMBAT_SPELL.Group, R_COMBAT_SPELL.Child);
@@ -132,7 +132,7 @@ begin
 
   if (Widget.ref <> nil) and (CheckWidget.ref <> nil) then
   begin
-    if (CheckWidget.TextureID = 1141) then
+    if (CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
     begin
       R_OpenGameTab(GAMETAB_COMBAT);
 
@@ -215,11 +215,11 @@ var
   State, PreviousTab: Integer;
 begin
   if On then
-    State := 1150
-  else State := 1141;
+    State := R_BUTTON_CENTER_HIGHLIGHT_RED
+  else State := R_BUTTON_CENTER_HIGHLIGHT_GREY;
 
   Widget := RSWidget.Get(R_COMBAT_AUTO_RETALIATE.Group, R_COMBAT_AUTO_RETALIATE.Child);
-  CheckWidget := RSWidget.Get(R_COMBAT_AUTO_RETALIATE.Group, R_COMBAT_AUTO_RETALIATE.Child + 2, 0);
+  CheckWidget := RSWidget.Get(R_COMBAT_AUTO_RETALIATE.Group, R_COMBAT_AUTO_RETALIATE.Child + 2, 4);
   if (Widget.ref <> nil) and (CheckWidget.ref <> nil) then
   begin
     if (CheckWidget.TextureID <> State) then
