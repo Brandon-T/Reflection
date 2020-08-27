@@ -786,7 +786,7 @@ begin
 
   Mouse.Click(Button.Bounds, MOUSE_LEFT);
   Button.Free;
-  Result := RSWidget.Get(Group, Child, 4) = R_BUTTON_CENTER_HIGHLIGHT_RED;
+  Result := RSWidget.Get(Group, Child, 4).TextureID = R_BUTTON_CENTER_HIGHLIGHT_RED;
 end;
 
 {*
