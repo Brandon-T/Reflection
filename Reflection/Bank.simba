@@ -35,41 +35,113 @@ type
   TRSBankQuantity = (ONE, FIVE, TEN, X, ALL);
 {$scopedenums off}
 
+{*
+R_BankScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if Bank Screen is open.
+
+Example:
+    if R_BankScreen then
+      ...
+*}
 Function R_BankScreen: Boolean;
 begin
   Result := RSWidget.IsValid(R_BANK_CONTAINER.Group, R_BANK_CONTAINER.Child);
 end;
 
+{*
+R_WaitBankScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns once Bank Screen is open, otherwise it waits for the timeout.
+
+Example:
+    if R_WaitBankScreen(1000) then
+      ...
+*}
 Function R_WaitBankScreen(timeout: UInt32): Boolean;
 begin
   Result := R_WaitFunction(timeout, 50, @R_BankScreen);
 end;
 
+{*
+R_PinScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if Pin Screen is open.
+
+Example:
+    if R_PinScreen then
+      ...
+*}
 Function R_PinScreen: Boolean;
 begin
   Result := RSWidget.IsValid(R_BANK_PIN_CONTAINER.Group, R_BANK_PIN_CONTAINER.Child);
 end;
 
+{*
+R_WaitPinScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns once Pin Screen is open, otherwise it waits for the timeout.
+
+Example:
+    if R_WaitPinScreen(1000) then
+      ...
+*}
 Function R_WaitPinScreen(timeout: UInt32): Boolean;
 begin
   Result := R_WaitFunction(timeout, 50, @R_PinScreen);
 end;
 
+{*
+R_DepositBox
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if Deposit Screen is open.
+
+Example:
+    if R_DepositBox then
+      ...
+*}
 Function R_DepositBox: Boolean;
 begin
   Result := RSWidget.IsValid(R_DEPOSITBOX_CONTAINER.Group, R_DEPOSITBOX_CONTAINER.Child);
 end;
 
+{*
+R_WaitDepositBox
+~~~~~~~~~~~~~~~~~~~~~~
+Returns once Deposit Screen is open, otherwise it waits for the timeout.
+
+Example:
+    if R_WaitDepositBox(1000) then
+      ...
+*}
 Function R_WaitDepositBox(timeout: UInt32): Boolean;
 begin
   Result := R_WaitFunction(timeout, 50, @R_DepositBox);
 end;
 
+{*
+R_CurrentBankTab
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the current open bank tab.
+
+Example:
+    if (R_CurrentBankTab <> 4) then
+      ...
+*}
 Function R_CurrentBankTab: Int32;
 begin
   Result := RSClient.getVarbit(VARBIT_CURRENT_BANK_TAB);
 end;
 
+{*
+R_BankTabCount
+~~~~~~~~~~~~~~~~~~~~~~
+Counts the number of items in a bank tab.
+
+Example:
+    if (R_BankTabCount(4) < 10) then
+      ...
+*}
 Function R_BankTabCount(Index: Int32): Int32;
 var
   TabVarbits: Array of Int32;
@@ -86,6 +158,14 @@ begin
   Result := RSClient.getVarbit(TabVarbits[Index]);
 end;
 
+{*
+R_BankSlotToTab
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the tab containing your global bank slot.
+
+Example:
+    BankTab := R_BankSlotToTab(135)
+*}
 Function R_BankSlotToTab(Slot: Int32): Int32;
 var
   I: Int32;
@@ -106,6 +186,14 @@ begin
   end;
 end;
 
+{*
+R_BankSlotToTabSlot
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the tab slot containing your global bank slot.
+
+Example:
+    BankTab := R_BankSlotToTabSlot(135)
+*}
 Function R_BankSlotToTabSlot(Slot: Int32): Int32;
 var
   I: Int32;
@@ -129,6 +217,14 @@ begin
   Result := Slot - Total;
 end;
 
+{*
+R_SelectBankTab
+~~~~~~~~~~~~~~~~~~~~~~
+Opens the specified bank tab.
+
+Example:
+    R_SelectBankTab(4);
+*}
 Function R_SelectBankTab(Index: Int32): Boolean;
 var
   TabWidget: RSWidget;
@@ -160,6 +256,14 @@ begin
   Result := R_CurrentBankTab = Index;
 end;
 
+{*
+R_BankSlotVisible
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the bank slot is visible on the screen.
+
+Example:
+    R_BankSlotVisible(40);
+*}
 Function R_BankSlotVisible(Index: Int32): Boolean;
 var
   TabContainer: RSWidget;
@@ -187,6 +291,14 @@ begin
   TabWidget.Free;
 end;
 
+{*
+R_BankSlotToBox
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the mainscreen bounds of the bank slot.
+
+Example:
+    R_BankSlotToBox(40);
+*}
 Function R_BankSlotToBox(Index: Int32): TBox;
 var
   ItemContainer, Slot: RSWidget;
@@ -202,6 +314,18 @@ begin
   ItemContainer.Free;
 end;
 
+{*
+R_ScrollToBankSlot
+~~~~~~~~~~~~~~~~~~~~~~
+Scrolls to the specified bank slot if it is not on screen.
+Possible scroll methods:
+  - TRSBankScroll.SCROLLWHEEL: Emulates the mouse scroll wheel.
+  - TRSBankScroll.SCROLLBAR: Drags the scroll bar to the desired location.
+  - TRSBankScroll.SCROLLARROWS: Uses the up/down arrows.
+
+Example:
+    R_ScrollToBankSlot(40, TRSBankScroll.SCROLLWHEEL);
+*}
 Function R_ScrollToBankSlot(Index: Int32; ScrollType: TRSBankScroll = TRSBankScroll.SCROLLWHEEL): Boolean;
 var
   ScrollBar, ScrollArrow, ItemContainer: RSWidget;
@@ -309,6 +433,14 @@ begin
   end;
 end;
 
+{*
+R_GetAllBankItems
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of all the items in your bank.
+
+Example:
+    Writeln(R_GetAllBankItems);
+*}
 Function R_GetAllBankItems: Array of TRSBankItem;
 var
   BankItemContainer, Child: RSWidget;
@@ -361,6 +493,14 @@ begin
   Garbage.Free;
 end;
 
+{*
+R_FindBankItem
+~~~~~~~~~~~~~~~~~~~~~~
+Locates and returns information about the specified item in the bank.
+
+Example:
+    Writeln(R_FindBankItem(123).Name);
+*}
 Function R_FindBankItem(ID: Int32): TRSBankItem;
 var
   BankItemContainer, Child: RSWidget;
@@ -419,12 +559,15 @@ begin
   Garbage.Free;
 end;
 
-Function R_IsBankSlotVisible(Index: Int32): Boolean;
-begin
-  //R_BANK_ITEM_CONTAINER
-end;
+{*
+R_DepositAllItems
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if successfully deposited all inventory items.
 
-Function R_DepositAll_Items: Boolean;
+Example:
+    R_DepositAllItems;
+*}
+Function R_DepositAllItems: Boolean;
 var
   Widget: RSWidget;
 begin
@@ -442,7 +585,15 @@ begin
   Result := R_InventoryCount = 0;
 end;
 
-Function R_DepositAll_Equipment: Boolean;
+{*
+R_DepositAllEquipment
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if successfully deposited all equipment items.
+
+Example:
+    R_DepositAllEquipment;
+*}
+Function R_DepositAllEquipment: Boolean;
 var
   Widget: RSWidget;
 begin
@@ -460,6 +611,14 @@ begin
   Result := True;
 end;
 
+{*
+R_DepositSlot
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if deposited specified inventory slot.
+
+Example:
+    R_DepositSlot(12, True);
+*}
 Function R_DepositSlot(Index: Int32; All: Boolean = False): Boolean;
 var
   InvItem: TRSInventoryItem;
@@ -472,9 +631,16 @@ begin
   begin
     if All then
     begin
-      Mouse.Click(InvItem.Bounds, MOUSE_RIGHT);
-      Wait(50 + RandomRange(0, 50));
-      Exit(R_ChooseOptions(['-All']));
+      Mouse.Move(InvItem.Bounds);
+      if R_WaitUptext(['-All'], True, RandomRange(500, 800)) then
+      begin
+        Mouse.Click(InvItem.Bounds, MOUSE_LEFT);
+        Exit(True);
+      end else begin
+        Mouse.Click(InvItem.Bounds, MOUSE_RIGHT);
+        Wait(50 + RandomRange(50, 100));
+        Exit(R_ChooseOptions(['-All']));
+      end;
     end;
 
     Mouse.Move(InvItem.Bounds);
@@ -484,6 +650,14 @@ begin
   end;
 end;
 
+{*
+R_WithdrawItem
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if withdrawed specified bank item into inventory.
+
+Example:
+    R_WithdrawItem(5442, 12);
+*}
 Function R_WithdrawItem(ID: Int32; Amount: Int32 = 0): Boolean;
 var
   Item: TRSBankItem;
@@ -516,9 +690,16 @@ begin
 
   if Amount = 0 then
   begin
-    Mouse.Click(Item.Bounds, MOUSE_RIGHT);
-    Wait(50 + RandomRange(50, 100));
-    Exit(R_ChooseOptions(['Withdraw-All']))
+    Mouse.Move(Item.Bounds);
+    if R_WaitUptext(['Withdraw-All'], True, RandomRange(500, 800)) then
+    begin
+      Mouse.Click(Item.Bounds, MOUSE_LEFT);
+      Exit(True);
+    end else begin
+      Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+      Wait(50 + RandomRange(50, 100));
+      Exit(R_ChooseOptions(['Withdraw-All']));
+    end;
   end;
 
   if Amount = -1 then
@@ -574,27 +755,53 @@ begin
   end;
 end;
 
+{*
+R_SetBankWithdrawMode
+~~~~~~~~~~~~~~~~~~~~~~
+Set withdraw mode as noted or items.
+
+Example:
+    R_SetBankWithdrawMode(true);
+*}
 Function R_SetBankWithdrawMode(Noted: Boolean): Boolean;
 var
   Button: RSWidget;
+  Group, Child: Integer;
 begin
   if not R_BankScreen then
     Exit(False);
 
   if Noted then
-    Button := RSWidget.Get(R_BANK_WITHDRAW_NOTE.Group, R_BANK_WITHDRAW_NOTE.Child)
-  else
-    Button := RSWidget.Get(R_BANK_WITHDRAW_ITEM.Group, R_BANK_WITHDRAW_ITEM.Child);
+  begin
+    Group := R_BANK_WITHDRAW_NOTE.Group;
+    Child := R_BANK_WITHDRAW_NOTE.Child;
+  end else begin
+    Group := R_BANK_WITHDRAW_ITEM.Group;
+    Child := R_BANK_WITHDRAW_ITEM.Child;
+  end;
 
+  Button := RSWidget.Get(Group, Child);
   if Button.ref = nil then
     Exit(False);
 
   Mouse.Click(Button.Bounds, MOUSE_LEFT);
   Button.Free;
-
-  Result := True; //TODO: Check if the mode actually changed by checking button spriteId..
+  Result := RSWidget.Get(Group, Child, 4) = R_BUTTON_CENTER_HIGHLIGHT_RED;
 end;
 
+{*
+R_SetBankQuantityMode
+~~~~~~~~~~~~~~~~~~~~~~
+Set withdraw quantity. Acceptable Inputs:
+  - TRSBankQuantity.ONE
+  - TRSBankQuantity.FIVE
+  - TRSBankQuantity.TEN
+  - TRSBankQuantity.X
+  - TRSBankQuantity.ALL
+
+Example:
+    R_SetBankQuantityMode(TRSBankQuantity.ONE);
+*}
 Function R_SetBankQuantityMode(Mode: TRSBankQuantity): Boolean;
 var
   Button: RSWidget;
@@ -619,6 +826,14 @@ begin
   Result := True; //TODO: Check if the mode actually changed by checking button spriteId..
 end;
 
+{*
+R_BankScreen_Close
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if bankscreen either is closed or was closed by the function.
+
+Example:
+    R_BankScreen_Close();
+*}
 Function R_BankScreen_Close: Boolean;
 var
   Widget: RSWidget;
@@ -636,4 +851,3 @@ begin
     Result := not R_BankScreen;
   end;
 end;    
-
