@@ -24,6 +24,14 @@ const
   MM_LEVEL_COMBAT_SPECIAL    = 3;
 
 
+{*
+R_GameTabIDs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a list of RWidget containing all possible Game Tabs.
+
+Example:
+    writeln(R_GameTabIDs[GAMETAB_COMBAT]);
+*}
 Function R_GameTabIDs: Array of RWidget;
 begin
   if not RSClient.IsResizeable then
@@ -67,6 +75,15 @@ begin
   ];
 end;
 
+{*
+R_IsGameTabOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if specified Game Tab is open.
+
+Example:
+    if R_IsGameTabOpen[GAMETAB_COMBAT] then
+      ...
+*}
 Function R_IsGameTabOpen(Tab: Int32): Boolean;
 var
   ID: RWidget;
@@ -83,6 +100,15 @@ begin
   end;
 end;
 
+{*
+R_OpenGameTab
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if specified Game Tab is open or if successfully opened.
+
+Example:
+    if R_OpenGameTab[GAMETAB_COMBAT] then
+      ...
+*}
 Function R_OpenGameTab(Tab: Int32): Boolean;
 var
   ID: RWidget;
@@ -102,6 +128,14 @@ begin
   end;
 end;
 
+{*
+R_GameTabBounds
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the bounds of a specified Game Tab.
+
+Example:
+    Mouse.Move(R_GameTabBounds[GAMETAB_COMBAT]);
+*}
 Function R_GameTabBounds(Tab: Int32): TBox;
 var
   ID: RWidget;
@@ -118,6 +152,15 @@ begin
   end;
 end;
 
+{*
+R_CurrentGameTab
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the currently opened Game Tab.
+
+Example:
+    if R_CurrentGameTab = GAMETAB_COMBAT) then
+      ...
+*}
 Function R_CurrentGameTab: Int32;
 var
   I: Int32;
@@ -145,6 +188,15 @@ begin
   Garbage.Free;
 end;
 
+{*
+R_GetMMLevels
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the value of the specified minimap orb.
+
+Example:
+    if R_GetMMLevels(MM_LEVEL_RUN) < 50) then
+      ...
+*}
 Function R_GetMMLevels(Level: Int32): Int32;
 var
   ID: RWidget;
