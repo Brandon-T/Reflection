@@ -38,6 +38,16 @@ type
     PRESERVE
   );
 
+
+{*
+R_ActivatePrayer
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the Prayer was selected.
+
+Example:
+  if R_ActivatePrayer(REDEMPTION) then
+    ...
+*}
 Function R_ActivatePrayer(Prayer: TStandardPrayer): Boolean;
 var
   Widget: RSWidget;
@@ -55,6 +65,15 @@ begin
   Widget.Free;
 end;
 
+{*
+R_IsPrayerSelected
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if a prayer is selected.
+
+Example:
+  if R_IsPrayerSelected then
+    ...
+*}
 {Function R_IsPrayerSelected(): Boolean;
 begin
  //Need the hook..

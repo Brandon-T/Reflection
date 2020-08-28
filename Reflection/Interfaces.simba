@@ -5,119 +5,111 @@
 {$include_once Mouse.simba}
 {$include_once Timing.simba}
 
-const
-  //Prayers
-  PRAYER_THICK_SKIN                    =0;
-  PRAYER_BURST_OF_STRENGTH             =1;
-  PRAYER_CLARITY_OF_THOUGHT            =2;
-  PRAYER_ROCK_SKIN                     =3;
-  PRAYER_SUPERHUMAN_STRENGTH           =4;
-  PRAYER_IMPROVED_REFLEXES             =5;
-  PRAYER_RAPID_RESTORE                 =6;
-  PRAYER_RAPID_HEAL                    =7;
-  PRAYER_PROTECT_ITEM                  =8;
-  PRAYER_STEEL_SKIN                    =9;
-  PRAYER_ULTIMATE_STRENGTH             =10;
-  PRAYER_INCREDIBLE_REFLEXES           =11;
-  PRAYER_PROTECT_FROM_MAGIC            =12;
-  PRAYER_PROTECT_FROM_MISSILES         =13;
-  PRAYER_PROTECT_FROM_MELEE            =14;
-  PRAYER_RETRIBUTION                   =15;
-  PRAYER_REDEMPTION                    =16;
-  PRAYER_SMITE                         =17;
-  PRAYER_SHARP_EYE                     =18;
-  PRAYER_MYSTIC_WILL                   =19;
-  PRAYER_HAWK_EYE                      =20;
-  PRAYER_MYSTIC_LORE                   =21;
-  PRAYER_EAGLE_EYE                     =22;
-  PRAYER_MYSTIC_MIGHT                  =23;
-  PRAYER_CHIVALRY                      =24;
-  PRAYER_PIETY                         =25;
-  PRAYER_RIGOUR                        =26;
-  PRAYER_AUGURY                        =27;
-  PRAYER_PRESERVE                      =28;
-
+type
   //Emotes
-  EMOTE_YES                            =0;
-  EMOTE_NO                             =1;
-  EMOTE_BOW                            =2;
-  EMOTE_ANGRY                          =3;
-  EMOTE_THINK                          =4;
-  EMOTE_WAVE                           =5;
-  EMOTE_SHRUG                          =6;
-  EMOTE_CHEER                          =7;
-  EMOTE_BECKON                         =8;
-  EMOTE_LAUGH                          =9;
-  EMOTE_JUMP_FOR_JOY                   =10;
-  EMOTE_YAWN                           =11;
-  EMOTE_DANCE                          =12;
-  EMOTE_JIG                            =13;
-  EMOTE_SPIN                           =14;
-  EMOTE_HEADBANG                       =15;
-  EMOTE_CRY                            =16;
-  EMOTE_BLOW_KISS                      =17;
-  EMOTE_PANIC                          =18;
-  EMOTE_RASPBERRY                      =19;
-  EMOTE_CLAP                           =20;
-  EMOTE_SALUTE                         =21;
-  EMOTE_GOBLIN_BOW                     =22;
-  EMOTE_GOBLIN_SALUTE                  =23;
-  EMOTE_GLASS_BOX                      =24;
-  EMOTE_CLIMB_ROPE                     =25;
-  EMOTE_LEAN                           =26;
-  EMOTE_GLASS_WALL                     =27;
-  EMOTE_IDEA                           =28;
-  EMOTE_STAMP                          =29;
-  EMOTE_FLAP                           =30;
-  EMOTE_SLAP_HEAD                      =31;
-  EMOTE_ZOMBIE_WALK                    =32;
-  EMOTE_ZOMBIE_DANCE                   =33;
-  EMOTE_SCARED                         =34;
-  EMOTE_RABBIT_HOP                     =35;
-  EMOTE_SIT_UP                         =36;
-  EMOTE_PUSH_UP                        =37;
-  EMOTE_STAR_JUMP                      =38;
-  EMOTE_JOG                            =39;
-  EMOTE_ZOMBIE_HAND                    =40;
-  EMOTE_HYPERMOBILE_DRINKER            =41;
-  EMOTE_SKILL_CAPE                     =42;
-  EMOTE_AIR_GUITAR                     =43;
-  EMOTE_URI_TRANSFORM                  =44;
-  EMOTE_SMOOTH_DANCE                   =45;
-  EMOTE_CRAZY_DANCE                    =46;
-  EMOTE_PREMIER_SHIELD                 =47;
-  EMOTE_EXPLORE                        =48;
+  TEmote = (
+    EMOTE_YES = 0,
+    EMOTE_NO,
+    EMOTE_BOW,
+    EMOTE_ANGRY,
+    EMOTE_THINK,
+    EMOTE_WAVE,
+    EMOTE_SHRUG,
+    EMOTE_CHEER,
+    EMOTE_BECKON,
+    EMOTE_LAUGH,
+    EMOTE_JUMP_FOR_JOY,
+    EMOTE_YAWN,
+    EMOTE_DANCE,
+    EMOTE_JIG,
+    EMOTE_SPIN,
+    EMOTE_HEADBANG,
+    EMOTE_CRY,
+    EMOTE_BLOW_KISS,
+    EMOTE_PANIC,
+    EMOTE_RASPBERRY,
+    EMOTE_CLAP,
+    EMOTE_SALUTE,
+    EMOTE_GOBLIN_BOW,
+    EMOTE_GOBLIN_SALUTE,
+    EMOTE_GLASS_BOX,
+    EMOTE_CLIMB_ROPE,
+    EMOTE_LEAN,
+    EMOTE_GLASS_WALL,
+    EMOTE_IDEA,
+    EMOTE_STAMP,
+    EMOTE_FLAP,
+    EMOTE_SLAP_HEAD,
+    EMOTE_ZOMBIE_WALK,
+    EMOTE_ZOMBIE_DANCE,
+    EMOTE_SCARED,
+    EMOTE_RABBIT_HOP,
+    EMOTE_SIT_UP,
+    EMOTE_PUSH_UP,
+    EMOTE_STAR_JUMP,
+    EMOTE_JOG,
+    EMOTE_ZOMBIE_HAND,
+    EMOTE_HYPERMOBILE_DRINKER,
+    EMOTE_SKILL_CAPE,
+    EMOTE_AIR_GUITAR,
+    EMOTE_URI_TRANSFORM,
+    EMOTE_SMOOTH_DANCE,
+    EMOTE_CRAZY_DANCE,
+    EMOTE_PREMIER_SHIELD,
+    EMOTE_EXPLORE);
 
   //Anvil
-  ANVIL_DAGGER                         =0;
-  ANVIL_SWORD                          =1;
-  ANVIL_SCIMITAR                       =2;
-  ANVIL_LONG_SWORD                     =3;
-  ANVIL_TWO_H_SWORD                    =4;
-  ANVIL_AXE                            =5;
-  ANVIL_MACE                           =6;
-  ANVIL_WARHAMMER                      =7;
-  ANVIL_BATTLE_AXE                     =8;
-  ANVIL_CLAWS                          =9;
-  ANVIL_CHAIN_BODY                     =10;
-  ANVIL_PLATE_LEGS                     =11;
-  ANVIL_PLATE_SKIRT                    =12;
-  ANVIL_PLATE_BODY                     =13;
-  ANVIL_NAILS                          =14;
-  ANVIL_MED_HELM                       =15;
-  ANVIL_FULL_HELM                      =16;
-  ANVIL_SQ_SHIELD                      =17;
-  ANVIL_KITE_SHIELD                    =18;
-  ANVIL_EXCLUSIVE1                     =19;
-  ANVIL_DART_TIPS                      =20;
-  ANVIL_ARROW_HEADS                    =21;
-  ANVIL_KNIVES                         =22;
-  ANVIL_EXCLUSIVE2                     =23;
-  ANVIL_JAVELIN_HEADS                  =24;
-  ANVIL_BOLTS                          =25;
-  ANVIL_LIMBS                          =26;
+  TAnvil = (
+    ANVIL_DAGGER = 0,
+    ANVIL_SWORD,
+    ANVIL_SCIMITAR,
+    ANVIL_LONG_SWORD,
+    ANVIL_TWO_H_SWORD,
+    ANVIL_AXE,
+    ANVIL_MACE,
+    ANVIL_WARHAMMER,
+    ANVIL_BATTLE_AXE,
+    ANVIL_CLAWS,
+    ANVIL_CHAIN_BODY,
+    ANVIL_PLATE_LEGS,
+    ANVIL_PLATE_SKIRT,
+    ANVIL_PLATE_BODY,
+    ANVIL_NAILS,
+    ANVIL_MED_HELM,
+    ANVIL_FULL_HELM,
+    ANVIL_SQ_SHIELD,
+    ANVIL_KITE_SHIELD,
+    ANVIL_EXCLUSIVE1,
+    ANVIL_DART_TIPS,
+    ANVIL_ARROW_HEADS,
+    ANVIL_KNIVES,
+    ANVIL_EXCLUSIVE2,
+    ANVIL_JAVELIN_HEADS,
+    ANVIL_BOLTS,
+    ANVIL_LIMBS);
+
+  //Multi-Skill
+  TMultiSkill = (
+    SKILL_OPTION_1 = 0,
+    SKILL_OPTION_2,
+    SKILL_OPTION_3,
+    SKILL_OPTION_4,
+    SKILL_OPTION_5,
+    SKILL_OPTION_6,
+    SKILL_OPTION_7,
+    SKILL_OPTION_8,
+    SKILL_OPTION_9);
 
 
+{*
+R_WidgetIsHidden
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if a widget is hidden.
+
+Example:
+  if R_WidgetIsHidden(R_PrayerIDs[0]) then
+    ...
+*}
 Function R_WidgetIsHidden(Constant: RWidget): Boolean;
 var
   Widget: RSWidget;
@@ -130,223 +122,38 @@ begin
   end;
 end;
 
-Function R_SpellIDs: Array of RWidget;
+{*
+R_WaitUntilVisible
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the widget is visible before the specified time runs out.
+  Otherwise, it returns false.
+
+Example:
+  if R_WidgetIsHidden(R_PrayerIDs[0], 200) then
+    ...
+*}
+Function R_WaitUntilVisible(Constant: RWidget; WaitTime: Int32 = 1000): Boolean;
+var
+  Widget: RSWidget;
+  T: Int32;
 begin
-  Result := [
-    R_SPELL_LUMBRIDGE_HOME_TELEPORT,
-    R_SPELL_WIND_STRIKE,
-    R_SPELL_CONFUSE,
-    R_SPELL_ENCHANT_CROSSBOW_BOLT,
-    R_SPELL_WATER_STRIKE,
-    R_SPELL_LVL_1_ENCHANT,
-    R_SPELL_EARTH_STRIKE,
-    R_SPELL_WEAKEN,
-    R_SPELL_FIRE_STRIKE,
-    R_SPELL_BONES_TO_BANANAS,
-    R_SPELL_WIND_BOLT,
-    R_SPELL_CURSE,
-    R_SPELL_BIND,
-    R_SPELL_LOW_LEVEL_ALCHEMY,
-    R_SPELL_WATER_BOLT,
-    R_SPELL_VARROCK_TELEPORT,
-    R_SPELL_LVL_2_ENCHANT,
-    R_SPELL_EARTH_BOLT,
-    R_SPELL_LUMBRIDGE_TELEPORT,
-    R_SPELL_TELEKINETIC_GRAB,
-    R_SPELL_FIRE_BOLT,
-    R_SPELL_FALADOR_TELEPORT,
-    R_SPELL_CRUMBLE_UNDEAD,
-    R_SPELL_TELEPORT_TO_HOUSE,
-    R_SPELL_WIND_BLAST,
-    R_SPELL_SUPERHEAT_ITEM,
-    R_SPELL_CAMELOT_TELEPORT,
-    R_SPELL_WATER_BLAST,
-    R_SPELL_LVL_3_ENCHANT,
-    R_SPELL_IBAN_BLAST,
-    R_SPELL_SNARE,
-    R_SPELL_MAGIC_DART,
-    R_SPELL_ARDOUGNE_TELEPORT,
-    R_SPELL_EARTH_BLAST,
-    R_SPELL_HIGH_LEVEL_ALCHEMY,
-    R_SPELL_CHARGE_WATER_ORB,
-    R_SPELL_LVL_4_ENCHANT,
-    R_SPELL_WATCHTOWER_TELEPORT,
-    R_SPELL_FIRE_BLAST,
-    R_SPELL_CHARGE_EARTH_ORB,
-    R_SPELL_BONES_TO_PEACHES,
-    R_SPELL_SARADOMIN_STRIKE,
-    R_SPELL_CLAWS_OF_GUTHIX,
-    R_SPELL_FLAMES_OF_ZAMORAK,
-    R_SPELL_TROLLHEIM_TELEPORT,
-    R_SPELL_WIND_WAVE,
-    R_SPELL_CHARGE_FIRE_ORB,
-    R_SPELL_TELEPORT_TO_APE_ATOLL,
-    R_SPELL_WATER_WAVE,
-    R_SPELL_CHARGE_AIR_ORB,
-    R_SPELL_VULNERABILITY,
-    R_SPELL_LVL_5_ENCHANT,
-    R_SPELL_TELEPORT_TO_KOUREND,
-    R_SPELL_EARTH_WAVE,
-    R_SPELL_ENFEEBLE,
-    R_SPELL_TELEOTHER_LUMBRIDGE,
-    R_SPELL_FIRE_WAVE,
-    R_SPELL_ENTANGLE,
-    R_SPELL_STUN,
-    R_SPELL_CHARGE,
-    R_SPELL_WIND_SURGE,
-    R_SPELL_TELEOTHER_FALADOR,
-    R_SPELL_WATER_SURGE,
-    R_SPELL_TELE_BLOCK,
-    R_SPELL_BOUNTY_TARGET_TELEPORT,
-    R_SPELL_LVL_6_ENCHANT,
-    R_SPELL_TELEOTHER_CAMELOT,
-    R_SPELL_EARTH_SURGE,
-    R_SPELL_LVL_7_ENCHANT,
-    R_SPELL_FIRE_SURGE,
-    R_SPELL_ICE_RUSH,
-    R_SPELL_ICE_BLITZ,
-    R_SPELL_ICE_BURST,
-    R_SPELL_ICE_BARRAGE,
-    R_SPELL_BLOOD_RUSH,
-    R_SPELL_BLOOD_BLITZ,
-    R_SPELL_BLOOD_BURST,
-    R_SPELL_BLOOD_BARRAGE,
-    R_SPELL_SMOKE_RUSH,
-    R_SPELL_SMOKE_BLITZ,
-    R_SPELL_SMOKE_BURST,
-    R_SPELL_SMOKE_BARRAGE,
-    R_SPELL_SHADOW_RUSH,
-    R_SPELL_SHADOW_BLITZ,
-    R_SPELL_SHADOW_BURST,
-    R_SPELL_SHADOW_BARRAGE,
-    R_SPELL_PADDEWWA_TELEPORT,
-    R_SPELL_SENNTISTEN_TELEPORT,
-    R_SPELL_KHARYRLL_TELEPORT,
-    R_SPELL_LASSAR_TELEPORT,
-    R_SPELL_DAREEYAK_TELEPORT,
-    R_SPELL_CARRALLANGER_TELEPORT,
-    R_SPELL_ANNAKARL_TELEPORT,
-    R_SPELL_GHORROCK_TELEPORT,
-    R_SPELL_EDGEVILLE_HOME_TELEPORT,
-    R_SPELL_LUNAR_HOME_TELEPORT,
-    R_SPELL_BAKE_PIE,
-    R_SPELL_CURE_PLANT,
-    R_SPELL_MONSTER_EXAMINE,
-    R_SPELL_NPC_CONTACT,
-    R_SPELL_CURE_OTHER,
-    R_SPELL_HUMIDIFY,
-    R_SPELL_MOONCLAN_TELEPORT,
-    R_SPELL_TELE_GROUP_MOONCLAN,
-    R_SPELL_CURE_ME,
-    R_SPELL_HUNTER_KIT,
-    R_SPELL_WATERBIRTH_TELEPORT,
-    R_SPELL_TELE_GROUP_WATERBIRTH,
-    R_SPELL_CURE_GROUP,
-    R_SPELL_STAT_SPY,
-    R_SPELL_BARBARIAN_TELEPORT,
-    R_SPELL_TELE_GROUP_BARBARIAN,
-    R_SPELL_SUPERGLASS_MAKE,
-    R_SPELL_TAN_LEATHER,
-    R_SPELL_KHAZARD_TELEPORT,
-    R_SPELL_TELE_GROUP_KHAZARD,
-    R_SPELL_DREAM,
-    R_SPELL_STRING_JEWELLERY,
-    R_SPELL_STAT_RESTORE_POT_SHARE,
-    R_SPELL_MAGIC_IMBUE,
-    R_SPELL_FERTILE_SOIL,
-    R_SPELL_BOOST_POTION_SHARE,
-    R_SPELL_FISHING_GUILD_TELEPORT,
-    R_SPELL_TELE_GROUP_FISHING_GUILD,
-    R_SPELL_PLANK_MAKE,
-    R_SPELL_CATHERBY_TELEPORT,
-    R_SPELL_TELE_GROUP_CATHERBY,
-    R_SPELL_RECHARGE_DRAGONSTONE,
-    R_SPELL_ICE_PLATEAU_TELEPORT,
-    R_SPELL_TELE_GROUP_ICE_PLATEAU,
-    R_SPELL_ENERGY_TRANSFER,
-    R_SPELL_HEAL_OTHER,
-    R_SPELL_VENGEANCE_OTHER,
-    R_SPELL_VENGEANCE,
-    R_SPELL_HEAL_GROUP,
-    R_SPELL_SPELLBOOK_SWAP,
-    R_SPELL_GEOMANCY,
-    R_SPELL_SPIN_FLAX,
-    R_SPELL_OURANIA_TELEPORT,
-    R_SPELL_ARCEUUS_HOME_TELEPORT,
-    R_SPELL_REANIMATE_GOBLIN,
-    R_SPELL_UNKNOWN_1,
-    R_SPELL_REANIMATE_MONKEY,
-    R_SPELL_REANIMATE_IMP,
-    R_SPELL_REANIMATE_MINOTAUR,
-    R_SPELL_UNKNOWN_2,
-    R_SPELL_REANIMATE_SCORPION,
-    R_SPELL_REANIMATE_BEAR,
-    R_SPELL_REANIMATE_UNICORN,
-    R_SPELL_REANIMATE_DOG,
-    R_SPELL_UNKNOWN_3,
-    R_SPELL_REANIMATE_CHAOS_DRUID,
-    R_SPELL_UNKNOWN_4,
-    R_SPELL_REANIMATE_GIANT,
-    R_SPELL_UNKNOWN_5,
-    R_SPELL_REANIMATE_OGRE,
-    R_SPELL_REANIMATE_ELF,
-    R_SPELL_REANIMATE_TROLL,
-    R_SPELL_UNKNOWN_6,
-    R_SPELL_REANIMATE_HORROR,
-    R_SPELL_REANIMATE_KALPHITE,
-    R_SPELL_UNKNOWN_7,
-    R_SPELL_REANIMATE_DAGANNOTH,
-    R_SPELL_REANIMATE_BLOODVELD,
-    R_SPELL_UNKNOWN_8,
-    R_SPELL_REANIMATE_TZHAAR,
-    R_SPELL_UNKNOWN_9,
-    R_SPELL_REANIMATE_DEMON,
-    R_SPELL_REANIMATE_AVIANSIE,
-    R_SPELL_UNKNOWN_10,
-    R_SPELL_UNKNOWN_11,
-    R_SPELL_REANIMATE_ABYSSAL,
-    R_SPELL_UNKNOWN_12,
-    R_SPELL_REANIMATE_DRAGON,
-    R_SPELL_BATTLEFRONT_TELEPORT,
-    R_SPELL_UNKNOWN_13
-  ];
+  Widget := RSWidget.Get(Constant.Group, Constant.Child);
+  if Widget.ref <> nil then
+  begin
+    T := GetTickCount;
+    repeat
+      Wait(50, RandomRange(100, 324));
+    until (not Widget.IsHidden) or ((GetTickCount - T) > WaitTime);
+    Result := Widget.IsHidden;
+    Widget.Free;
+  end;
 end;
 
-Function R_PrayerIDs: Array of RWidget;
-begin
-  Result := [
-    R_PRAYER_THICK_SKIN,
-    R_PRAYER_BURST_OF_STRENGTH,
-    R_PRAYER_CLARITY_OF_THOUGHT,
-    R_PRAYER_ROCK_SKIN,
-    R_PRAYER_SUPERHUMAN_STRENGTH,
-    R_PRAYER_IMPROVED_REFLEXES,
-    R_PRAYER_RAPID_RESTORE,
-    R_PRAYER_RAPID_HEAL,
-    R_PRAYER_PROTECT_ITEM,
-    R_PRAYER_STEEL_SKIN,
-    R_PRAYER_ULTIMATE_STRENGTH,
-    R_PRAYER_INCREDIBLE_REFLEXES,
-    R_PRAYER_PROTECT_FROM_MAGIC,
-    R_PRAYER_PROTECT_FORM_MISSILES,
-    R_PRAYER_PROTECT_FROM_MELEE,
-    R_PRAYER_RETRIBUTION,
-    R_PRAYER_REDEMPTION,
-    R_PRAYER_SMITE,
-    R_PRAYER_SHARP_EYE,
-    R_PRAYER_MYSTIC_WILL,
-    R_PRAYER_HAWK_EYE,
-    R_PRAYER_MYSTIC_LORE,
-    R_PRAYER_EAGLE_EYE,
-    R_PRAYER_MYSTIC_MIGHT,
-    R_PRAYER_CHIVALRY,
-    R_PRAYER_PIETY,
-    R_PRAYER_RIGOUR,
-    R_PRAYER_AUGURY,
-    R_PRAYER_PRESERVE
-  ];
-end;
-
+{*
+EMOTES
+~~~~~~
+Functions for using emotes.
+*}
 Function R_EmoteIDs: Array of RWidget;
 begin
   Result := [
@@ -402,6 +209,68 @@ begin
   ];
 end;
 
+{*
+R_Emotes
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if a widget is valid.
+
+Example:
+  if R_Emotes then
+    ...
+*}
+Function R_Emotes: Boolean;
+begin
+  Result := RSWidget.IsValid(R_EMOTE_CONTAINER.Group, R_EMOTE_CONTAINER.Child);
+end;
+
+{*
+R_WaitEmotes
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if a widget is valid within the time specified.
+
+Example:
+  if R_WaitEmotes(300) then
+    ...
+*}
+Function R_WaitEmotes(timeout: UInt32): Boolean;
+begin
+  Result := WaitUntil(R_Emotes, 50, timeout);
+end;
+
+{*
+R_DoEmote
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the emote is clicked.
+
+Example:
+  if R_DoEmote(EMOTE_YES) then
+    ...
+*}
+Function R_DoEmote(Emote: TEmote): Boolean;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  ID := R_EmoteIDs[Ord(Emote)];
+  if (not R_Emotes) or R_WidgetIsHidden(ID) then
+    Exit(False);
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+
+{*
+ANVIL
+~~~~~
+Functions for using an anvil.
+*}
+
 Function R_AnvilIDs: Array of RWidget;
 begin
   Result := [
@@ -435,176 +304,49 @@ begin
   ];
 end;
 
-(*
-LOGOUT INTERFACE
-~~~~~~~~~~~~~~~~
+{*
+R_AnvilScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the anvil screen is valid.
 
-  Anything in the Logout Tab.
-*)
-Function R_Logout: Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-
-  if (RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_LOGOUT_LOGOUT_BUTTON)) then
-  begin
-    Widget := RSWidget.Get(R_LOGOUT_LOGOUT_BUTTON.Group, R_LOGOUT_LOGOUT_BUTTON.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end else if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_LOGOUT_BUTTON)) then
-  begin
-    Widget := RSWidget.Get(R_WORLD_SWITCHER_LOGOUT_BUTTON.Group, R_WORLD_SWITCHER_LOGOUT_BUTTON.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end;
-end;
-
-Function R_CloseWorldSwitcher(): Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-
-  if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_CLOSE)) then
-  begin
-    Widget := RSWidget.Get(R_WORLD_SWITCHER_CLOSE.Group, R_WORLD_SWITCHER_CLOSE.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end
-
-end;
-
-Function R_OpenWorldSwitcher: Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsGametabOpen(GAMETAB_LOGOUT)) then
-    R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-  if (not RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) or R_WidgetIsHidden(R_LOGOUT_WORLD_SWITCHER_BUTTON) then
-    Exit(False);
-
-  Widget := RSWidget.Get(R_LOGOUT_WORLD_SWITCHER_BUTTON.Group, R_LOGOUT_WORLD_SWITCHER_BUTTON.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
-end;
-
-(*
-MAGIC SPELL BOOK
-~~~~~~~~~~~~~~~~
-
-  Functions for using the spell book.
-*)
-
-Function R_SpellBook: Boolean;
-begin
-  Result := RSWidget.IsValid(R_SPELLBOOK_CONTAINER.Group, R_SPELLBOOK_CONTAINER.Child);
-end;
-
-Function R_WaitSpellBook(timeout: UInt32): Boolean;
-begin
-  Result := WaitUntil(R_SpellBook, 50, timeout);
-end;
-
-Function R_CastSpell(Spell: Int32): Boolean;
-var
-  ID: RWidget;
-  Widget: RSWidget;
-begin
-  ID := R_SpellIDs[Spell];
-  if (not R_SpellBook) or R_WidgetIsHidden(ID) then
-    Exit(False);
-
-  Widget := RSWidget.Get(ID.Group, ID.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
-end;
-
-
-(*
-EMOTES
-~~~~~~
-
-  Functions for using emotes.
-*)
-
-Function R_Emotes: Boolean;
-begin
-  Result := RSWidget.IsValid(R_EMOTE_CONTAINER.Group, R_EMOTE_CONTAINER.Child);
-end;
-
-Function R_WaitEmotes(timeout: UInt32): Boolean;
-begin
-  Result := WaitUntil(R_Emotes, 50, timeout);
-end;
-
-Function R_DoEmote(Emote: Int32): Boolean;
-var
-  ID: RWidget;
-  Widget: RSWidget;
-begin
-  ID := R_EmoteIDs[Emote];
-  if (not R_Emotes) or R_WidgetIsHidden(ID) then
-    Exit(False);
-
-  Widget := RSWidget.Get(ID.Group, ID.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
-end;
-
-
-(*
-ANVIL
-~~~~~
-
-  Functions for using an anvil.
-*)
-
+Example:
+  if R_AnvilScreen then
+    ...
+*}
 Function R_AnvilScreen: Boolean;
 begin
   Result := RSWidget.IsValid(R_ANVIL_CONTAINER.Group, R_ANVIL_CONTAINER.Child);
 end;
 
+{*
+R_WaitAnvilScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the anvil screen is valid within the time specified.
+
+Example:
+  if R_WaitAnvilScreen(200) then
+    ...
+*}
 Function R_WaitAnvilScreen(timeout: UInt32): Boolean;
 begin
   Result := WaitUntil(R_AnvilScreen, 50, timeout);
 end;
 
-Function R_SmithAnvil(AnvilObject: Int32): Boolean;
+{*
+R_SmithAnvil
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item was smithed.
+
+Example:
+  if R_SmithAnvil(ANVIL_DAGGER) then
+    ...
+*}
+Function R_SmithAnvil(AnvilObject: TAnvil): Boolean;
 var
   ID: RWidget;
   Widget: RSWidget;
 begin
-  ID := R_AnvilIDs[AnvilObject];
+  ID := R_AnvilIDs[Ord(AnvilObject)];
   if (not R_AnvilScreen) or (R_WidgetIsHidden(ID)) then
     Exit(False);
 
@@ -617,13 +359,16 @@ begin
   end;
 end;
 
-(*
+{*
 R_AnvilSetAmount
 ~~~~~~~~~~~~~~~~
-
-  Chooses the amount of items to smith using the anvil.
+Chooses the amount of items to smith using the anvil.
   Amount = 0: All
-*)
+
+Example:
+  if R_AnvilSetAmount(14) then
+    ...
+*}
 Function R_AnvilSetAmount(Amount: Integer): Boolean;
 var
   AnvilWidget, InputText: RSWidget;
@@ -689,4 +434,137 @@ begin
   end;
 end;
 
+{*
+MULTI-SKILL
+~~~~~~~~~~~
+Functions for interacting with skills that have options that appear in
+  the chat box. (Crafting, Fletching, Herblore, Cooking, Etc.)
+*}
 
+Function R_OptionIDs: Array of RWidget;
+begin
+  Result := [
+    R_MULTI_OPTION_1,
+    R_MULTI_OPTION_2,
+    R_MULTI_OPTION_3,
+    R_MULTI_OPTION_4,
+    R_MULTI_OPTION_5,
+    R_MULTI_OPTION_6,
+    R_MULTI_OPTION_7,
+    R_MULTI_OPTION_8,
+    R_MULTI_OPTION_9
+  ];
+end;
+
+Function R_OptionKeyIDs: Array of RWidget;
+begin
+  Result := [
+    R_MULTI_OPTION_1_KEY,
+    R_MULTI_OPTION_2_KEY,
+    R_MULTI_OPTION_3_KEY,
+    R_MULTI_OPTION_4_KEY,
+    R_MULTI_OPTION_5_KEY,
+    R_MULTI_OPTION_6_KEY,
+    R_MULTI_OPTION_7_KEY,
+    R_MULTI_OPTION_8_KEY,
+    R_MULTI_OPTION_9_KEY
+  ];
+end;
+
+{*
+R_SkillMenu
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the multi-skill menu is open.
+
+Example:
+    if R_SkillMenu then
+      ...
+*}
+Function R_SkillMenu: Boolean;
+begin
+  Result := RSWidget.IsValid(R_MULTI_CONTAINER.Group, R_MULTI_CONTAINER.Child);
+end;
+
+{*
+R_ChooseSkillOption
+~~~~~~~~~~~~~~~~~~~~~~
+Selects the desired skill option.
+
+Example:
+  R_ChooseSkillOption(SKILL_OPTION_1);
+*}
+Function R_ChooseSkillOption(Option: TMultiSkill): Boolean;
+var
+  Widget, WidgetKey: RSWidget;
+  Widgets: Array of RSWidget;
+  OptionButton, OptionKey: RWidget;
+begin
+  OptionButton := R_OptionIDs[Ord(Option)];
+  OptionKey := R_OptionKeyIDs[Ord(Option)];
+
+  if (not R_SkillMenu) or (R_WidgetIsHidden(OptionButton)) then
+    Exit(False);
+
+  WidgetKey := RSWidget.Get(OptionKey.Group, OptionKey.Child, OptionKey.Index);
+  if WidgetKey.ref <> nil then
+  begin
+    Widgets += WidgetKey;
+    if (WidgetKey.Text = '') or (Lowercase(WidgetKey.Text) = 'space') then
+    begin
+      Keyboard.Send(" ");
+      RSTypeArray(Widgets).Free;
+      Exit(True);
+    end else
+    begin
+      Widget := RSWidget.Get(OptionButton.Group, OptionButton.Child);
+      if Widget.ref <> nil then
+      begin
+        Widgets += Widget;
+        Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+        Result := True;
+        RSTypeArray(Widgets).Free;
+      end;
+    end;
+  end;
+end;
+
+{*
+R_ChooseSkillOption
+~~~~~~~~~~~~~~~~~~~~~~
+Selects the desired skill option.
+
+Example:
+  R_ChooseSkillOption(['Oak Longbow'], False);
+*}
+Function R_ChooseSkillOption(Options: Array of String; CaseSensitive: Boolean = True): Boolean; overload;
+var
+  Widget: RSWidget;
+  Widgets: Array of RSWidget;
+  I, J: Integer;
+  Name: String;
+begin
+  if (not R_SkillMenu) then
+    Exit(False);
+
+  for I:=0 to High(R_OptionKeyIDs) do
+  begin
+    Widget := RSWidget.Get(R_OptionIDs[I].Group, R_OptionIDs[I].Child, R_OptionIDs[I].Index);
+    if Widget.ref <> nil then
+    begin
+      Widgets += Widget;
+
+      For J:=0 to High(Options) do
+      begin
+        Name := Widget.Name;
+        if (CaseSensitive and (Pos(Options[J], Name) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[J]), Lowercase(Name)) > 0)) then
+        begin
+          Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+          RSTypeArray(Widgets).Free;
+          Exit(True);
+        end;
+      end;
+
+    end;
+  end;
+  RSTypeArray(Widgets).Free;
+end;

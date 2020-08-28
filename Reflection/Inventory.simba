@@ -15,6 +15,14 @@ const
   ItemSlotSize = 32;      //InventoryWidget.Child(Index).Size
 
 
+{*
+R_GetInventoryWidgetID
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the RWidget of the type of Inventory that is open.
+
+Example:
+  InventoryID := R_GetInventoryWidgetID;
+*}
 Function R_GetInventoryWidgetID: RWidget;
 begin
   if RSWidget.IsValid(R_BANK_INVENTORY_ITEM_CONTAINER.Group, R_BANK_INVENTORY_ITEM_CONTAINER.Child) then
@@ -30,6 +38,15 @@ begin
   Result.Child := -1;
 end;
 
+{*
+R_InventoryCount
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the amount of occupied inventory slots.
+
+Example:
+  if (R_InventoryCount > 12) then
+    ...
+*}
 Function R_InventoryCount: Int32;
 var
   I: Int32;
@@ -55,11 +72,29 @@ begin
   end;
 end;
 
+{*
+R_IsInventoryFull
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the inventory is full.
+
+Example:
+  if R_IsInventoryFull then
+    ...
+*}
 Function R_IsInventoryFull(): Boolean;
 begin
   Result := R_InventoryCount = 28;
 end;
 
+{*
+R_CountInventoryItem
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the total number items of a specific ID in the inventory.
+
+Example:
+  if (R_CountInventoryItem(132) > 12) then
+    ...
+*}
 Function R_CountInventoryItem(ID: Int32): Int32;
 var
   ItemNodeCache: RSHashTable;
@@ -89,6 +124,15 @@ begin
   end;
 end;
 
+{*
+R_GetInventoryItem
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSInventoryItem containing information on all occurrences
+  of the specified ID.
+
+Example:
+  GoldBars := R_GetInventoryItem(132);
+*}
 Function R_GetInventoryItem(ID: Int32): Array of TRSInventoryItem;
 var
   InventoryID: RWidget;
@@ -166,6 +210,14 @@ begin
   Garbage.Free;
 end;
 
+{*
+R_GetInventorySlotItem
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a TRSInventoryItem of the item in the specified slot.
+
+Example:
+  Slot1 := R_GetInventorySlotItem(1);
+*}
 Function R_GetInventorySlotItem(Index: Int32): TRSInventoryItem;
 var
   InventoryID: RWidget;
@@ -239,6 +291,14 @@ begin
   Garbage.Free;
 end;
 
+{*
+R_GetAllInventoryItems
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSInventoryItem of all items in the inventory.
+
+Example:
+  InventoryItems := R_GetAllInventoryItems;
+*}
 Function R_GetAllInventoryItems: Array of TRSInventoryItem;
 var
   InventoryID: RWidget;

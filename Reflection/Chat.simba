@@ -10,6 +10,17 @@ type
     LineNumber: Int32;
   end;
 
+{*
+R_ChatMessages
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSChatMessage containing all in-game
+  chat messages in your chat box.
+
+Example:
+    Messages := R_ChatMessages();
+    for I:=0 to High(Messages) do
+      ...
+*}
 Function R_ChatMessages(Limit: UInt32 = 0): Array of TRSChatMessage;
 var
   I, J, Count: Int32;
@@ -52,6 +63,15 @@ begin
   ChatWidget.Free;
 end;
 
+{*
+R_ChatMessages
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the Chat Dialog is open.
+
+Example:
+    if R_ChatDialog then
+      ...
+*}
 Function R_ChatDialog: Boolean;
 var
   Dialog: RSWidget;
@@ -71,6 +91,15 @@ begin
   end;
 end;
 
+{*
+R_ChatMessages
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the chat input option is open (Chat screen with '*').
+
+Example:
+    if R_ChatInput then
+      ...
+*}
 Function R_ChatInput: Boolean;
 var
   Input: RSWidget;
@@ -84,6 +113,15 @@ begin
   end;
 end;
 
+{*
+R_ChatChooseOption
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if selected specified chat option.
+
+Example:
+    if R_ChatChooseOption(['Yes']) then
+      ...
+*}
 Function R_ChatChooseOption(options: Array of String; caseSensitive: Boolean = True): Boolean;
 var
   I, J: Int32;
@@ -116,6 +154,32 @@ begin
   end;
 end;
 
+{*
+R_ClickToContinueIsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if 'Click to continue' is open.
+
+Example:
+    if R_ClickToContinueIsOpen then
+      ...
+*}
+Function R_ClickToContinueIsOpen(): Boolean;
+begin
+  Result := (RSWidget.Get(R_CHATBOX_NPC_CLICK_TO_CONTINUE.Group, R_CHATBOX_NPC_CLICK_TO_CONTINUE.Child).ref <> nil)
+    or (RSWidget.Get(R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Group, R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Child).ref <> nil)
+    or (RSWidget.Get(R_INTERFACE_LEVEL_UP_CONTINUE.Group, R_INTERFACE_LEVEL_UP_CONTINUE.Child).ref <> nil)
+    or (RSWidget.Get(R_INTERFACE_CHAT_DIALOG_CONTINUE.Group, R_INTERFACE_CHAT_DIALOG_CONTINUE.Child).ref <> nil);
+end;
+
+{*
+R_ClickToContinue
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if clicked 'Click to continue'.
+
+Example:
+    if R_ClickToContinue then
+      ...
+*}
 Function R_ClickToContinue: Boolean;
 var
   NPCContinue, PlayerContinue, LevelUpContinue, DialogContinue: RSWidget;
@@ -152,47 +216,3 @@ begin
     Exit(True);
   end;
 end;
-
-Function R_ChatSkillChooseOptions(option: Int32): Boolean;
-var
-  Widget: RSWidget;
-begin
-  Widget := RSWidget.Get(R_INTERFACE_SKILL_OPTIONS, 14 + (Option - 1), 38);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Widget.Free;
-    Exit(True);
-  end;
-end;
-
-Function R_ChatSkillChooseOptions(options: Array of String; caseSensitive: Boolean = True): Boolean; overload;
-var
-  I, J: Int32;
-  Widget: RSWidget;
-  Widgets: Array of RSWidget;
-  Title: String;
-begin
-  For I := 0 to 8 do
-  begin
-    Widget := RSWidget.Get(R_INTERFACE_SKILL_OPTIONS, 14 + I);
-    if Widget.ref <> nil then
-    begin
-      Widgets += Widget;
-
-      For J := 0 to High(Options) do
-      begin
-        Title := Widget.Name;
-        if (caseSensitive and (Pos(Options[J], Title) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[J]), Lowercase(Title)) > 0)) then
-        begin
-          Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-          RSTypeArray(Widgets).Free;
-          Exit(True);
-        end;
-      end;
-    end;
-  end;
-
-  RSTypeArray(Widgets).Free;
-end;
-
