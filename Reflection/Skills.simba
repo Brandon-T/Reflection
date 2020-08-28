@@ -1,118 +1,175 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
 
-const
-  R_SKILL_ATTACK =        0;
-  R_SKILL_DEFENCE =       1;
-  R_SKILL_STRENGTH =      2;
-  R_SKILL_HITPOINTS =     3;
-  R_SKILL_RANGED =        4;
-  R_SKILL_PRAYER =        5;
-  R_SKILL_MAGIC =         6;
-  R_SKILL_COOKING =       7;
-  R_SKILL_WOODCUTTING =   8;
-  R_SKILL_FLETCHING =     9;
-  R_SKILL_FISHING =       10;
-  R_SKILL_FIREMAKING =    11;
-  R_SKILL_CRAFTING =      12;
-  R_SKILL_SMITHING =      13;
-  R_SKILL_MINING =        14;
-  R_SKILL_HERBLORE =      15;
-  R_SKILL_AGILITY =       16;
-  R_SKILL_THIEVING =      17;
-  R_SKILL_SLAYER =        18;
-  R_SKILL_FARMING =       19;
-  R_SKILL_RUNECRAFT =     20;
-  R_SKILL_HUNTER =        21;
-  R_SKILL_CONSTRUCTION =  22;
-  R_SKILL_TOTALLEVEL =    23;
+type
+  TSkill = (
+    R_SKILL_ATTACK = 0,
+    R_SKILL_DEFENCE,
+    R_SKILL_STRENGTH,
+    R_SKILL_HITPOINTS,
+    R_SKILL_RANGED,
+    R_SKILL_PRAYER,
+    R_SKILL_MAGIC,
+    R_SKILL_COOKING,
+    R_SKILL_WOODCUTTING,
+    R_SKILL_FLETCHING,
+    R_SKILL_FISHING,
+    R_SKILL_FIREMAKING,
+    R_SKILL_CRAFTING,
+    R_SKILL_SMITHING,
+    R_SKILL_MINING,
+    R_SKILL_HERBLORE,
+    R_SKILL_AGILITY,
+    R_SKILL_THIEVING,
+    R_SKILL_SLAYER,
+    R_SKILL_FARMING,
+    R_SKILL_RUNECRAFT,
+    R_SKILL_HUNTER,
+    R_SKILL_CONSTRUCTION,
+    R_SKILL_TOTALLEVEL);
 
+  TSkillIndex = (
+    R_SKILL_TAB_INDEX_ATTACK = 1,
+    R_SKILL_TAB_INDEX_STRENGTH,
+    R_SKILL_TAB_INDEX_DEFENCE,
+    R_SKILL_TAB_INDEX_RANGED,
+    R_SKILL_TAB_INDEX_PRAYER,
+    R_SKILL_TAB_INDEX_MAGIC,
+    R_SKILL_TAB_INDEX_RUNECRAFT,
+    R_SKILL_TAB_INDEX_CONSTRUCTION,
+    R_SKILL_TAB_INDEX_HITPOINTS,
+    R_SKILL_TAB_INDEX_AGILITY,
+    R_SKILL_TAB_INDEX_HERBLORE,
+    R_SKILL_TAB_INDEX_THIEVING,
+    R_SKILL_TAB_INDEX_CRAFTING,
+    R_SKILL_TAB_INDEX_FLETCHING,
+    R_SKILL_TAB_INDEX_SLAYER,
+    R_SKILL_TAB_INDEX_HUNTER,
+    R_SKILL_TAB_INDEX_MINING,
+    R_SKILL_TAB_INDEX_SMITHING,
+    R_SKILL_TAB_INDEX_FISHING,
+    R_SKILL_TAB_INDEX_COOKING,
+    R_SKILL_TAB_INDEX_FIREMAKING,
+    R_SKILL_TAB_INDEX_WOODCUTTING,
+    R_SKILL_TAB_INDEX_FARMING,
+    R_SKILL_TAB_INDEX_TOTALLEVEL);
 
-  R_SKILL_TAB_INDEX_ATTACK =        1;
-  R_SKILL_TAB_INDEX_STRENGTH =      2;
-  R_SKILL_TAB_INDEX_DEFENCE =       3;
-  R_SKILL_TAB_INDEX_RANGED =        4;
-  R_SKILL_TAB_INDEX_PRAYER =        5;
-  R_SKILL_TAB_INDEX_MAGIC =         6;
-  R_SKILL_TAB_INDEX_RUNECRAFT =     7;
-  R_SKILL_TAB_INDEX_CONSTRUCTION =  8;
-  R_SKILL_TAB_INDEX_HITPOINTS =     9;
-  R_SKILL_TAB_INDEX_AGILITY =       10;
-  R_SKILL_TAB_INDEX_HERBLORE =      11;
-  R_SKILL_TAB_INDEX_THIEVING =      12;
-  R_SKILL_TAB_INDEX_CRAFTING =      13;
-  R_SKILL_TAB_INDEX_FLETCHING =     14;
-  R_SKILL_TAB_INDEX_SLAYER =        15;
-  R_SKILL_TAB_INDEX_HUNTER =        16;
-  R_SKILL_TAB_INDEX_MINING =        17;
-  R_SKILL_TAB_INDEX_SMITHING =      18;
-  R_SKILL_TAB_INDEX_FISHING =       19;
-  R_SKILL_TAB_INDEX_COOKING =       20;
-  R_SKILL_TAB_INDEX_FIREMAKING =    21;
-  R_SKILL_TAB_INDEX_WOODCUTTING =   22;
-  R_SKILL_TAB_INDEX_FARMING =       23;
-  R_SKILL_TAB_INDEX_TOTALLEVEL =    24;
+{*
+R_GetSkillLevel
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the level of the specified skill.
 
-Function R_GetSkillLevel(Skill: Int32): Int32;
+Example:
+  CurrentSkillLevel := R_GetSkillLevel(R_SKILL_ATTACK);
+*}
+Function R_GetSkillLevel(Skill: TSkill): Int32;
 var
   Skills: Pointer;
 begin
   Skills := RGetArray(R_EIOS, nil, CLIENT_CURRENTLEVELS);
-  Result := RGetIntArray(R_EIOS, Skills, Skill);
+  Result := RGetIntArray(R_EIOS, Skills, Ord(Skill));
   RFreeObject(R_EIOS, Skills);
 end;
 
-Function R_GetSkillMaxLevel(Skill: Int32): Int32;
+{*
+R_GetSkillMaxLevel
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the maximum level of the specified skill.
+
+Example:
+  MaxLevel := R_GetSkillMaxLevel(R_SKILL_ATTACK);
+*}
+Function R_GetSkillMaxLevel(Skill: TSkill): Int32;
 var
   Skills: Pointer;
 begin
   Skills := RGetArray(R_EIOS, nil, CLIENT_REALLEVELS);
-  Result := RGetIntArray(R_EIOS, Skills, Skill);
+  Result := RGetIntArray(R_EIOS, Skills, Ord(Skill));
   RFreeObject(R_EIOS, Skills);
 end;
 
-Function R_GetSkillExperience(Skill: Int32): Int32;
+{*
+R_GetSkillExperience
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the total experience earned in the specified skill.
+
+Example:
+  AttackXP := R_GetSkillExperience(R_SKILL_ATTACK);
+*}
+Function R_GetSkillExperience(Skill: TSkill): Int32;
 var
   Experiences: Pointer;
 begin
   Experiences := RGetArray(R_EIOS, nil, CLIENT_EXPERIENCES);
-  Result := RGetIntArray(R_EIOS, Experiences, Skill);
+  Result := RGetIntArray(R_EIOS, Experiences, Ord(Skill));
   RFreeObject(R_EIOS, Experiences);
 end;
 
-{ R_SKILL_TAB_INDEX }
-Function R_GetSkillTabBounds(Skill: Int32): TBox;
+{*
+R_GetSkillTabBounds
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a TBox containing the bounds of the specified skill.
+
+Example:
+  Mouse.Move(R_GetSkillTabBounds(R_SKILL_TAB_INDEX_ATTACK));
+*}
+Function R_GetSkillTabBounds(Skill: TSkillIndex): TBox;
 var
   Widget: RSWidget;
 begin
-  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Skill);
+  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Ord(Skill));
   Result := Widget.Bounds;
   Widget.Free;
 end;
 
-Function R_GetSkillTabLevel(Skill: Int32): Int32;
+{*
+R_GetSkillTabLevel
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the level of the specified skill.
+
+Example:
+  Writeln(R_GetSkillTabLevel(R_SKILL_TAB_INDEX_ATTACK));
+*}
+Function R_GetSkillTabLevel(Skill: TSkillIndex): Int32;
 var
   Widget: RSWidget;
 begin
-  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Skill, 3);
+  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Ord(Skill), 3);
   Result := StrToInt(Widget.Text);
   Widget.Free;
 end;
 
-Function R_GetSkillTabMaxLevel(Skill: Int32): Int32;
+{*
+R_GetSkillTabMaxLevel
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the max level of the specified skill.
+
+Example:
+  Writeln(R_GetSkillTabMaxLevel(R_SKILL_TAB_INDEX_ATTACK));
+*}
+Function R_GetSkillTabMaxLevel(Skill: TSkillIndex): Int32;
 var
   Widget: RSWidget;
 begin
-  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Skill, 4);
+  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Ord(Skill), 4);
   Result := StrToInt(Widget.Text);
   Widget.Free;
 end;
 
+{*
+R_GetSkillTabTotalLevel
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the player's total level.
+
+Example:
+  Writeln(R_GetSkillTabTotalLevel);
+*}
 Function R_GetSkillTabTotalLevel: Int32;
 var
   Widget: RSWidget;
+  SkillTotal: Integer;
 begin
-  Widget := RSWidget.Get(R_INTERFACE_SKILLS, R_SKILL_TAB_INDEX_TOTALLEVEL);
-  Result := StrToInt(Widget.Text);
+  Widget := RSWidget.Get(R_INTERFACE_SKILLS, Ord(R_SKILL_TAB_INDEX_TOTALLEVEL) + 3);
+  Result := StrToInt(copy(Widget.Text, pos(':', Widget.Text) + 1, High(Widget.Text)));
   Widget.Free;
 end;
