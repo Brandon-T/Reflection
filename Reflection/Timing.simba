@@ -10,7 +10,7 @@ Converts the input tile to a point on the minimap.
 Example:
   Mouse.Move(R_TileToMM(R_GetMe.Tile));
 *}
-Function R_TileToMM(Tile: TPoint): TPoint;
+Function R_TileToMM(Tile: RSTile): TPoint;
 begin
   Result := RSTile(Tile).ToLocal.TileToMM;
 end;
