@@ -1,76 +1,68 @@
-{$include_once Internal/Reflection.simba}
-{$include_once Constants.simba}
-{$include_once srl/shared.simba}
+type
+  Timer = record
+    Tick: Int64;
+  end;
 
 {*
-R_TileToMM
-~~~~~~~~~~
-Converts the input tile to a point on the minimap.
+Start
+~~~~~
+Starts the timer.
 
 Example:
-  Mouse.Move(R_TileToMM(R_GetMe.Tile));
+  Timer.Start;
 *}
-Function R_TileToMM(Tile: RSTile): TPoint;
+Procedure Timer.Start;
 begin
-  Result := RSTile(Tile).ToLocal.TileToMM;
+  tick := GetTickCount();
 end;
 
 {*
-R_TileToMM
-~~~~~~~~~~
-Converts the input point to a mainscreen point.
+ElapsedTime
+~~~~~~~~~~~
+Returns the time elapsed or the total time on the timer.
 
 Example:
-  Mouse.Move(R_MMToMS(R_TileToMM(R_GetMe.Tile)));
-*}
-Function R_MMToMS(P: TPoint): TPoint;
-begin
-  Result := TPoint(RSTile(P).MMToTile.TileToMS);
-end;
-
-{*
-R_TileHeight
-~~~~~~~~~~~~
-Returns the height of a given tile.
-
-Example:
-  if (R_TileHeight > 13) then
+  if Timer.ElapsedTime < 100 then
     ...
 *}
-Function R_TileHeight(Tile: TPoint): Int32;
+Function Timer.ElapsedTime: Int64;
 begin
-  Result := RSTile.GetHeight;
+  Result := GetTickCount() - self.Tick;
 end;
 
 {*
-R_TileBounds
-~~~~~~~~~~~~
-Returns the mainscreen bounds of a given tile.
+Reset
+~~~~~
+Resets the timer.
 
 Example:
-  TileBounds := R_TileBounds(R_GetMe.Tile);
+  Timer.Reset
 *}
-Function R_TileBounds(Tile: RSTile): TRectangle;
+Procedure Timer.Reset();
+begin
+  self.Tick := 0;
+end;
+
+{*
+R_WaitFunction
+~~~~~~~~~~~~~~
+Waits until a function is completed. If not completed within the specified time,
+  it will return false.
+
+Example:
+  R_WaitFunction(1200, 50, KillNPC());
+*}
+Function R_WaitFunction(timeout: UInt32; timePerLoop: Int32 = 50; func: Function: Boolean): Boolean;
 var
-  Rect: T2DRectangle;
+  timer: Timer;
 begin
-  Rect := RSTile(Tile).Project;
+  timer.Start;
+  while(not func) do
+  begin
+    if timer.ElapsedTime >= timeout then
+      Exit(False);
 
-  Result.Top := Rect.NW;
-  Result.Right := Rect.NE;
-  Result.Btm   := Rect.SE;
-  Result.Left  := Rect.SW;
-end;
-
-{*
-R_GetMidTile
-~~~~~~~~~~~~
-Returns the middle tile between the two tiles.
-
-Example:
-  MidTile := R_GetMidTile([2543, 3254], [2513, 3267]);
-*}
-Function R_GetMidTile(Tile1, Tile2: RSTile): RSTile;
-begin
-  Result := Point(Round((Tile1.X + Tile2.X)/2), Round((Tile1.Y+Tile2.Y)/2));
+    Wait(timePerLoop + Random(50));
+  end;
+  Result := True;
 end;
