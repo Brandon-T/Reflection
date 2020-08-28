@@ -1,5 +1,6 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
+{$include_once srl/shared.simba} 
 
 const
   GAMETAB_COMBAT             = 0;

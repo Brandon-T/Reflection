@@ -41,7 +41,7 @@ type
     ICE_BARRAGE = 46,
     WIND_SURGE = 48,
     WATER_SURGE = 49,
-    EARTH_SURGE = 50
+    EARTH_SURGE = 50,
     FIRE_SURGE = 51);
 
 (*
@@ -139,7 +139,7 @@ begin
       Mouse.Click(Widget.Bounds, MOUSE_LEFT);
       Wait(250, RandomRange(612, 1330));
 
-      SpellWidget := RSWidget.Get(R_COMBAT_SPELL_CONTAINER.Group, R_COMBAT_SPELL_CONTAINER.Child, Spell);
+      SpellWidget := RSWidget.Get(R_COMBAT_SPELL_CONTAINER.Group, R_COMBAT_SPELL_CONTAINER.Child, Ord(Spell));
 
       if (SpellWidget.ref <> nil) then
       begin

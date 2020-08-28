@@ -1,3 +1,5 @@
+{$include_once Internal/RSWidget.simba}
+{$include_once Interfaces.simba}
 type
   TRSWorldScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
 
@@ -290,4 +292,3 @@ begin
     Widget.Free;
   end;
 end;
-

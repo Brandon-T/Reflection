@@ -1,1 +1,1 @@
-{$i srl/shared.simba}
+{$include_once srl/shared.simba}          
