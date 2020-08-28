@@ -1,0 +1,19 @@
+{$include_once Internal/RSWidget.simba}
+{$include_once Constants.simba}
+{*
+R_MainscreenBounds
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the pixel coordinates that bound the viewable screen.
+
+Example:
+
+   if (R_MainscreenBounds.Contains([X, Y]) then
+      ...
+*}
+Function R_MainscreenBounds(): TBox;
+begin
+  Result := RSWidget.Get(R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT[0], R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT[1]).bounds;
+  if (Result.Contains([-1, -1])) then
+    Result := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+end;
