@@ -14,6 +14,14 @@ type
     Orientation: Int32;
   end;
 
+{*
+R_GetMe
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a TRSPlayer containing information about the signed in account.
+
+Example:
+  Me := R_GetMe;
+*}
 Function R_GetMe: TRSPlayer;
 var
   LocalPlayer: RSPlayer;
@@ -33,6 +41,14 @@ begin
   LocalPlayer.Free;
 end;
 
+{*
+R_GetPlayers
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSPlayer containing all visible players.
+
+Example:
+  AllPlayers := R_GetPlayers;
+*}
 Function R_GetPlayers: Array of TRSPlayer;
 var
   I: Int32;
@@ -57,6 +73,14 @@ begin
   RSTypeArray(Players).Free;
 end;
 
+{*
+R_GetAnimation
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the Animation ID of your player.
+
+Example:
+  MyAnimation := R_GetAnimation;
+*}
 Function R_GetAnimation: Int32;
 var
   Me: RSPlayer;
@@ -66,6 +90,15 @@ begin
   Me.Free;
 end;
 
+{*
+R_IsMoving
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the player is moving.
+
+Example:
+  if R_IsMoving then
+    ...
+*}
 Function R_IsMoving: Boolean;
 var
   Me: RSPlayer;
@@ -75,6 +108,15 @@ begin
   Me.Free;
 end;
 
+{*
+R_GetDestination
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the destination tile of the player.
+
+Example:
+  if (R_GetMe.Tile.DistanceTo(R_GetDestination) < 9) then
+    ...
+*}
 Function R_GetDestination: RSTile;
 var
   Me: RSPlayer;
@@ -83,5 +125,3 @@ begin
   Result := Me.Destination;
   Me.Free;
 end;
-
-

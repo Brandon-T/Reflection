@@ -1057,3 +1057,7 @@ const //Widgets
   R_ANVIL_SMITH_JAVELIN_HEADS: RWidget =             [R_INTERFACE_ANVIL, 33];
   R_ANVIL_SMITH_BOLTS: RWidget =                     [R_INTERFACE_ANVIL, 34];
   R_ANVIL_SMITH_LIMBS: RWidget =                     [R_INTERFACE_ANVIL, 35];
+  
+  //Texture (Sprite) ID
+  R_BUTTON_CENTER_HIGHLIGHT_RED = 1154;
+  R_BUTTON_CENTER_HIGHLIGHT_GREY = 1145; 

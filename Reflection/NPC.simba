@@ -12,7 +12,14 @@ type
     Visible: Boolean;
   end;
 
+{*
+R_GetNPCs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TNPC containing all visible NPCs.
 
+Example:
+  AllNPCs := R_GetNPCs;
+*}
 Function R_GetNPCs: Array of TNPC;
 var
   I: Int32;
@@ -43,6 +50,14 @@ begin
   RSTypeArray(NPCs).Free;
 end;
 
+{*
+R_GetNPCs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TNPC containing all visible NPCs of the specified ID.
+
+Example:
+  Goblins := R_GetNPCs(1546);
+*}
 Function R_GetNPCs(ID: Int32): Array of TNPC; overload;
 var
   I, J: Int32;
@@ -79,6 +94,15 @@ begin
   SetLength(Result, J);
 end;
 
+{*
+R_GetNPCs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TNPC containing all visible NPCs with a name matching the
+  specified string.
+
+Example:
+  Goblins := R_GetNPCs('Goblins');
+*}
 Function R_GetNPCs(Name: String): Array of TNPC; overload;
 var
   I, J: Int32;
@@ -115,6 +139,14 @@ begin
   SetLength(Result, J);
 end;
 
+{*
+R_GetNPCs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TNPC containing all visible NPCs on a specific tile.
+
+Example:
+  Jad := R_GetNPCs([2536, 3265]);
+*}
 Function R_GetNPCs(Tile: RSTile): Array of TNPC; overload;
 var
   I, J: Int32;

@@ -190,6 +190,11 @@ type
     BATTLEFRONT_TELEPORT,
     UNKNOWN_13);
 
+{*
+R_CastSpell - Utility Function
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified spell was cast.
+*}
 Function R_CastSpell(Child: Int32): Boolean;
 var
   Widget: RSWidget;
@@ -207,26 +212,70 @@ begin
   Widget.Free;
 end;
 
+{*
+R_CastSpell
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified spell was cast.
+  Only accepts spell from the Standard Spell Book (TStandardSpell).
+
+Example:
+  R_CastSpell(CONFUSE);
+*}
 Function R_CastSpell(Spell: TStandardSpell): Boolean; overload;
 begin
   Result := R_CastSpell(Ord(Spell));
 end;
 
+{*
+R_CastSpell
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified spell was cast.
+  Only accepts spell from the Ancient Spell Book (TAncientSpell).
+
+Example:
+  R_CastSpell(ICE_BARRAGE);
+*}
 Function R_CastSpell(Spell: TAncientSpell): Boolean; overload;
 begin
   Result := R_CastSpell(Ord(Spell));
 end;
 
+{*
+R_CastSpell
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified spell was cast.
+  Only accepts spell from the Lunar Spell Book (TLunarSpell).
+
+Example:
+  R_CastSpell(CURE_OTHER);
+*}
 Function R_CastSpell(Spell: TLunarSpell): Boolean; overload;
 begin
   Result := R_CastSpell(Ord(Spell));
 end;
 
+{*
+R_CastSpell
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified spell was cast.
+  Only accepts spell from the Arceuus Spell Book (TArceuusSpell).
+
+Example:
+  R_CastSpell(REANIMATE_HORROR);
+*}
 Function R_CastSpell(Spell: TArceuusSpell): Boolean; overload;
 begin
   Result := R_CastSpell(Ord(Spell));
 end;
 
+{*
+R_IsSpellSelected
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if a spell is selected.
+
+Example:
+  if R_IsSpellSelected then
+*}
 {Function R_IsSpellSelected(): Boolean;
 begin
  //Need the hook..

@@ -1,12 +1,12 @@
 (*
-R_GetMainscreenGroundItemByID
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+R_GetGroundItemByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Returns the Mainscreen coordinates of a specific item ID.
+Returns the RSTile of a specific item ID.
 
 Example:
 
-   Mouse.Move(R_GetMainscreenGroundItemByID(526)[0]);
+   Mouse.Move(R_GetGroundItemByID(526)[0]);
 *)
 Function R_GetGroundItem(ItemID: Int32): Array of RSTile;
 var
@@ -83,4 +83,3 @@ begin
   end;
   RSTypeArray(Items).Free;
 end;
-

@@ -6,6 +6,19 @@ type
     Name: String;
   end;
 
+{*
+R_FindObject
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a TRSObject of object on a specific tile.
+  RSObjectTypes:
+    - GAME_OBJECT
+    - WALL_DECORATION
+    - BOUNDARY_OBJECT
+    - FLOOR_DECORATION
+
+Example:
+  Bank := R_FindObject(GAME_OBJECT, 2403, 3452);
+*}
 Function R_FindObject(ObjectType: RSObjectType; X, Y: Int32): TRSObject;
 var
   Obj: RSObject;
@@ -29,6 +42,19 @@ begin
   end;
 end;
 
+{*
+R_FindObject
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSObject of the specified ID and Object Type.
+  RSObjectTypes:
+    - GAME_OBJECT
+    - WALL_DECORATION
+    - BOUNDARY_OBJECT
+    - FLOOR_DECORATION
+
+Example:
+  Trees := R_FindObject(1342, GAME_OBJECT);
+*}
 Function R_FindObjects(ID: Int32; ObjectType: RSObjectType): Array of TRSObject; overload;
 var
   I, J: Int32;
@@ -59,6 +85,19 @@ begin
   SetLength(Result, J);
 end;
 
+{*
+R_FindObject
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSObject of the specified Object Type.
+  RSObjectTypes:
+    - GAME_OBJECT
+    - WALL_DECORATION
+    - BOUNDARY_OBJECT
+    - FLOOR_DECORATION
+
+Example:
+  AllObjects := R_FindObject(GAME_OBJECT);
+*}
 Function R_FindObjects(ObjectType: RSObjectType): Array of TRSObject; overload;
 var
   I: Int32;

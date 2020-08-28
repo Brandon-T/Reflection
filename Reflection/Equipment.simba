@@ -22,6 +22,14 @@ type
     Bounds: TBox;
   end;
 
+{*
+R_GetEquipmentIDs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a list of IDs for all equiped items.
+
+Example:
+    CurrentEquipment := R_GetEquipmentIDs;
+*}
 Function R_GetEquipmentIDs: Array of Int32;
 var
   Equipment: Pointer;
@@ -69,6 +77,15 @@ begin
   Garbage.Free;
 end;
 
+{*
+R_IsEquipped
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item ID is equiped.
+
+Example:
+    if R_IsEquipped(312) then
+      ...
+*}
 Function R_IsEquipped(ID: Int32): Boolean;
 var
   IDs: Array of Int32;
@@ -80,6 +97,15 @@ begin
       Result := True;
 end;
 
+{*
+R_IsEquipmentOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the equipment screen is visible.
+
+Example:
+    if R_IsEquipmentOpen then
+      ...
+*}
 Function R_IsEquipmentOpen: Boolean;
 var
   Widget: RSWidget;
@@ -127,6 +153,16 @@ begin
   end;
 end;
 
+{*
+R_GetAllEquipment
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSEquipmentItem of all equiped items.
+  This object contains ID, Slot, Name, and Bounds.
+
+Example:
+    if 'Rune platesk' in R_GetAllEquipment[X].Name then
+      ...
+*}
 Function R_GetAllEquipment: Array of TRSEquipmentItem;
 var
   Garbage: RSTypeArray;
@@ -204,6 +240,14 @@ begin
   end;
 end;
 
+{*
+R_GetEquipment
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the TRSEquipmentItem in the specified slot.
+
+Example:
+    Writeln(R_GetEquipment(2).Name);
+*}
 Function R_GetEquipment(Slot: Int32): TRSEquipmentItem;
 var
   Interfaces: Array of RWidget;
@@ -278,5 +322,3 @@ begin
     Exit;
   end;
 end;
-
-
