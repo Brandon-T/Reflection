@@ -267,6 +267,10 @@ Actor_IsWalking: THook =                          ['cg', 'an', 'Z', 1];
 Actor_TargetIndex: THook =                        ['cg', 'bi', 'I', -1685554577];
 Actor_CombatInfoList: THook =                     ['cg', 'bh', 'Ljv;', 1];
 Actor_Height: THook =                             ['cg', 'cv', 'I', -446174757];
+Actor_SpotAnimation : THook =                     ['cg', 'bx', 'I', -475440643];
+Actor_SpotAnimationFrame : THook =                ['cg', 'bq', 'I', -822724081];
+Actor_SpotAnimationFrameCycle : THook =           ['cg', 'by', 'I', 1684193507];
+Actor_GraphicsID : THook =                        ['cg', 'bp', 'I', 450756931];
 
 {NPCDefinition: jx}
 NPCDefinition_ID: THook =                         ['jx', 'i', 'I', -851756363];
