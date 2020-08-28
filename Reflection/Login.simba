@@ -1,0 +1,293 @@
+type
+  TRSWorldScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
+
+(*
+LOBBY INTERFACE
+================
+
+  Lobby Interface functionality.
+*)
+
+{*
+R_IsLobbyOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Checks to see if the Lobby is open.
+*}
+Function R_IsLobbyOpen: Boolean;
+begin
+  Result := RSWidget.IsValid(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
+end;
+
+Function R_WaitIsLobbyOpen(timeout: UInt32): Boolean;
+begin
+  Result := WaitUntil(R_IsLobbyOpen, 50, timeout);
+end;
+
+{*
+R_EnterGame
+~~~~~~~~~~~~~~~~~~~~~~
+Checks if we are in the Lobby and clicks the 'Click here to play' button if true.
+*}
+Function R_EnterGame(): Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not R_IsLobbyOpen) or R_WidgetIsHidden(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+(*
+LOGOUT INTERFACE
+================
+
+  Logout Tab functionality.
+*)
+
+{*
+R_Logout
+~~~~~~~~~~~~~~~~~~~~~~
+Logs the player out of the game.
+
+Example:
+    R_Logout;
+*}
+Function R_Logout: Boolean;
+var
+  Widget: RSWidget;
+begin
+  R_OpenGametab(GAMETAB_LOGOUT);
+  Wait(50, RandomRange(250, 692));
+
+  if (RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_LOGOUT_LOGOUT_BUTTON)) then
+  begin
+    Widget := RSWidget.Get(R_LOGOUT_LOGOUT_BUTTON.Group, R_LOGOUT_LOGOUT_BUTTON.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end else if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_LOGOUT_BUTTON)) then
+  begin
+    Widget := RSWidget.Get(R_WORLD_SWITCHER_LOGOUT_BUTTON.Group, R_WORLD_SWITCHER_LOGOUT_BUTTON.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end;
+end;
+
+{*
+R_CloseWorldSwitcher
+~~~~~~~~~~~~~~~~~~~~~~
+Closes the world switcher and returns to the main logout tab.
+
+Example:
+    R_CloseWorldSwitcher;
+*}
+Function R_CloseWorldSwitcher(): Boolean;
+var
+  Widget: RSWidget;
+begin
+  R_OpenGametab(GAMETAB_LOGOUT);
+  Wait(50, RandomRange(250, 692));
+
+  if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_CLOSE)) then
+  begin
+    Widget := RSWidget.Get(R_WORLD_SWITCHER_CLOSE.Group, R_WORLD_SWITCHER_CLOSE.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end
+
+end;
+
+{*
+R_OpenWorldSwitcher
+~~~~~~~~~~~~~~~~~~~~~~
+Opens the world switcher.
+
+Example:
+    R_OpenWorldSwitcher;
+*}
+Function R_OpenWorldSwitcher: Boolean;
+var
+  Widget: RSWidget;
+begin
+  R_OpenGametab(GAMETAB_LOGOUT);
+
+  Wait(50, RandomRange(250, 692));
+
+  if (not R_WaitUntilVisible(R_LOGOUT_CONTAINER, 2500)) or R_WidgetIsHidden(R_LOGOUT_WORLD_SWITCHER_BUTTON) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_LOGOUT_WORLD_SWITCHER_BUTTON.Group, R_LOGOUT_WORLD_SWITCHER_BUTTON.Child);
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := R_WaitUntilVisible(R_WORLD_SWITCHER_SCROLL_UP, 2500);
+    Widget.Free;
+  end;
+end;
+
+{*
+R_WorldToBox
+~~~~~~~~~~~~~~~~~~~~~~
+Utility function that converts a given world to mainscreen coordinates.
+
+Example:
+    R_WorldToBox(500);
+*}
+Function R_WorldToBox(World: Int32): TBox;
+var
+  WorldWidget: RSWidget;
+begin
+  WorldWidget := RSWidget.Get(R_WORLD_SWITCHER_LIST.Group, R_WORLD_SWITCHER_LIST.Child, World);
+  Result := WorldWidget.Bounds;
+  WorldWidget.Free;
+end;
+
+{*
+R_ScrollToWorld
+~~~~~~~~~~~~~~~~~~~~~~
+Scrolls to the proper world in the world switcher.
+
+Example:
+    R_ScrollToWorld(500, TRSWorldScroll.SCROLLBAR);
+*}
+Function R_ScrollToWorld(World: Int32; ScrollType: TRSWorldScroll = TRSWorldScroll.SCROLLWHEEL): Boolean;
+var
+  ScrollBar, ScrollArrow, WorldContainer: RSWidget;
+  WorldContainerBounds: TBox;
+  T: Timer;
+  Direction: Boolean;
+  P: TPoint;
+begin
+  WorldContainer := RSWidget.Get(R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Group, R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Child);
+  if WorldContainer.ref = nil then
+    Exit(False);
+
+  //Adds a buffer to make sure that the world is completely clickable
+  WorldContainerBounds := [WorldContainer.Bounds.X1, WorldContainer.Bounds.Y1 + 15, WorldContainer.Bounds.X2, WorldContainer.Bounds.Y2 - 15];
+  WorldContainer.Free;
+
+  if WorldContainerBounds.Contains(R_WorldToBox(World)) then
+    Exit(True);
+
+  Direction := WorldContainerBounds.Middle.Y > R_WorldToBox(World).Middle.Y;
+
+  //Scroll the interface using the mouse-wheel
+  if ScrollType = TRSWorldScroll.SCROLLWHEEL then
+  begin
+    Mouse.Move(WorldContainerBounds);
+
+    T.Start;
+    while not WorldContainerBounds.Contains(R_WorldToBox(World)) do
+    begin
+      if T.ElapsedTime > 5000 then
+        Exit(False);
+
+      Mouse.Scroll(3, Direction);
+    end;
+
+    Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
+  end;
+
+  //Scroll the interface using the scroll-bar
+  if ScrollType = TRSWorldScroll.SCROLLBAR then
+  begin
+    ScrollBar := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_BAR.Group, R_WORLD_SWITCHER_SCROLL_BAR.Child, R_WORLD_SWITCHER_SCROLL_BAR.Index);
+    if ScrollBar.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollBar.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollBar.Free;
+
+    T.Start;
+    while not WorldContainerBounds.Contains(R_WorldToBox(World)) do
+    begin
+      if T.ElapsedTime > 5000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+
+      P := Mouse.GetPosition;
+      if Direction then
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
+      else
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y + RandomRange(3, 7));
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
+  end;
+
+  //Scroll the interface using the arrows
+  if ScrollType = TRSWorldScroll.SCROLLARROWS then
+  begin
+    if Direction then
+      ScrollArrow := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_UP.Group, R_WORLD_SWITCHER_SCROLL_UP.Child, R_WORLD_SWITCHER_SCROLL_UP.Index)
+    else
+      ScrollArrow := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_DOWN.Group, R_WORLD_SWITCHER_SCROLL_DOWN.Child, R_WORLD_SWITCHER_SCROLL_DOWN.Index);
+
+    if ScrollArrow.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollArrow.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollArrow.Free;
+
+    T.Start;
+    while not WorldContainerBounds.Contains(R_WorldToBox(World)) do
+    begin
+      if T.ElapsedTime > 20000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
+  end;
+end;
+
+{*
+R_SelectWorld
+~~~~~~~~~~~~~~~~~~~~~~
+Clicks on the selected world if it is visible in the list.
+
+Example:
+    R_SelectWorld(500);
+*}
+Function R_SelectWorld(World: Int32): Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not RSWidget.IsValid(R_WORLD_SWITCHER_LIST.Group, R_WORLD_SWITCHER_LIST.Child, World)) or R_WidgetIsHidden(R_WORLD_SWITCHER_LIST) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_WORLD_SWITCHER_LIST.Group, R_WORLD_SWITCHER_LIST.Child, World);
+  if (Widget.ref <> nil) and (RSWidget.Get(R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Group, R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Child).Bounds.Contains(Widget.Bounds)) then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+

@@ -122,20 +122,11 @@ begin
   end;
 end;
 
-{*
-R_WaitUntilVisible
-~~~~~~~~~~~~~~~~~~~~~~
-Returns true if the widget is visible before the specified time runs out.
-  Otherwise, it returns false.
-
-Example:
-  if R_WidgetIsHidden(R_PrayerIDs[0], 200) then
-    ...
-*}
 Function R_WaitUntilVisible(Constant: RWidget; WaitTime: Int32 = 1000): Boolean;
 var
   Widget: RSWidget;
   T: Int32;
+
 begin
   Widget := RSWidget.Get(Constant.Group, Constant.Child);
   if Widget.ref <> nil then
