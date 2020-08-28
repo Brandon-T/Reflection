@@ -17,7 +17,7 @@ Returns a TRSObject of object on a specific tile.
     - FLOOR_DECORATION
 
 Example:
-  Item := R_FindObject(GAME_OBJECT, 2403, 3452);
+  Bank := R_FindObject(GAME_OBJECT, 2403, 3452);
 *}
 Function R_FindObject(ObjectType: RSObjectType; X, Y: Int32): TRSObject;
 var
@@ -53,7 +53,7 @@ Returns an array of TRSObject of the specified ID and Object Type.
     - FLOOR_DECORATION
 
 Example:
-  Item := R_FindObject(1342, GAME_OBJECT);
+  Trees := R_FindObject(1342, GAME_OBJECT);
 *}
 Function R_FindObjects(ID: Int32; ObjectType: RSObjectType): Array of TRSObject; overload;
 var
@@ -96,7 +96,7 @@ Returns an array of TRSObject of the specified Object Type.
     - FLOOR_DECORATION
 
 Example:
-  Item := R_FindObject(GAME_OBJECT);
+  AllObjects := R_FindObject(GAME_OBJECT);
 *}
 Function R_FindObjects(ObjectType: RSObjectType): Array of TRSObject; overload;
 var
