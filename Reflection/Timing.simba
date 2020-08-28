@@ -3,21 +3,55 @@ type
     Tick: Int64;
   end;
 
+{*
+Start
+~~~~~
+Starts the timer.
+
+Example:
+  Timer.Start;
+*}
 Procedure Timer.Start;
 begin
   tick := GetTickCount();
 end;
 
+{*
+ElapsedTime
+~~~~~~~~~~~
+Returns the time elapsed or the total time on the timer.
+
+Example:
+  if Timer.ElapsedTime < 100 then
+    ...
+*}
 Function Timer.ElapsedTime: Int64;
 begin
   Result := GetTickCount() - self.Tick;
 end;
 
+{*
+Reset
+~~~~~
+Resets the timer.
+
+Example:
+  Timer.Reset
+*}
 Procedure Timer.Reset();
 begin
   self.Tick := 0;
 end;
 
+{*
+R_WaitFunction
+~~~~~~~~~~~~~~
+Waits until a function is completed. If not completed within the specified time,
+  it will return false.
+
+Example:
+  R_WaitFunction(1200, 50, KillNPC());
+*}
 Function R_WaitFunction(timeout: UInt32; timePerLoop: Int32 = 50; func: Function: Boolean): Boolean;
 var
   timer: Timer;
