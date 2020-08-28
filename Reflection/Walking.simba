@@ -36,7 +36,7 @@ Converts the input point to a RSTile.
 Example:
   Mouse.Move(R_MMToTile(R_TileToMM(R_GetMe.Tile)));
 *}
-Function R_MMToMS(P: TPoint): RSTile;
+Function R_MMToTile(P: TPoint): RSTile;
 begin
   Result := RSTile(P).MMToTile;
 end;
