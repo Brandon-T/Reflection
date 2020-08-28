@@ -50,7 +50,7 @@ Returns the mainscreen bounds of a given tile.
 Example:
   TileBounds := R_TileBounds(R_GetMe.Tile);
 *}
-Function R_TileBounds(Tile: TPoint): TRectangle;
+Function R_TileBounds(Tile: RSTile): TRectangle;
 var
   Rect: T2DRectangle;
 begin
