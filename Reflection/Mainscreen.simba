@@ -13,7 +13,7 @@ Example:
 *}
 Function R_MainscreenBounds(): TBox;
 begin
-  Result := RSWidget.Get(R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT[0], R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT[1]).bounds;
+  Result := RSWidget.Get(R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT.Group, R_INTERFACE_MAIN_RESIZEABLE_VIEWPORT.Child).bounds;
   if (Result.Contains([-1, -1])) then
-    Result := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT[0], R_INTERFACE_MAIN_FIXED_VIEWPORT[1]).bounds;
+    Result := RSWidget.Get(R_INTERFACE_MAIN_FIXED_VIEWPORT.Group, R_INTERFACE_MAIN_FIXED_VIEWPORT.Child).bounds;
 end;
