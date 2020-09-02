@@ -384,15 +384,10 @@ Example:
     ...
   until (R_WaitInventoryChange(1000));
 *}
-Function R_WaitInventoryChange(WaitTime: Integer): Boolean;
+Function R_WaitInventoryChange(WaitTime: Int32): Boolean;
 var
-  Time: Timer;
-  C: Integer;
+  Count: Int32;
 begin
-  C := R_InventoryCount;
-  Time.Start;
-  repeat
-    if (C <> R_InventoryCount) then
-      Exit(True);
-  until (Time.ElapsedTime > WaitTime);
+  Count := R_InventoryCount;
+  Result := R_WaitUntil(R_InventoryCount <> Count, 50, WaitTime);
 end;
