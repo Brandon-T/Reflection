@@ -1,5 +1,6 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
+{$include_once Timing.simba}
 
 type
   TRSInventoryItem = record
@@ -371,4 +372,22 @@ begin
   end;
 
   Garbage.Free;
+end;
+
+{*
+R_WaitInventoryChange
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if inventory count has changed during the specified wait time.
+
+Example:
+  repeat
+    ...
+  until (R_WaitInventoryChange(1000));
+*}
+Function R_WaitInventoryChange(WaitTime: Int32): Boolean;
+var
+  Count: Int32;
+begin
+  Count := R_InventoryCount;
+  Result := R_WaitUntil(R_InventoryCount <> Count, 50, WaitTime);
 end;
