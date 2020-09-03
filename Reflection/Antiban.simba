@@ -2,6 +2,7 @@
 {$include_once Login.simba}
 {$include_once Mainscreen.simba}
 {$include_once Mouse.simba}
+{$include_once Player.simba}
 {$include_once Skills.simba}
 {$include_once Timing.simba}
 (*
@@ -575,17 +576,15 @@ begin
 end;
 
 Procedure RAntiban.RandomCompass();
-var
-  Key: Integer;
-  Directions: Array of UInt32;
 begin
   DebugNote('[RND] Randomizing Compass');
-  //Best we can do until we get hook for compass
-  Directions := [VK_LEFT, VK_RIGHT];
-  Key := Random(0, High(Directions));
-  Keyboard.KeyDown(Directions[Key]);
-  Wait(420, RandomRange(820, 4163));
-  Keyboard.KeyUp(Directions[Key]);
+  R_SetCameraAngle(Random(0, 360));
+end;
+
+Procedure RAntiban.RandomHeight();
+begin
+  DebugNote('[RND] Randomizing Camera Height');
+  R_SetCameraAngle(Random(0, 100));
 end;
 
 procedure RAntiban.OpenRandomTab();
@@ -677,5 +676,3 @@ begin
   else
     Result := srl.MsToTime(Round(Break.NextAtTime - TimeRunning()), Format);
 end;
-
-
