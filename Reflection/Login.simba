@@ -4,6 +4,24 @@ type
   TRSWorldScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
 
 (*
+LOGIN
+=====
+
+  Login functions.
+*)
+
+{*
+R_IsLoggedIn
+~~~~~~~~~~~~~~~~~~~~~~
+Checks the login state to see if we are logged in.
+  Note: Will result true if entering username and password.
+*}
+Function R_IsLoggedIn: Boolean;
+begin
+  Result := RGetInt(R_EIOS, nil, Client_LoginState) = 2;
+end;    
+
+(*
 LOBBY INTERFACE
 ================
 
