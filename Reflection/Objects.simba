@@ -80,8 +80,8 @@ begin
       end;
       Inc(J);
     end;
+    Objects[I].Free;
   end;
-  RSTypeArray(Objects).Free;
   SetLength(Result, J);
 end;
 
@@ -119,6 +119,6 @@ begin
       Result[I].Name := Definition.Name;
       Definition.Free;
     end;
+    Objects[I].Free;
   end;
-  RSTypeArray(Objects).Free;
 end;
