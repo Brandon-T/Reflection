@@ -192,7 +192,7 @@ begin
     Exit(False);
 
   DesiredAngle := Round(Degrees * (256 / 45));
-  RandomizedRange := RandomRange(15, 45);
+  RandomizedRange := RandomRange(35, 75);
   AngleEdge1 := DesiredAngle - RandomizedRange;
   AngleEdge2 := DesiredAngle + RandomizedRange;
 
