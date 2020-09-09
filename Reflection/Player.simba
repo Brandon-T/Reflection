@@ -1,5 +1,6 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
+{$include_once Mainscreen.simba}
 {$include_once srl/shared.simba}
 
 type
@@ -18,6 +19,11 @@ type
     MIN_HEIGHT = 0,
     MAX_HEIGHT = 100);
 
+  TCameraZoom = (
+    MIN_ZOOM = 0,
+    HALF_ZOOM = 50,
+    MAX_ZOOM = 100);
+
 const
   //PITCH UTILITY
   PITCH_MIN  = 128;
@@ -26,7 +32,6 @@ const
   //YAW UTILITY
   YAW_MIN    = 0;
   YAW_MAX    = 2047;
-
 
 
 {*
@@ -192,7 +197,7 @@ begin
     Exit(False);
 
   DesiredAngle := Round(Degrees * (256 / 45));
-  RandomizedRange := RandomRange(35, 75);
+  RandomizedRange := RandomRange(15, 45);
   AngleEdge1 := DesiredAngle - RandomizedRange;
   AngleEdge2 := DesiredAngle + RandomizedRange;
 
@@ -290,4 +295,52 @@ Example:
 Function R_SetCameraHeight(Height: TCameraHeight): Boolean;
 begin
   Result := R_SetCameraHeightPercent(Ord(Height));
+end;
+
+{*
+R_SetCameraZoomPercent
+~~~~~~~~~~~~~~~~~
+Returns true if the camera zoom was set to the specified zoom.
+
+Example:
+  if R_SetCameraZoomPercent(75) then
+    ...
+*}
+Function R_SetCameraZoomPercent(Zoom: Int32): Boolean;
+var
+  Widget: RSWidget;
+  RandomizedRange: Int32;
+begin
+  Widget := RSWidget.Get(R_SETTINGS_DISPLAY_ZOOM_SLIDER.Group, R_SETTINGS_DISPLAY_ZOOM_SLIDER.Child);
+  RandomizedRange := RandomRange(7, 20);
+
+  Mouse.Move(R_MainscreenBounds, False);
+
+  While (not InRange(Widget.RelativeX, Zoom - RandomizedRange, Zoom + RandomizedRange)) do
+  begin
+    if (Widget.RelativeX > Zoom) then
+      Mouse.Scroll(RandomRange(1, 3), False)
+    else if (Widget.RelativeX < Zoom) then
+     Mouse.Scroll(RandomRange(1, 3), True);
+  end;
+  Result := InRange(Widget.RelativeX, Zoom - RandomizedRange, Zoom + RandomizedRange);
+  Widget.Free;
+end;
+
+{*
+R_SetCameraZoom
+~~~~~~~~~~~~~~~~~
+Returns true if the camera zoom was set to the specified zoom.
+  Acceptable Inputs:
+    - MAX_ZOOM
+    - HALF_ZOOM
+    - MIN_ZOOM
+
+Example:
+  if R_SetCameraZoom(MAX_ZOOM) then
+    ...
+*}
+Function R_SetCameraZoom(Zoom: TCameraZoom): Boolean;
+begin
+  Result := R_SetCameraZoomPercent(Ord(Zoom));
 end;
