@@ -230,7 +230,7 @@ begin
       end;
       Wait(25, RandomRange(50, 75));
     end;
-    Result := InRange(RSCamera.Yaw, AngleEdge1, AngleEdge2);
+    Result := Not InRange(RSCamera.Yaw, AngleEdge2, AngleEdge1);
   end else
   begin
     While not InRange(RSCamera.Yaw, AngleEdge1, AngleEdge2) do
