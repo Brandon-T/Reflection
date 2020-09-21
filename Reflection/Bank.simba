@@ -804,27 +804,32 @@ Example:
 *}
 Function R_SetBankQuantityMode(Mode: TRSBankQuantity): Boolean;
 var
-  Button: RSWidget;
+  Widget, CheckWidget: RSWidget;
+  Quantity: RWidget;
 begin
-  if not R_BankScreen then
-    Exit(False);
-
   case Mode of
-    TRSBankQuantity.ONE:  begin Button := RSWidget.Get(R_BANK_QUANTITY_1.Group, R_BANK_QUANTITY_1.Child) end;
-    TRSBankQuantity.FIVE: begin Button := RSWidget.Get(R_BANK_QUANTITY_5.Group, R_BANK_QUANTITY_5.Child) end;
-    TRSBankQuantity.TEN:  begin Button := RSWidget.Get(R_BANK_QUANTITY_10.Group, R_BANK_QUANTITY_10.Child) end;
-    TRSBankQuantity.X:    begin Button := RSWidget.Get(R_BANK_QUANTITY_X.Group, R_BANK_QUANTITY_X.Child) end;
-    TRSBankQuantity.ALL:  begin Button := RSWidget.Get(R_BANK_QUANTITY_ALL.Group, R_BANK_QUANTITY_ALL.Child) end;
+    TRSBankQuantity.ONE: Quantity := R_BANK_QUANTITY_1;
+    TRSBankQuantity.FIVE: Quantity := R_BANK_QUANTITY_5;
+    TRSBankQuantity.TEN: Quantity := R_BANK_QUANTITY_10;
+    TRSBankQuantity.X: Quantity := R_BANK_QUANTITY_X;
+    TRSBankQuantity.ALL: Quantity := R_BANK_QUANTITY_ALL;
   end;
 
-  if Button.ref = nil then
-    Exit(False);
+  Widget := RSWidget.Get(Quantity.Group, Quantity.Child);
+  CheckWidget := RSWidget.Get(Quantity.Group, Quantity.Child, 4);
 
-  Mouse.Click(Button.Bounds, MOUSE_LEFT);
-  Button.Free;
-
-  Result := True; //TODO: Check if the mode actually changed by checking button spriteId..
-end;
+  if (Widget.ref <> nil) and (CheckWidget.ref <> nil) then
+  begin
+    if (CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Wait(250, RandomRange(612, 1330));
+    end;
+    Result := CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_RED;
+    Widget.Free;
+    CheckWidget.Free;
+  end;
+end;  
 
 {*
 R_BankScreen_Close
