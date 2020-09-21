@@ -614,41 +614,80 @@ end;
 {*
 R_DepositSlot
 ~~~~~~~~~~~~~~~~~~~~~~
-Returns true if deposited specified inventory slot.
+Returns true if deposited specified inventory slot. Accepts any amount to
+  deposit. Amount = 0: Deposit all items.
 
 Example:
-    R_DepositSlot(12, True);
+    R_DepositSlot(12, 0);
 *}
-Function R_DepositSlot(Index: Int32; All: Boolean = False): Boolean;
+Function R_DepositSlot(Index: Int32; Amount: Int32 = 1): Boolean;
 var
-  InvItem: TRSInventoryItem;
+  Item: TRSInventoryItem;
+  InputFull: RSWidget;
+  Retries: Int32;
 begin
   if not R_BankScreen then
-    Exit;
+    Exit(False);
 
-  InvItem := R_GetInventorySlotItem(Index);
-  if InvItem.ID <> -1 then
+  Item := R_GetInventorySlotItem(Index);
+  if Item.ID = -1 then
+    Exit(False);
+
+  if Amount = 0 then
   begin
-    if All then
+    Mouse.Move(Item.Bounds);
+    if R_WaitUptext(['Deposit-All'], True, RandomRange(500, 800)) then
     begin
-      Mouse.Move(InvItem.Bounds);
-      if R_WaitUptext(['-All'], True, RandomRange(500, 800)) then
-      begin
-        Mouse.Click(InvItem.Bounds, MOUSE_LEFT);
-        Exit(True);
-      end else begin
-        Mouse.Click(InvItem.Bounds, MOUSE_RIGHT);
-        Wait(50 + RandomRange(50, 100));
-        Exit(R_ChooseOptions(['-All']));
-      end;
+      Mouse.Click(Item.Bounds, MOUSE_LEFT);
+      Exit(True);
+    end else begin
+      Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+      Wait(50 + RandomRange(50, 100));
+      Exit(R_ChooseOptions(['Deposit-All']));
     end;
+  end;
 
-    Mouse.Move(InvItem.Bounds);
-    Wait(50 + RandomRange(0, 50));
-    Mouse.Click(MOUSE_LEFT);
+  Mouse.Move(Item.Bounds);
+  Wait(50 + RandomRange(50, 100));
+  if R_WaitUptext(['Deposit-' + IntToStr(Amount)], True, RandomRange(200, 300)) then
+  begin
+    Mouse.Click(Item.Bounds, MOUSE_LEFT);
     Exit(True);
   end;
-end;
+
+  Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+  Wait(50 + RandomRange(50, 100));
+  if R_ChooseOptions(['Deposit-' + IntToStr(Amount)]) then
+    Exit(True);
+
+  if R_ChooseOptions(['Deposit-X']) then
+  begin
+    InputFull := RSWidget.Get(R_CHATBOX_INPUT_FULL.Group, R_CHATBOX_INPUT_FULL.Child);
+    if InputFull.ref = nil then
+      Exit(False);
+
+    while Retries < 3 do
+    begin
+      if InputFull.Text <> '*' then
+      begin
+        Keyboard.KeyDown(VK_BACK);
+        while InputFull.Text <> '*' do
+          Wait(50 + RandomRange(50, 100));
+        Keyboard.KeyUp(VK_BACK);
+      end;
+
+      Keyboard.Send(IntToStr(Amount));
+      Result := InputFull.Text = IntToStr(Amount) + '*';
+      if Result then
+      begin
+        Keyboard.PressKey(VK_ENTER);
+        Exit(True);
+      end;
+
+      Inc(Retries);
+    end;
+  end;
+end;    
 
 {*
 R_WithdrawItem
@@ -720,9 +759,7 @@ begin
   Mouse.Click(Item.Bounds, MOUSE_RIGHT);
   Wait(50 + RandomRange(50, 100));
   if R_ChooseOptions(['Withdraw-' + IntToStr(Amount)]) then
-  begin
     Exit(True);
-  end;
 
   if R_ChooseOptions(['Withdraw-X']) then
   begin
@@ -736,9 +773,7 @@ begin
       begin
         Keyboard.KeyDown(VK_BACK);
         while InputFull.Text <> '*' do
-        begin
           Wait(50 + RandomRange(50, 100));
-        end;
         Keyboard.KeyUp(VK_BACK);
       end;
 
