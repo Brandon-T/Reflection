@@ -689,6 +689,33 @@ begin
   end;
 end;    
 
+
+{*
+R_DepositItem
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if deposited specified inventory item into bank.
+  Amount = 0: Deposit all items.
+
+Example:
+    R_DepositItem(5442, 0);
+*}
+Function R_DepositItem(ID: Int32; Amount: Int32 = 1; RandomObject: Boolean = False): Boolean;
+var
+  Items: Array of TRSInventoryItem;
+begin
+  if not R_BankScreen then
+    Exit(False);
+
+  Items := R_GetInventoryItem(ID);
+
+  if Length(Items) < 1 then
+    Exit(False);
+
+  if RandomObject then
+    R_DepositSlot(Items[Random(0, High(Items))].Slot, Amount)
+  else R_DepositSlot(Items[0].Slot, Amount);
+end;
+ 
 {*
 R_WithdrawItem
 ~~~~~~~~~~~~~~~~~~~~~~
