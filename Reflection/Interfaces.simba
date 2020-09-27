@@ -100,6 +100,48 @@ type
     SKILL_OPTION_8,
     SKILL_OPTION_9);
 
+  //Furnace Crafting
+  TRing = (
+    RING_GOLD = 7,
+    RING_SAPPHIRE,
+    RING_EMERALD,
+    RING_RUBY,
+    RING_DIAMOND,
+    RING_DRAGONSTONE,
+    RING_ONYX,
+    RING_SLAYER,
+    RING_ZENYTE);
+
+  TNecklace = (
+    NECKLACE_GOLD = 21,
+    NECKLACE_SAPPHIRE,
+    NECKLACE_EMERALD,
+    NECKLACE_RUBY,
+    NECKLACE_DIAMOND,
+    NECKLACE_DRAGONSTONE,
+    NECKLACE_ONYX,
+    NECKLACE_ZENYTE);
+
+  TAmulet = (
+    AMULET_GOLD = 34,
+    AMULET_SAPPHIRE,
+    AMULET_EMERALD,
+    AMULET_RUBY,
+    AMULET_DIAMOND,
+    AMULET_DRAGONSTONE,
+    AMULET_ONYX,
+    AMULET_ZENYTE);
+
+  TBracelet = (
+    BRACELET_GOLD = 46,
+    BRACELET_SAPPHIRE,
+    BRACELET_EMERALD,
+    BRACELET_RUBY,
+    BRACELET_DIAMOND,
+    BRACELET_DRAGONSTONE,
+    BRACELET_ONYX,
+    BRACELET_ZENYTE);
+
 
 {*
 R_WidgetIsHidden
@@ -558,4 +600,262 @@ begin
     end;
   end;
   RSTypeArray(Widgets).Free;
+end;
+
+{*
+CRAFTING JEWELRY
+~~~~~
+Functions for crafting jewelry at the furnace.
+*}
+
+{*
+R_JewelryScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the jewelry screen is valid.
+
+Example:
+  if R_JewelryScreen then
+    ...
+*}
+Function R_JewelryScreen: Boolean;
+begin
+  Result := RSWidget.IsValid(R_CRAFTING_CONTAINER.Group, R_CRAFTING_CONTAINER.Child);
+end;
+
+{*
+R_WaitJewelryScreen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the Jewelry screen is valid within the time specified.
+
+Example:
+  if R_WaitJewelryScreen(200) then
+    ...
+*}
+Function R_WaitJewelryScreen(timeout: UInt32): Boolean;
+begin
+  Result := WaitUntil(R_JewelryScreen, 50, timeout);
+end;
+
+{*
+R_JewelrySetAmount
+~~~~~~~~~~~~~~~~
+Chooses the amount of jewelry items to craft using the furnace.
+  Amount = 0: All
+
+Example:
+  if R_JewelrySetAmount(14) then
+    ...
+*}
+Function R_JewelrySetAmount(Amount: Integer): Boolean;
+var
+  JewelryWidget, InputText: RSWidget;
+  T, Retries: Integer;
+begin
+  if (not R_JewelryScreen) or (R_WidgetIsHidden(R_CRAFTING_AMOUNT_CONTAINER)) then
+    Exit(False);
+
+  if ((Amount = 0) or (Amount = 1) or (Amount = 5) or (Amount = 10)) then
+  begin
+    Case Amount of
+      0: JewelryWidget := RSWidget.Get(R_CRAFTING_MAKE_ALL.Group, R_CRAFTING_MAKE_ALL.Child);
+      1: JewelryWidget := RSWidget.Get(R_CRAFTING_MAKE_1.Group, R_CRAFTING_MAKE_1.Child);
+      5: JewelryWidget := RSWidget.Get(R_CRAFTING_MAKE_5.Group, R_CRAFTING_MAKE_5.Child);
+      10: JewelryWidget := RSWidget.Get(R_CRAFTING_MAKE_10.Group, R_CRAFTING_MAKE_10.Child);
+    end;
+
+    if JewelryWidget.ref = nil then
+      Exit(False);
+
+    Mouse.Click(JewelryWidget.Bounds, MOUSE_LEFT);
+    Result := True;
+    JewelryWidget.Free;
+  end else if (IntToStr(Amount) in RSWidget.Get(R_CRAFTING_MAKE_CUSTOM_TEXT.Group, R_CRAFTING_MAKE_CUSTOM_TEXT.Child, R_CRAFTING_MAKE_CUSTOM_TEXT.Index).Text) then
+  begin
+    JewelryWidget := RSWidget.Get(R_CRAFTING_MAKE_CUSTOM.Group, R_CRAFTING_MAKE_CUSTOM.Child, R_CRAFTING_MAKE_CUSTOM.Index);
+
+    if JewelryWidget.ref = nil then
+      Exit(False);
+
+    Mouse.Click(JewelryWidget.Bounds, MOUSE_LEFT);
+    Result := True;
+    JewelryWidget.Free;
+  end else
+  begin
+    JewelryWidget := RSWidget.Get(R_CRAFTING_MAKE_X.Group, R_CRAFTING_MAKE_X.Child);
+    if JewelryWidget.ref = nil then
+      Exit(False);
+
+    Mouse.Click(JewelryWidget.Bounds, MOUSE_LEFT);
+    Wait(260, RandomRange(560, 730));
+    if (RSWidget.Get(R_CHATBOX_INPUT_TITLE.Group, R_CHATBOX_INPUT_TITLE.Child).Text.Startswith("Enter amount:")) then
+    begin
+      InputText := RSWidget.Get(R_CHATBOX_INPUT_FULL.Group, R_CHATBOX_INPUT_FULL.Child);
+      if InputText.ref = nil then
+        Exit(False);
+
+      T := GetTickCount;
+      while (Retries < 3) and (GetTickCount - T < 5000) do
+      begin
+        if InputText.Text <> '*' then
+        begin
+          Keyboard.KeyDown(VK_BACK);
+          while InputText.Text <> '*' do
+          begin
+            Wait(50 + RandomRange(50, 100));
+          end;
+          Keyboard.KeyUp(VK_BACK);
+        end;
+
+        Keyboard.Send(IntToStr(Amount));
+        Result := InputText.Text = IntToStr(Amount) + '*';
+        if Result then
+        begin
+          Keyboard.PressKey(VK_ENTER);
+          InputText.Free;
+          JewelryWidget.Free;
+          Exit(True);
+        end;
+
+        Inc(Retries);
+      end;
+    end;
+    JewelryWidget.Free;
+  end;
+end;
+
+{*
+R_CraftJewelry
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item was crafted.
+  Acceptable Inputs:
+    RING_GOLD
+    RING_SAPPHIRE
+    RING_EMERALD
+    RING_RUBY
+    RING_DIAMOND
+    RING_DRAGONSTONE
+    RING_ONYX
+    RING_SLAYER
+    RING_ZENYTE
+
+Example:
+  if R_CraftJewelry(RING_RUBY) then
+    ...
+*}
+Function R_CraftJewelry(Jewelry: TRing): Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not R_JewelryScreen) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_INTERFACE_CRAFTING_FURNACE, Ord(Jewelry));
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+{*
+R_CraftJewelry
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item was crafted.
+  Acceptable Inputs:
+    NECKLACE_GOLD
+    NECKLACE_SAPPHIRE
+    NECKLACE_EMERALD
+    NECKLACE_RUBY
+    NECKLACE_DIAMOND
+    NECKLACE_DRAGONSTONE
+    NECKLACE_ONYX
+    NECKLACE_ZENYTE
+
+Example:
+  if R_CraftJewelry(NECKLACE_EMERALD) then
+    ...
+*}
+Function R_CraftJewelry(Jewelry: TNecklace): Boolean; overload;
+var
+  Widget: RSWidget;
+begin
+  if (not R_JewelryScreen) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_INTERFACE_CRAFTING_FURNACE, Ord(Jewelry));
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+{*
+R_CraftJewelry
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item was crafted.
+  Acceptable Inputs:
+    AMULET_GOLD
+    AMULET_SAPPHIRE
+    AMULET_EMERALD
+    AMULET_RUBY
+    AMULET_DIAMOND
+    AMULET_DRAGONSTONE
+    AMULET_ONYX
+    AMULET_ZENYTE
+
+Example:
+  if R_CraftJewelry(AMULET_DIAMOND) then
+    ...
+*}
+Function R_CraftJewelry(Jewelry: TAmulet): Boolean; overload;
+var
+  Widget: RSWidget;
+begin
+  if (not R_JewelryScreen) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_INTERFACE_CRAFTING_FURNACE, Ord(Jewelry));
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+{*
+R_CraftJewelry
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item was crafted.
+  Acceptable Inputs:
+    BRACELET_GOLD
+    BRACELET_SAPPHIRE
+    BRACELET_EMERALD
+    BRACELET_RUBY
+    BRACELET_DIAMOND
+    BRACELET_DRAGONSTONE
+    BRACELET_ONYX
+    BRACELET_ZENYTE
+
+Example:
+  if R_CraftJewelry(BRACELET_DRAGONSTONE) then
+    ...
+*}
+Function R_CraftJewelry(Jewelry: TBracelet): Boolean; overload;
+var
+  Widget: RSWidget;
+begin
+  if (not R_JewelryScreen) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_INTERFACE_CRAFTING_FURNACE, Ord(Jewelry));
+  if Widget.ref <> nil then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
 end;

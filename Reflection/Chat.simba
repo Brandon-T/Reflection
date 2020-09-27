@@ -114,6 +114,21 @@ begin
 end;
 
 {*
+R_ChatChooseOptionIsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if chat option is open.
+
+Example:
+    if R_ChatChooseOptionIsOpen then
+      Keyboard.Send("2");
+      ...
+*}
+Function R_ChatChooseOptionIsOpen: Boolean;
+begin
+  Result := RSWidget.Get(R_CHATBOX_NPC_DIALOG_OPTION.Group, R_CHATBOX_NPC_DIALOG_OPTION.Child).ref <> nil;
+end;  
+
+{*
 R_ChatChooseOption
 ~~~~~~~~~~~~~~~~~~~~~~
 Returns true if selected specified chat option.

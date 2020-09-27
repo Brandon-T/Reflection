@@ -91,7 +91,7 @@ begin
         Offset := 21 + (I * 16); // + RandomRange(2, 10);
 
         //Small characters are 4 pixels wide with a 4px offset from the left
-        OptionBounds := Box(Bounds.X1 + 4, Bounds.Y1 + Offset + 2, Bounds.X1 + 4 + ((Length(Items[I]) * 4) - 4), Bounds.Y1 + Offset + 10);
+        OptionBounds := Box(Bounds.X1 + 4, Bounds.Y1 + Offset, Bounds.X1 + 4 + ((Length(Items[I]) * 4) - 4), Bounds.Y1 + Offset + 7);
         Mouse.Move(OptionBounds);
         GetMousePos(X, Y);
         if PointInBox(Point(X, Y), OptionBounds) then
@@ -103,7 +103,7 @@ begin
     end;
   end;
   Result := False;
-end;
+end;  
 
 {*
 R_WaitChooseOptions
