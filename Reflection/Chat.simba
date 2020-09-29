@@ -46,8 +46,8 @@ begin
       Inc(Count);
     end;
 
-    Name := Children[I].Text;
-    Message := Children[I + 1].Text;
+    Name := Children[I].Text.Replace(Char($C2) + Char($A0), ' ');
+    Message := Children[I + 1].Text.Replace(Char($C2) + Char($A0), ' ');
 
     if (Name = '') and (Message = '') then
       break;
@@ -64,7 +64,7 @@ begin
 end;
 
 {*
-R_ChatMessages
+R_ChatDialog
 ~~~~~~~~~~~~~~~~~~~~~~
 Returns true if the Chat Dialog is open.
 
@@ -92,7 +92,7 @@ begin
 end;
 
 {*
-R_ChatMessages
+R_ChatInput
 ~~~~~~~~~~~~~~~~~~~~~~
 Returns true if the chat input option is open (Chat screen with '*').
 
