@@ -56,7 +56,7 @@ begin
   if NameInfo.ref = nil then
     Exit;
 
-  Result := NameInfo.Name;
+  Result := NameInfo.Name.Replace(Char($C2) + Char($A0), ' ');
   NameInfo.Free;
 end;
 
