@@ -46,8 +46,8 @@ begin
       Inc(Count);
     end;
 
-    Name := Children[I].Text.Replace(Char($C2) + Char($A0), ' ');
-    Message := Children[I + 1].Text.Replace(Char($C2) + Char($A0), ' ');
+    Name := Children[I].Text.SanitizeRS;
+    Message := Children[I + 1].Text.SanitizeRS;
 
     if (Name = '') and (Message = '') then
       break;
