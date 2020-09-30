@@ -5,6 +5,7 @@
 {$include_once RSPlayerDefinition.simba}
 {$include_once RSIterableHashTable.simba}
 {$include_once RSAnimation.simba}
+{$include_once RSText.simba}
 
 
 Function RSPlayer.Me: RSLocalPlayer; static;
@@ -56,7 +57,7 @@ begin
   if NameInfo.ref = nil then
     Exit;
 
-  Result := NameInfo.Name.Replace(Char($C2) + Char($A0), ' ');
+  Result := NameInfo.Name.SanitizeRS;
   NameInfo.Free;
 end;
 
