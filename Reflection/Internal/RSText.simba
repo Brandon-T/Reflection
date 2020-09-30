@@ -1,3 +1,31 @@
+Function AnsiString.ReplaceCharacters(characters: Array of UInt8; replacement: String): String; constref;
+var
+  i: Int32;
+  str: String;
+begin
+  for i := 0 to high(characters) do
+    str += Char(characters[i]);
+
+  Result := self.replace(str, replacement, [rfReplaceAll]);
+end;
+
+{$IFDEF USE_THOROUGH_SANITIZATION}
+Function AnsiString.SanitizeRS(): String; constref;
+begin
+  Result := self.ReplaceCharacters([$C2, $A0], ' ');
+  Result := Result.Replace('<lt>', '<', [rfReplaceAll]);
+  Result := Result.Replace('<gt>', '>', [rfReplaceAll]);
+  Result := Result.Replace('<br>', #10, [rfReplaceAll]);
+  Result := Result.Replace('<br />', #10, [rfReplaceAll]);
+  Result := Result.ReplaceCharacters([13, 10], #10);
+  Result := Result.Replace(#13, #10, [rfReplaceAll]);
+end;
+{$ELSE}
+Function AnsiString.SanitizeRS: String; constref;
+begin
+  Result := self.ReplaceCharacters([$C2, $A0], ' ');
+end;
+{$ENDIF}
 
 Function StripHTML(Str: String): String;
 var
