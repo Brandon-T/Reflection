@@ -1,7 +1,7 @@
 {$include_once Internal/RSWidget.simba}
 {$include_once Interfaces.simba}
-type
-  TRSWorldScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
+{$include_once Lobby.simba}
+{$include_once Worlds.simba}
 
 (*
 LOGIN
@@ -10,303 +10,372 @@ LOGIN
   Login functions.
 *)
 
+type
+  TRSLogin = record
+    RootPoint: TPoint;
+    LoginEntryBox: TBox;
+    PasswordEntryBox: TBox;
+    LoginButtonBox: TBox;
+    CancelButtonBox: TBox;
+    ResponseBox: TBox;
+    WorldBox: TBox;
+    ExistingUserBox: TBox;
+    TryAgainBox: TBox;
+    WarningBox: TBox;
+    BackBox: TBox;
+    OkBox: TBox;
+ end;
+
+const
+  COLOR_LOGIN_YELLOW = 65535;
+  COLOR_LOGIN_WHITE = 16777215;
+
+var
+  R_LoginScreen: TRSLogin;
+
+{*
+TRSLogin.__Setup
+~~~~~~~~~~~~~~~~
+Sets up the locations of different options on the login page based on the size
+  of your client.
+*}
+Procedure TRSLogin.__Setup;
+var
+  X, Y, LoginDTM: Integer;
+begin
+  with Self do
+  begin
+    LoginDTM := DTMFromString('mkwEAAHicE2ZgYOBmZGAwAeJIIE4DYj8gLgPieCYGhk9AejEQbwfiKiC2A2JRIF4CxMeB+AsQKwLVpQHxRCAWA5pXBcTFQJwMxIlAnALEqkDsAsQxUDF5INYA4mAgtgHiqVD1rVD5iUDML8DL8P2bI0NUuDDDo8fvwGxJGRkGWzt3Bg+vIAa/gFiGlav3ouDcglqGzt65DLEJ+WB1IDUgtdQEjFTEWAAANNMplA==');
+    FindDTM(LoginDTM, X, Y, GetClientBounds);
+    self.RootPoint := Point(X, Y);
+    FreeDTM(LoginDTM);
+    OkBox := [143 + self.RootPoint.X, 306 - self.RootPoint.Y, 279 + self.RootPoint.X, 337 - self.RootPoint.Y];
+    LoginEntryBox := [142 + self.RootPoint.X, 264 - self.RootPoint.Y, 371 + self.RootPoint.X, 275 - self.RootPoint.Y];
+    PasswordEntryBox := [171 + self.RootPoint.X, 278 - self.RootPoint.Y, 371 + self.RootPoint.X, 291 - self.RootPoint.Y];
+    ResponseBox := [30 + self.RootPoint.X, 154 + self.RootPoint.Y, 390 + self.RootPoint.X, 217 + self.RootPoint.Y];
+    ExistingUserBox := [224 + self.RootPoint.X, 253 + self.RootPoint.Y, 358 + self.RootPoint.X, 284 + self.RootPoint.Y];
+    TryAgainBox := [144 + self.RootPoint.X, 238 + self.RootPoint.Y, 277 + self.RootPoint.X, 269 + self.RootPoint.Y];
+    BackBox := [144 + self.RootPoint.X, 288 + self.RootPoint.Y, 277 + self.RootPoint.X, 320 + self.RootPoint.Y];
+    LoginButtonBox := [62 + self.RootPoint.X, 283 + self.RootPoint.Y, 197 + self.RootPoint.X, 316 + self.RootPoint.Y];
+    CancelButtonBox := [224 + self.RootPoint.X, 283 + self.RootPoint.Y, 358 + self.RootPoint.X, 316 + self.RootPoint.Y];
+    WorldBox := [-162 + self.RootPoint.X, 442 + self.RootPoint.Y, -71 + self.RootPoint.X, 474 + self.RootPoint.Y];
+  end;
+end;
+
+{*
+TRSLogin.IsOpen
+~~~~~~~~~~~~~~~
+Returns true if any part of the login page is visible.
+*}
+Function TRSLogin.IsOpen: Boolean;
+var
+  X, Y, LoginDTM: Integer;
+begin
+  LoginDTM := DTMFromString('mkwEAAHicE2ZgYOBmZGAwAeJIIE4DYj8gLgPieCYGhk9AejEQbwfiKiC2A2JRIF4CxMeB+AsQKwLVpQHxRCAWA5pXBcTFQJwMxIlAnALEqkDsAsQxUDF5INYA4mAgtgHiqVD1rVD5iUDML8DL8P2bI0NUuDDDo8fvwGxJGRkGWzt3Bg+vIAa/gFiGlav3ouDcglqGzt65DLEJ+WB1IDUgtdQEjFTEWAAANNMplA==');
+  Result := FindDTM(LoginDTM, X, Y, GetClientBounds);
+  FreeDTM(LoginDTM);
+end;
+
+{*
+TRSLogin.IsWelcomeOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the 'Welcome' information is displayed on login page.
+*}
+Function TRSLogin.IsWelcomeOpen: Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Existing User', 'UpChars07_s', COLOR_LOGIN_WHITE, 1, Self.ExistingUserBox);
+end;
+
+{*
+TRSLogin.IsInvaildDetailsOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the 'Invalid Credentials' information is displayed on login page.
+*}
+Function TRSLogin.IsInvaildDetailsOpen: Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Try again', 'SmallChars07', COLOR_LOGIN_WHITE, 1, Self.TryAgainBox);
+end;
+
+{*
+TRSLogin.IsDisabledOpen
+~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the 'Disabled' information is displayed on login page.
+*}
+Function TRSLogin.IsDisabledOpen: Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Back', 'UpChars07_s', COLOR_LOGIN_WHITE, 1, Self.BackBox);
+end;
+
+{*
+TRSLogin.IsDisconnectedOpen
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the 'Disconnected' information is displayed on login page.
+*}
+Function TRSLogin.IsDisconnectedOpen: Boolean;
+var
+  P: TPoint;
+begin
+  Result := srl.FindText(P, 'Ok', 'UpChars07_s', COLOR_LOGIN_WHITE, 1, Self.OkBox);
+end;
+
+{*
+TRSLogin.Open
+~~~~~~~~~~~~~
+Returns true if the login screen was opened.
+*}
+Function TRSLogin.Open: Boolean;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + 10000;
+  while (T > GetTickCount()) do
+  begin
+    if Self.IsOpen() then
+    begin
+      if Self.IsWelcomeOpen() then
+        Mouse.Click(Self.ExistingUserBox, mouse_Left);
+      if Self.IsInvaildDetailsOpen() then
+        Mouse.Click(Self.TryAgainBox, mouse_Left);
+      if Self.IsDisabledOpen() then
+        Mouse.Click(Self.BackBox, mouse_Left);
+      if Self.IsDisconnectedOpen() then
+        Mouse.Click(Self.OkBox, mouse_Left);
+    end;
+
+    if Self.IsOpen() and
+      (not Self.IsWelcomeOpen()) and (not Self.IsInvaildDetailsOpen()) and
+      (not Self.IsDisabledOpen) and (not Self.IsDisconnectedOpen()) then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
+end;
+
+{*
+TRSLogin.IsCaret
+~~~~~~~~~~~~~~~~
+Returns true if the blinking cursor is present in the box.
+*}
+Function TRSLogin.IsCaret(B: TBox): Boolean;
+var
+  T: UInt64;
+begin
+  T := GetTickCount() + Random(600, 800);
+
+  while (T > GetTickCount()) do
+  begin
+    if (CountColor(COLOR_LOGIN_YELLOW, B) > 0) then
+      Exit(True);
+
+    Wait(Random(50, 100));
+  end;
+end;
+
+{*
+TRSLogin.SetCaret
+~~~~~~~~~~~~~~~~~
+Returns true if the blinking cursor was moved into the desired box.
+*}
+Function TRSLogin.SetCaret(B: TBox): Boolean;
+begin
+  if IsCaret(B) then
+    Exit(True);
+  Keyboard.PressKey(VK_TAB);
+  if IsCaret(B) then
+    Exit(True);
+end;
+
+{*
+TRSLogin.EnterLogin
+~~~~~~~~~~~~~~~~~~~
+Returns true if we have entered the account's username/email.
+*}
+Function TRSLogin.EnterLogin(Login: String): Boolean;
+begin
+  if (GetTextAtEx(Self.LoginEntryBox, 0, 3, 3, COLOR_LOGIN_WHITE, 0, 'UpChars07_s') = Login) then
+    Exit(True);
+
+  if SetCaret(Self.LoginEntryBox) then
+  begin
+    while (CountColor(COLOR_LOGIN_WHITE, Self.LoginEntryBox) > 0) do
+    begin
+      Keyboard.PressKey(VK_BACK);
+
+      Wait(Random(30, 130));
+    end;
+
+    Keyboard.Send(Login);
+
+    Exit(True);
+  end;
+end;
+
+{*
+TRSLogin.EnterPassword
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if we have entered the account's password.
+*}
+Function TRSLogin.EnterPassword(Password: String): Boolean;
+begin
+  if SetCaret(Self.PasswordEntryBox) then
+  begin
+    while (CountColor(COLOR_LOGIN_WHITE, Self.PasswordEntryBox) > 0) do
+    begin
+      Keyboard.PressKey(VK_BACK);
+
+      Wait(Random(30, 130));
+    end;
+
+    Keyboard.Send(Password);
+
+    Exit(True);
+  end;
+end
+
+{*
+TRSLogin.EnterDetails
+~~~~~~~~~~~~~~~~~~~~~
+Returns true if we have entered the login details.
+*}
+Function TRSLogin.EnterDetails(Login, Password: String): Boolean;
+begin
+  if Self.Open() and EnterLogin(Login) and EnterPassword(Password) then
+  begin
+    Keyboard.PressKey(VK_RETURN);
+    Exit(True);
+  end;
+end;
+
+{*
+TRSLogin.OpenWorldSwitcher
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if we have opened the world switcher.
+*}
+Function TRSLogin.OpenWorldSwitcher(): Boolean;
+begin
+  if (WorldPanel.IsOpen()) then
+    Exit(True);
+
+  if Self.IsOpen() then
+  begin
+    Mouse.Click(Self.WorldBox, mouse_Left);
+
+    if WaitUntil(WorldPanel.isOpen(), 50, Random(2500, 3500)) then
+      Exit(True);
+  end else
+    Writeln('Cannot open world switcher - Login screen not open');
+end;
+
+{*
+TRSLogin.GetResponse
+~~~~~~~~~~~~~~~~~~~~
+Returns the response on the login window.
+*}
+Function TRSLogin.GetResponse: String;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  i: Integer;
+begin
+  if (FindColors(TPA, COLOR_LOGIN_YELLOW, Self.ResponseBox)) then
+  begin
+    ATPA := SplitTPAEx(TPA, 10, 1);
+    SortATPAFromFirstPointY(ATPA, Point(0, 0));
+    for i := 0 to High(ATPA) do
+      Result += Trim(GetTextAtEx(GetTPABounds(ATPA[i]), 0, 3, 3, COLOR_LOGIN_YELLOW, 0, 'UpChars07_s'));
+  end;
+end;
+
+{*
+TRSLogin.WaitResponse
+~~~~~~~~~~~~~~~~~~~~~~
+Returns waits to get a response after an attempt to log in.
+*}
+Function TRSLogin.WaitResponse: String;
+const
+  VAILD_CONNECTING = 'Connecting to server...';
+var
+  T: UInt64;
+begin
+  // First wait for connectiong response
+  T := GetTickCount() + 5000;
+  while Self.IsOpen() and (Result <> VAILD_CONNECTING) and (T > GetTickCount()) do
+  begin
+    Result := GetResponse();
+
+    Wait(Random(50, 100));
+  end;
+
+  // Wait until connecting response has gone
+  while Self.IsOpen() and (Result = VAILD_CONNECTING) do
+  begin
+    Result := GetResponse();
+
+    Wait(Random(50, 100));
+  end;
+
+  Result := GetResponse();
+end;
+
+{*
+TRSLogin.GetCurrentWorld
+~~~~~~~~~~~~~~~~~~~~~~~~
+Returns the world that is selected.
+
+Example:
+  if (MyPlayer.GetCurrentWorld <> 400)  then
+    ...
+*}
+
+Function TRSLogin.GetCurrentWorld: Int32;
+var
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+begin
+  if Self.IsOpen and FindColors(TPA, COLOR_LOGIN_WHITE, Self.WorldBox) then
+  begin
+    ATPA := SplitTPAEx(TPA, 10, 3);
+    SortATPAFromFirstPointY(ATPA, [0, 0]);
+
+    Result := StrToIntDef(ExtractFromStr(GetTextAtEx(GetTPABounds(ATPA[0]), 0, 3, 3, COLOR_LOGIN_WHITE, 0, 'UpChars07_s'), Numbers), -1);
+  end;
+end;
+
+{*
+TRSLogin.IsLoggedIn
+~~~~~~~~~~~~~~~~~~~
+Checks the login state to see if we are logged in.
+
+Example:
+  if not MyPlayer.IsLoggedIn then
+    MyPlayer.Login;
+*}
+
+Function TRSLogin.IsLoggedIn: Boolean;
+begin
+  Result := (not R_IsLobbyOpen) and (RGetInt(R_EIOS, nil, Client_GameState) = 30) and (RGetInt(R_EIOS, nil, Client_LoginState) = 2);
+end;
+
 {*
 R_IsLoggedIn
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 Checks the login state to see if we are logged in.
-  Note: Will result true if entering username and password.
+
+Example:
+  if not R_IsLoggedIn then
+    MyPlayer.Login;
 *}
 Function R_IsLoggedIn: Boolean;
 begin
-  Result := RGetInt(R_EIOS, nil, Client_LoginState) = 2;
-end;    
-
-(*
-LOBBY INTERFACE
-================
-
-  Lobby Interface functionality.
-*)
-
-{*
-R_IsLobbyOpen
-~~~~~~~~~~~~~~~~~~~~~~
-Checks to see if the Lobby is open.
-*}
-Function R_IsLobbyOpen: Boolean;
-begin
-  Result := RSWidget.IsValid(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
+  Result := R_LoginScreen.IsLoggedIn;
 end;
 
-Function R_WaitIsLobbyOpen(timeout: UInt32): Boolean;
 begin
-  Result := WaitUntil(R_IsLobbyOpen, 50, timeout);
-end;
-
-{*
-R_EnterGame
-~~~~~~~~~~~~~~~~~~~~~~
-Checks if we are in the Lobby and clicks the 'Click here to play' button if true.
-*}
-Function R_EnterGame(): Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not R_IsLobbyOpen) or R_WidgetIsHidden(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER) then
-    Exit(False);
-
-  Widget := RSWidget.Get(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
-end;
-
-(*
-LOGOUT INTERFACE
-================
-
-  Logout Tab functionality.
-*)
-
-{*
-R_Logout
-~~~~~~~~~~~~~~~~~~~~~~
-Logs the player out of the game.
-
-Example:
-    R_Logout;
-*}
-Function R_Logout: Boolean;
-var
-  Widget: RSWidget;
-begin
-  R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-
-  if (RSWidget.IsValid(R_LOGOUT_CONTAINER.Group, R_LOGOUT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_LOGOUT_LOGOUT_BUTTON)) then
-  begin
-    Widget := RSWidget.Get(R_LOGOUT_LOGOUT_BUTTON.Group, R_LOGOUT_LOGOUT_BUTTON.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end else if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_LOGOUT_BUTTON)) then
-  begin
-    Widget := RSWidget.Get(R_WORLD_SWITCHER_LOGOUT_BUTTON.Group, R_WORLD_SWITCHER_LOGOUT_BUTTON.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end;
-end;
-
-{*
-R_CloseWorldSwitcher
-~~~~~~~~~~~~~~~~~~~~~~
-Closes the world switcher and returns to the main logout tab.
-
-Example:
-    R_CloseWorldSwitcher;
-*}
-Function R_CloseWorldSwitcher(): Boolean;
-var
-  Widget: RSWidget;
-begin
-  R_OpenGametab(GAMETAB_LOGOUT);
-  Wait(50, RandomRange(250, 692));
-
-  if (RSWidget.IsValid(R_WORLD_SWITCHER_CONTAINER.Group, R_WORLD_SWITCHER_CONTAINER.Child)) and (not R_WidgetIsHidden(R_WORLD_SWITCHER_CLOSE)) then
-  begin
-    Widget := RSWidget.Get(R_WORLD_SWITCHER_CLOSE.Group, R_WORLD_SWITCHER_CLOSE.Child);
-    if Widget.ref <> nil then
-    begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-      Result := True;
-      Widget.Free;
-    end;
-  end
-
-end;
-
-{*
-R_OpenWorldSwitcher
-~~~~~~~~~~~~~~~~~~~~~~
-Opens the world switcher.
-
-Example:
-    R_OpenWorldSwitcher;
-*}
-Function R_OpenWorldSwitcher: Boolean;
-var
-  Widget: RSWidget;
-begin
-  R_OpenGametab(GAMETAB_LOGOUT);
-
-  Wait(50, RandomRange(250, 692));
-
-  if (not R_WaitUntilVisible(R_LOGOUT_CONTAINER, 2500)) or R_WidgetIsHidden(R_LOGOUT_WORLD_SWITCHER_BUTTON) then
-    Exit(False);
-
-  Widget := RSWidget.Get(R_LOGOUT_WORLD_SWITCHER_BUTTON.Group, R_LOGOUT_WORLD_SWITCHER_BUTTON.Child);
-  if Widget.ref <> nil then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := R_WaitUntilVisible(R_WORLD_SWITCHER_SCROLL_UP, 2500);
-    Widget.Free;
-  end;
-end;
-
-{*
-R_WorldToBox
-~~~~~~~~~~~~~~~~~~~~~~
-Utility function that converts a given world to mainscreen coordinates.
-
-Example:
-    R_WorldToBox(500);
-*}
-Function R_WorldToBox(World: Int32): TBox;
-var
-  WorldWidget: RSWidget;
-begin
-  WorldWidget := RSWidget.Get(R_WORLD_SWITCHER_LIST.Group, R_WORLD_SWITCHER_LIST.Child, World);
-  Result := WorldWidget.Bounds;
-  WorldWidget.Free;
-end;
-
-{*
-R_ScrollToWorld
-~~~~~~~~~~~~~~~~~~~~~~
-Scrolls to the proper world in the world switcher.
-
-Example:
-    R_ScrollToWorld(500, TRSWorldScroll.SCROLLBAR);
-*}
-Function R_ScrollToWorld(World: Int32; ScrollType: TRSWorldScroll = TRSWorldScroll.SCROLLWHEEL): Boolean;
-var
-  ScrollBar, ScrollArrow, WorldContainer: RSWidget;
-  WorldContainerBounds: TBox;
-  T: Timer;
-  Direction: Boolean;
-  P: TPoint;
-begin
-  WorldContainer := RSWidget.Get(R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Group, R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Child);
-  if WorldContainer.ref = nil then
-    Exit(False);
-
-  //Adds a buffer to make sure that the world is completely clickable
-  WorldContainerBounds := [WorldContainer.Bounds.X1, WorldContainer.Bounds.Y1 + 15, WorldContainer.Bounds.X2, WorldContainer.Bounds.Y2 - 15];
-  WorldContainer.Free;
-
-  if WorldContainerBounds.Contains(R_WorldToBox(World)) then
-    Exit(True);
-
-  Direction := WorldContainerBounds.Middle.Y > R_WorldToBox(World).Middle.Y;
-
-  //Scroll the interface using the mouse-wheel
-  if ScrollType = TRSWorldScroll.SCROLLWHEEL then
-  begin
-    Mouse.Move(WorldContainerBounds);
-
-    T.Start;
-    while not WorldContainerBounds.Contains(R_WorldToBox(World)) do
-    begin
-      if T.ElapsedTime > 5000 then
-        Exit(False);
-
-      Mouse.Scroll(3, Direction);
-    end;
-
-    Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
-  end;
-
-  //Scroll the interface using the scroll-bar
-  if ScrollType = TRSWorldScroll.SCROLLBAR then
-  begin
-    ScrollBar := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_BAR.Group, R_WORLD_SWITCHER_SCROLL_BAR.Child, R_WORLD_SWITCHER_SCROLL_BAR.Index);
-    if ScrollBar.ref = nil then
-      Exit(False);
-
-    Mouse.Move(ScrollBar.Bounds);
-    Mouse.Hold(MOUSE_LEFT);
-    ScrollBar.Free;
-
-    T.Start;
-    while not WorldContainerBounds.Contains(R_WorldToBox(World)) do
-    begin
-      if T.ElapsedTime > 5000 then
-      begin
-        Mouse.Release(MOUSE_LEFT);
-        Exit(False);
-      end;
-
-      P := Mouse.GetPosition;
-      if Direction then
-        Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
-      else
-        Mouse.Move(P.X + RandomRange(-1, 1), P.Y + RandomRange(3, 7));
-    end;
-
-    Mouse.Release(MOUSE_LEFT);
-    Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
-  end;
-
-  //Scroll the interface using the arrows
-  if ScrollType = TRSWorldScroll.SCROLLARROWS then
-  begin
-    if Direction then
-      ScrollArrow := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_UP.Group, R_WORLD_SWITCHER_SCROLL_UP.Child, R_WORLD_SWITCHER_SCROLL_UP.Index)
-    else
-      ScrollArrow := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_DOWN.Group, R_WORLD_SWITCHER_SCROLL_DOWN.Child, R_WORLD_SWITCHER_SCROLL_DOWN.Index);
-
-    if ScrollArrow.ref = nil then
-      Exit(False);
-
-    Mouse.Move(ScrollArrow.Bounds);
-    Mouse.Hold(MOUSE_LEFT);
-    ScrollArrow.Free;
-
-    T.Start;
-    while not WorldContainerBounds.Contains(R_WorldToBox(World)) do
-    begin
-      if T.ElapsedTime > 20000 then
-      begin
-        Mouse.Release(MOUSE_LEFT);
-        Exit(False);
-      end;
-    end;
-
-    Mouse.Release(MOUSE_LEFT);
-    Exit(WorldContainerBounds.Contains(R_WorldToBox(World).Middle));
-  end;
-end;
-
-{*
-R_SelectWorld
-~~~~~~~~~~~~~~~~~~~~~~
-Clicks on the selected world if it is visible in the list.
-
-Example:
-    R_SelectWorld(500);
-*}
-Function R_SelectWorld(World: Int32): Boolean;
-var
-  Widget: RSWidget;
-begin
-  if (not RSWidget.IsValid(R_WORLD_SWITCHER_LIST.Group, R_WORLD_SWITCHER_LIST.Child, World)) or R_WidgetIsHidden(R_WORLD_SWITCHER_LIST) then
-    Exit(False);
-
-  Widget := RSWidget.Get(R_WORLD_SWITCHER_LIST.Group, R_WORLD_SWITCHER_LIST.Child, World);
-  if (Widget.ref <> nil) and (RSWidget.Get(R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Group, R_WORLD_SWITCHER_LIST_INTERFACE_CONTAINER_CHILD.Child).Bounds.Contains(Widget.Bounds)) then
-  begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
-    Result := True;
-    Widget.Free;
-  end;
+  R_LoginScreen.__Setup;
 end;
