@@ -202,7 +202,7 @@ const //Widgets
   { BANK }
   R_BANK_CONTAINER: RWidget =                       [R_INTERFACE_BANK, 1];
   R_BANK_CONTAINER_CHILD: RWidget =                 [R_INTERFACE_BANK, 2];
-  R_BANK_CLOSE: RWidget =                           [R_INTERFACE_BANK, 2, 3];
+  R_BANK_CLOSE: RWidget =                           [R_INTERFACE_BANK, 2, 11];
   R_BANK_TITLE_BAR: RWidget =                       [R_INTERFACE_BANK, 3];
   R_BANK_HELP_CONTAINER: RWidget =                  [R_INTERFACE_BANK, 4];
   R_BANK_CAPACITY_USED: RWidget =                   [R_INTERFACE_BANK, 5];
@@ -1078,6 +1078,8 @@ const //Widgets
   R_ANVIL_AMOUNT_MAKE_10: RWidget =                  [R_INTERFACE_ANVIL, 5];
   R_ANVIL_AMOUNT_MAKE_X: RWidget =                   [R_INTERFACE_ANVIL, 6];
   R_ANVIL_AMOUNT_MAKE_ALL: RWidget =                 [R_INTERFACE_ANVIL, 7];
+  R_ANVIL_AMOUNT_MAKE_CUSTOM: RWidget =              [R_INTERFACE_ANVIL, 8];
+  R_ANVIL_AMOUNT_MAKE_CUSTOM_TEXT: RWidget =         [R_INTERFACE_ANVIL, 8, 9];
 
   R_ANVIL_SMITH_DAGGER: RWidget =                    [R_INTERFACE_ANVIL, 9];
   R_ANVIL_SMITH_SWORD: RWidget =                     [R_INTERFACE_ANVIL, 10];
@@ -1109,4 +1111,5 @@ const //Widgets
   
   //Texture (Sprite) ID
   R_BUTTON_CENTER_HIGHLIGHT_RED = 1154;
-  R_BUTTON_CENTER_HIGHLIGHT_GREY = 1145; 
+  R_BUTTON_CENTER_HIGHLIGHT_GREY = 1145;
+  R_BUTTON_CENTER_UNSELECTED_ANVIL = 1040;

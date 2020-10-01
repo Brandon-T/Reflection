@@ -1,5 +1,6 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
+{$include_once Chat.simba}
 {$include_once Menu.simba}
 {$include_once Inventory.simba}
 {$include_once Mouse.simba}
@@ -404,25 +405,43 @@ Example:
 *}
 Function R_AnvilSetAmount(Amount: Integer): Boolean;
 var
+  Widget: RWidget;
   AnvilWidget, InputText: RSWidget;
   T, Retries: Integer;
 begin
-  if (not R_AnvilScreen) or (R_WidgetIsHidden(R_ANVIL_CONTAINER)) then
+  if not R_AnvilScreen then
     Exit(False);
 
   if ((Amount = 0) or (Amount = 1) or (Amount = 5) or (Amount = 10)) then
   begin
     Case Amount of
-      0: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_ALL.Group, R_ANVIL_AMOUNT_MAKE_ALL.Child);
-      1: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_1.Group, R_ANVIL_AMOUNT_MAKE_1.Child);
-      5: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_5.Group, R_ANVIL_AMOUNT_MAKE_5.Child);
-      10: AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_10.Group, R_ANVIL_AMOUNT_MAKE_10.Child);
+      0: Widget := R_ANVIL_AMOUNT_MAKE_ALL;
+      1: Widget := R_ANVIL_AMOUNT_MAKE_1;
+      5: Widget := R_ANVIL_AMOUNT_MAKE_5;
+      10: Widget := R_ANVIL_AMOUNT_MAKE_10;
     end;
+
+    AnvilWidget := RSWidget.Get(Widget.Group, Widget.Child);
+
     if AnvilWidget.ref = nil then
       Exit(False);
 
-    Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
-    Result := True;
+    if (RSWidget.Get(Widget.Group, Widget.Child, 0).TextureID = R_BUTTON_CENTER_UNSELECTED_ANVIL) then
+      Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
+
+    Result := RSWidget.Get(Widget.Group, Widget.Child, 0).TextureID <> R_BUTTON_CENTER_UNSELECTED_ANVIL;
+    AnvilWidget.Free;
+  end else if (IntToStr(Amount) in RSWidget.Get(R_ANVIL_AMOUNT_MAKE_CUSTOM_TEXT.Group, R_ANVIL_AMOUNT_MAKE_CUSTOM_TEXT.Child, R_ANVIL_AMOUNT_MAKE_CUSTOM_TEXT.Index).Text) then
+  begin
+    AnvilWidget := RSWidget.Get(R_ANVIL_AMOUNT_MAKE_CUSTOM.Group, R_ANVIL_AMOUNT_MAKE_CUSTOM.Child, R_ANVIL_AMOUNT_MAKE_CUSTOM.Index);
+
+    if AnvilWidget.ref = nil then
+      Exit(False);
+
+    if (RSWidget.Get(Widget.Group, Widget.Child, 0).TextureID = R_BUTTON_CENTER_UNSELECTED_ANVIL) then
+      Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
+
+    Result := RSWidget.Get(Widget.Group, Widget.Child, 0).TextureID = R_BUTTON_CENTER_UNSELECTED_ANVIL;
     AnvilWidget.Free;
   end else
   begin
@@ -431,6 +450,7 @@ begin
       Exit(False);
 
     Mouse.Click(AnvilWidget.Bounds, MOUSE_LEFT);
+    WaitUntil(R_ChatInput, 50, 2000);
     if (RSWidget.Get(R_CHATBOX_INPUT_TITLE.Group, R_CHATBOX_INPUT_TITLE.Child).Text.Startswith("Enter amount:")) then
     begin
       InputText := RSWidget.Get(R_CHATBOX_INPUT_FULL.Group, R_CHATBOX_INPUT_FULL.Child);
