@@ -1,4 +1,4 @@
-{$include_once GameTab.simba}    
+{$include_once GameTab.simba}
 {$include_once Login.simba}
 {$include_once Lobby.simba}
 {$include_once Mainscreen.simba}
@@ -668,7 +668,9 @@ begin
 
   if (not EIOS_HasFocus(R_EIOS)) then
     EIOS_GainFocus(R_EIOS);
-  //Login
+
+  Player.Login;
+
   Wait(60,600, wdLeft);
   if Random(10)=0 then Self.CheckSkill();
 end;
