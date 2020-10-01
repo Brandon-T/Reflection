@@ -53,6 +53,8 @@ const
   YAW_MIN    = 0;
   YAW_MAX    = 2047;
 
+var
+  Player: RPlayer;
 (*
 RPlayer Functions
 =================
