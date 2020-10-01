@@ -202,7 +202,7 @@ Returns true if the world panel is/was closed.
 Function TRSWorldPanel.Close: Boolean;
 begin
   if not Self.IsOpen then
-    Result := True;
+    Result := True
   else begin
     Mouse.Click([self.PanelBounds.X2 - 55, self.PanelBounds.Y1 + 4, self.PanelBounds.X2 - 8, self.PanelBounds.Y1 + 18], mouse_Left);
     Wait(Random(500, 1000));
