@@ -37,8 +37,6 @@ type
     Worlds: TRSWorldObjectArray; // Must be initalized once with TRSWorldPanel.Worlds.Load()
  end;
 
-  TRSWorldScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
-
 var
   R_DEFAULT_WORLD_FILTER: TRSWorldFilters = [[TYPE_PVP, TYPE_DEADMAN, TYPE_SKILL, TYPE_EVENT, TYPE_AUSTRALIA], [302, 330]]; // 302 & 330 are often full.
   WorldPanel: TRSWorldPanel;
@@ -370,9 +368,9 @@ R_ScrollToWorld
 Scrolls to the proper world in the world switcher.
 
 Example:
-    R_ScrollToWorld(500, TRSWorldScroll.SCROLLBAR);
+    R_ScrollToWorld(500, RSScroll.SCROLLBAR);
 *}
-Function R_ScrollToWorld(World: Int32; ScrollType: TRSWorldScroll = TRSWorldScroll.SCROLLWHEEL): Boolean;
+Function R_ScrollToWorld(World: Int32; ScrollType: RSScroll = RSScroll.SCROLLWHEEL): Boolean;
 var
   ScrollBar, ScrollArrow, WorldContainer: RSWidget;
   WorldContainerBounds: TBox;
@@ -394,7 +392,7 @@ begin
   Direction := WorldContainerBounds.Middle.Y > R_WorldToBox(World).Middle.Y;
 
   //Scroll the interface using the mouse-wheel
-  if ScrollType = TRSWorldScroll.SCROLLWHEEL then
+  if ScrollType = RSScroll.SCROLLWHEEL then
   begin
     Mouse.Move(WorldContainerBounds);
 
@@ -411,7 +409,7 @@ begin
   end;
 
   //Scroll the interface using the scroll-bar
-  if ScrollType = TRSWorldScroll.SCROLLBAR then
+  if ScrollType = RSScroll.SCROLLBAR then
   begin
     ScrollBar := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_BAR.Group, R_WORLD_SWITCHER_SCROLL_BAR.Child, R_WORLD_SWITCHER_SCROLL_BAR.Index);
     if ScrollBar.ref = nil then
@@ -442,7 +440,7 @@ begin
   end;
 
   //Scroll the interface using the arrows
-  if ScrollType = TRSWorldScroll.SCROLLARROWS then
+  if ScrollType = RSScroll.SCROLLARROWS then
   begin
     if Direction then
       ScrollArrow := RSWidget.Get(R_WORLD_SWITCHER_SCROLL_UP.Group, R_WORLD_SWITCHER_SCROLL_UP.Child, R_WORLD_SWITCHER_SCROLL_UP.Index)
