@@ -31,7 +31,6 @@ type
 
 {$scopedenums on}
 type
-  TRSBankScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
   TRSBankQuantity = (ONE, FIVE, TEN, X, ALL);
 {$scopedenums off}
 
@@ -319,14 +318,14 @@ R_ScrollToBankSlot
 ~~~~~~~~~~~~~~~~~~~~~~
 Scrolls to the specified bank slot if it is not on screen.
 Possible scroll methods:
-  - TRSBankScroll.SCROLLWHEEL: Emulates the mouse scroll wheel.
-  - TRSBankScroll.SCROLLBAR: Drags the scroll bar to the desired location.
-  - TRSBankScroll.SCROLLARROWS: Uses the up/down arrows.
+  - RSScroll.SCROLLWHEEL: Emulates the mouse scroll wheel.
+  - RSScroll.SCROLLBAR: Drags the scroll bar to the desired location.
+  - RSScroll.SCROLLARROWS: Uses the up/down arrows.
 
 Example:
-    R_ScrollToBankSlot(40, TRSBankScroll.SCROLLWHEEL);
+    R_ScrollToBankSlot(40, RSScroll.SCROLLWHEEL);
 *}
-Function R_ScrollToBankSlot(Index: Int32; ScrollType: TRSBankScroll = TRSBankScroll.SCROLLWHEEL): Boolean;
+Function R_ScrollToBankSlot(Index: Int32; ScrollType: RSScroll = RSScroll.SCROLLWHEEL): Boolean;
 var
   ScrollBar, ScrollArrow, ItemContainer: RSWidget;
   ItemContainerBounds: TBox;
@@ -348,7 +347,7 @@ begin
   Down := ItemContainerBounds.Middle.Y < R_BankSlotToBox(Index).Middle.Y;
 
   //Scroll the interface using the mouse-wheel
-  if ScrollType = TRSBankScroll.SCROLLWHEEL then
+  if ScrollType = RSScroll.SCROLLWHEEL then
   begin
     Mouse.Move(ItemContainerBounds);
 
@@ -365,7 +364,7 @@ begin
   end;
 
   //Scroll the interface using the scroll-bar
-  if ScrollType = TRSBankScroll.SCROLLBAR then
+  if ScrollType = RSScroll.SCROLLBAR then
   begin
     ScrollBar := RSWidget.Get(R_BANK_SCROLLBAR_BAR.Group, R_BANK_SCROLLBAR_BAR.Child, R_BANK_SCROLLBAR_BAR.Index);
     if ScrollBar.ref = nil then
@@ -400,7 +399,7 @@ begin
   end;
 
   //Scroll the interface using the arrows
-  if ScrollType = TRSBankScroll.SCROLLARROWS then
+  if ScrollType = RSScroll.SCROLLARROWS then
   begin
     if Down then
       ScrollArrow := RSWidget.Get(R_BANK_SCROLLBAR_BAR_DOWN.Group, R_BANK_SCROLLBAR_BAR_DOWN.Child, R_BANK_SCROLLBAR_BAR_DOWN.Index)
@@ -739,7 +738,7 @@ begin
 
   if Item.Slot = 0 then
   begin
-    if not R_ScrollToBankSlot(Item.Slot, TRSBankScroll.SCROLLWHEEL) then
+    if not R_ScrollToBankSlot(Item.Slot, RSScroll.SCROLLWHEEL) then
       Exit(False);
   end else
     begin
