@@ -932,7 +932,7 @@ begin
   if ListContainer.ref = nil then
     Exit(False);
 
-  //Adds a buffer to make sure that the world is completely clickable
+  //Adds a buffer to make sure that the npc is completely clickable
   ListContainerBounds := [ListContainer.Bounds.X1, ListContainer.Bounds.Y1 + 15, ListContainer.Bounds.X2, ListContainer.Bounds.Y2 - 15];
   ListContainer.Free;
 
