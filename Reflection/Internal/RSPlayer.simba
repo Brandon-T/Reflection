@@ -19,7 +19,7 @@ var
   PlayersArray: Array of Pointer;
   Indices: Array of Int32;
   I, PlayersSize, Actual, Count: SizeUInt;
-begin	begin
+begin
   Count := RSClient.PlayerCount;
   if Count < 1 then	
     Exit;	
