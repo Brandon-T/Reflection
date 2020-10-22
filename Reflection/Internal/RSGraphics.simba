@@ -107,7 +107,7 @@ begin
   if Animated then
   begin
     animatedModel := npc.AnimatedModel;
-    if model.ref <> nil then
+    if animatedModel.ref <> nil then
     begin
       tile := npc.LocalTile;
       heightTile := tile;

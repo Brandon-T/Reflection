@@ -16,7 +16,7 @@ var
   Indices: Array of Int32;
   I, NPCsSize, Actual: SizeUInt;
 begin
-  Indices := RSClient.NPCIndices;
+  Indices := RSClient.NPCIndices();
   if Length(Indices) < 1 then
     Exit;
 
@@ -30,7 +30,7 @@ begin
 
   SetLength(Result, Length(NPCsArray));
 
-  for I := 0 to Length(NPCsArray) - 1 do
+  for I := 0 to High(NPCsArray) do
   begin
     if NPCsArray[I] <> nil then
     begin

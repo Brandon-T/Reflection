@@ -281,9 +281,9 @@ NPCDefinition_CombatLevel: THook =                ['jn', 'a', 'I', 1396717947];
 NPCDefinition_Visible: THook =                    ['jn', 'i', 'Z', 1];
 NPCDefinition_ModelCache: THook =                 ['jn', 'm', 'Lev;', 1];
 NPCDefinition_Transformations: THook =            ['jn', 'av', '[I', 1];
-NPCDefinition_ModelTileSize: THook =              ['jn', 'k', 'i', 2022516453];
-NPCDefinition_ModelScaleWidth: THook =            ['jn', 'g', 'i', 9158797];
-NPCDefinition_ModelScaleHeight: THook =           ['jn', 'h', 'i', -174548931];
+NPCDefinition_ModelTileSize: THook =              ['jn', 'k', 'I', 2022516453];
+NPCDefinition_ModelScaleWidth: THook =            ['jn', 'g', 'I', 9158797];
+NPCDefinition_ModelScaleHeight: THook =           ['jn', 'h', 'I', -174548931];
 
 {NPC: ca}
 NPC_Definition: THook =                           ['ca', 'f', 'Ljn;', 1];
