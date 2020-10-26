@@ -72,7 +72,11 @@ var
   X, Y, LoginDTM: Integer;
 begin
   LoginDTM := DTMFromString('mkwEAAHicE2ZgYOBmZGAwAeJIIE4DYj8gLgPieCYGhk9AejEQbwfiKiC2A2JRIF4CxMeB+AsQKwLVpQHxRCAWA5pXBcTFQJwMxIlAnALEqkDsAsQxUDF5INYA4mAgtgHiqVD1rVD5iUDML8DL8P2bI0NUuDDDo8fvwGxJGRkGWzt3Bg+vIAa/gFiGlav3ouDcglqGzt65DLEJ+WB1IDUgtdQEjFTEWAAANNMplA==');
-  Result := FindDTM(LoginDTM, X, Y, GetClientBounds);
+  if FindDTM(LoginDTM, X, Y, GetClientBounds) then
+  begin
+    self.RootPoint := Point(X, Y);
+    Result := True;
+  end else Result := False;
   FreeDTM(LoginDTM);
 end;
 
