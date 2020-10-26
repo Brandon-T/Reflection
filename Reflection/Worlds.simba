@@ -129,7 +129,7 @@ begin
   self.Init;
 
   if srl.FindText(P, 'Select a world', 'UpChars07_s', [self.RootPoint.X, self.RootPoint.Y, 124 + self.RootPoint.X, 24 + self.RootPoint.Y]) then
-    Exit(True);
+    Result := True;
 end;
 
 {*
