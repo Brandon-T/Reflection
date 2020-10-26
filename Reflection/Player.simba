@@ -128,8 +128,6 @@ begin
     if (not R_LoginScreen.Open()) then
       Exit(False);
 
-    R_LoginScreen.Open();
-
     if R_LoginScreen.EnterDetails(Self.LoginName, Self.Password) then
     begin
       Response := R_LoginScreen.WaitResponse();
@@ -161,9 +159,8 @@ begin
       Exit(True);
 
     if R_IsLobbyOpen then
-      R_EnterGame
-    else
-    begin
+      Result := R_EnterGame
+    else begin
       R_LoginScreen.Open();
 
       if (Self.World < 1) then
@@ -183,8 +180,11 @@ begin
           Continue;
       end;
 
-      if (not Self.LoginToLobby()) and (not R_IsLoggedIn) then
-        Break;
+      if (Self.LoginToLobby()) then
+        R_EnterGame;
+      
+      if (R_IsLoggedIn) then
+        Result := True;
     end;
 
     Wait(Random(200, 400));
