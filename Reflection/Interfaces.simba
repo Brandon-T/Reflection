@@ -167,6 +167,14 @@ type
     NPC_AMY = R_NPC_CONTACT_AMY.Child
     );
 
+const
+  //VARBITS
+  VARBIT_BLAST_FURNACE_BAR_DISPENSER    = 936;
+  VARBIT_MOTHERLOAD_SACK_NUMBER         = 5558;
+  VARBIT_MOTHERLOAD_SACK_UPGRADED       = 5556;
+  VARBIT_TITHE_FARM_POINTS              = 4893;
+  VARBIT_TITHE_FARM_SACK_AMOUNT         = 4900;
+  VARBIT_TITHE_FARM_SACK_ICON           = 5370;
 
 {*
 R_WidgetIsHidden
@@ -242,6 +250,130 @@ begin
 end;
 
 {*
+R_EmoteToBox
+~~~~~~~~~~~~
+Utility function that converts a given Emote in the Emotes Gametab
+  to mainscreen coordinates.
+
+Example:
+    R_EmoteToBox(EMOTE_YES);
+*}
+Function R_EmoteToBox(Emote: TEmote): TBox;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(R_EMOTE_CONTAINER_CHILD.Group, R_EMOTE_CONTAINER_CHILD.Child, Ord(Emote));
+  Result := Widget.Bounds;
+  Widget.Free;
+end;
+
+{*
+R_ScrollToEmote
+~~~~~~~~~~~~~~~
+Scrolls to the proper emote in the emote tab.
+
+Example:
+    R_ScrollToEmote(EMOTE_SHRUG, RSScroll.SCROLLBAR);
+*}
+Function R_ScrollToEmote(Emote: TEmote; ScrollType: RSScroll = RSScroll.SCROLLWHEEL): Boolean;
+var
+  ScrollBar, ScrollArrow, ListContainer: RSWidget;
+  ListContainerBounds: TBox;
+  T: Timer;
+  Direction: Boolean;
+  P: TPoint;
+begin
+  ListContainer := RSWidget.Get(R_EMOTE_CONTAINER.Group, R_EMOTE_CONTAINER.Child);
+  if ListContainer.ref = nil then
+    Exit(False);
+
+  ListContainerBounds := ListContainer.Bounds;
+  ListContainer.Free;
+
+  if ListContainerBounds.Contains(R_EmoteToBox(Emote)) then
+    Exit(True);
+
+  Direction := ListContainerBounds.Middle.Y > R_EmoteToBox(Emote).Middle.Y;
+
+  //Scroll the interface using the mouse-wheel
+  if ScrollType = RSScroll.SCROLLWHEEL then
+  begin
+    Mouse.Move(ListContainerBounds);
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle) do
+    begin
+      if T.ElapsedTime > 5000 then
+        Exit(False);
+
+      Mouse.Scroll(1, Direction);
+    end;
+
+    Exit(ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle));
+  end;
+
+  //Scroll the interface using the scroll-bar
+  if ScrollType = RSScroll.SCROLLBAR then
+  begin
+    ScrollBar := RSWidget.Get(R_EMOTE_SCROLL_BAR.Group, R_EMOTE_SCROLL_BAR.Child, R_EMOTE_SCROLL_BAR.Index);
+    if ScrollBar.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollBar.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollBar.Free;
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle) do
+    begin
+      if T.ElapsedTime > 5000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+
+      P := Mouse.GetPosition;
+      if Direction then
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
+      else
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y + RandomRange(3, 7));
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle));
+  end;
+
+  //Scroll the interface using the arrows
+  if ScrollType = RSScroll.SCROLLARROWS then
+  begin
+    if Direction then
+      ScrollArrow := RSWidget.Get(R_EMOTE_SCROLL_ARROW_UP.Group, R_EMOTE_SCROLL_ARROW_UP.Child, R_EMOTE_SCROLL_ARROW_UP.Index)
+    else
+      ScrollArrow := RSWidget.Get(R_EMOTE_SCROLL_ARROW_DOWN.Group, R_EMOTE_SCROLL_ARROW_DOWN.Child, R_EMOTE_SCROLL_ARROW_DOWN.Index);
+
+    if ScrollArrow.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollArrow.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollArrow.Free;
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle) do
+    begin
+      if T.ElapsedTime > 20000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle));
+  end;
+end;
+
+{*
 R_DoEmote
 ~~~~~~~~~
 Returns true if the emote is clicked.
@@ -252,11 +384,11 @@ Example:
 *}
 Function R_DoEmote(Emote: TEmote): Boolean;
 var
-  ID: RWidget;
   Widget: RSWidget;
 begin
-  if (not R_Emotes) then
-    Exit(False);
+  R_OpenGametab(GAMETAB_EMOTES);
+
+  Writeln(R_ScrollToEmote(Emote, RSScroll.SCROLLWHEEL));
 
   Widget := RSWidget.Get(R_EMOTE_CONTAINER_CHILD.Group, R_EMOTE_CONTAINER_CHILD.Child, Ord(Emote));
   if Widget.ref <> nil then
@@ -905,11 +1037,11 @@ Example:
 *}
 Function R_NPCToBox(NPC: TNPCContact): TBox;
 var
-  WorldWidget: RSWidget;
+  Widget: RSWidget;
 begin
-  WorldWidget := RSWidget.Get(R_INTERFACE_NPC_CONTACT, Ord(NPC));
-  Result := WorldWidget.Bounds;
-  WorldWidget.Free;
+  Widget := RSWidget.Get(R_INTERFACE_NPC_CONTACT, Ord(NPC));
+  Result := Widget.Bounds;
+  Widget.Free;
 end;
 
 {*
@@ -1041,4 +1173,63 @@ begin
     Result := True;
     Widget.Free;
   end;
+end;
+
+
+{*
+BLAST FURNACE
+~~~~~~~~~~~~~
+Functions for working at the Blast Furnace.
+*}
+
+{*
+R_BarDispenserStatus
+~~~~~~~~~~~~~~~~~~~~
+Gets the status of the Bar Dispenser.
+  0 = No bars being processed
+	1 = Ores are being processed on the conveyor belt, bar dispenser cannot be checked
+	2 = Bars are cooling down
+	3 = Bars can be collected
+
+Example:
+    if R_BarDispenserStatus = 3 then
+      ...
+*}
+Function R_BlastFurnaceBarDispenserStatus: Int32;
+begin
+  Result := RSClient.GetVarBit(VARBIT_BLAST_FURNACE_BAR_DISPENSER);
+end;
+
+
+{*
+MOTHERLOAD MINE
+~~~~~~~~~~~~~~~
+Functions for working at the Motherload Mine.
+*}
+
+{*
+R_MotherloadSackTotal
+~~~~~~~~~~~~~~~~~~~~~
+Returns the total number of items in the sack.
+
+Example:
+    if R_MotherloadSackTotal then
+      ...
+*}
+Function R_MotherloadSackTotal: Int32;
+begin
+  Result := RSClient.GetVarBit(VARBIT_MOTHERLOAD_SACK_NUMBER);
+end;
+
+{*
+R_IsMotherloadSackUpgraded
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the Motherload Sack is upgraded.
+Example:
+    if R_IsMotherloadSackUpgraded then
+      ...
+*}
+Function R_IsMotherloadSackUpgraded: Boolean;
+begin
+  Result := RSClient.GetVarBit(VARBIT_MOTHERLOAD_SACK_UPGRADED) = 1;
 end;
