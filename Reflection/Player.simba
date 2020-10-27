@@ -52,6 +52,11 @@ const
   //YAW UTILITY
   YAW_MIN    = 0;
   YAW_MAX    = 2047;
+  
+  //VARBITS
+  VARBIT_IS_POISONED         = 102;
+  VARBIT_IS_ATTACKING_PLAYER = 1075;
+  VARBIT_IN_WILDERNESS       = 5963;   
 
 var
   Player: RPlayer;
