@@ -311,6 +311,48 @@ begin
 end;
 
 {*
+R_IsPoisoned
+~~~~~~~~~~~~
+Returns true if the player is poisoned.
+
+Example:
+  if R_IsPoisoned then
+    ...
+*}
+Function R_IsPoisoned: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IS_POISONED) = 1;
+end;
+
+{*
+R_IsAttackingPlayer
+~~~~~~~~~~~~~~~~~~~
+Returns true if the player is attacking another player.
+
+Example:
+  if R_IsAttackingPlayer then
+    ...
+*}
+Function R_IsAttackingPlayer: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IS_ATTACKING_PLAYER) <> -1;
+end;
+
+{*
+R_IsInWilderness
+~~~~~~~~~~~~~~~~
+Returns true if the player is in the wilderness.
+
+Example:
+  if R_IsInWilderness then
+    ...
+*}
+Function R_IsInWilderness: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IN_WILDERNESS) = 1;
+end;    
+
+{*
 R_GetDirectionToMove - Utility Function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Returns the direction to turn camera based off current camera position and
