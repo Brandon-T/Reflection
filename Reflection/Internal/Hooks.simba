@@ -438,7 +438,8 @@ Client_MenuHeight: THook =                        ['gw', 'lt', 'I', 271502915];
 Client_CurrentLevels: THook =                     ['client', 'kb', '[I', 1];
 Client_RealLevels: THook =                        ['client', 'kh', '[I', 1];
 Client_Experiences: THook =                       ['client', 'ln', '[I', 1];
-Client_CurrentWorld: THook =                      ['client', 'bb', 'I', 380841186];
+Client_CurrentWorld: THook =                      ['kl', 'z', 'I', 11106869];
+Client_WorldId: THook =                           ['client', 'bb', 'I', 380841186];
 Client_Energy: THook =                            ['client', 'mq', 'I', 1875055983];
 Client_Weight: THook =                            ['client', 'mt', 'I', 373944835];
 
