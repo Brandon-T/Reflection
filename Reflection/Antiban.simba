@@ -1,10 +1,12 @@
 {$include_once GameTab.simba}
 {$include_once Login.simba}
+{$include_once Lobby.simba}
 {$include_once Mainscreen.simba}
 {$include_once Mouse.simba}
 {$include_once Player.simba}
 {$include_once Skills.simba}
 {$include_once Timing.simba}
+{$include_once Worlds.simba}
 (*
 Antiban
 =======
@@ -494,7 +496,7 @@ end;
 procedure RAntiban.HoverPlayers();
 var
   Players: Array of RSPlayer;
-  I, T: Integer;
+  I, T, W, H: Integer;
   Pnt: TPoint;
 begin
   DebugNote('[RND] Hovering players');
@@ -522,7 +524,9 @@ begin
     case Random(100) of
       0..79: Mouse.Click(MOUSE_RIGHT);
     end;
-    Wait(560, RandomRange(5130, 13015));
+    Wait(560, Random(5130, 13015));
+    GetClientDimensions(W, H);
+    Mouse.Move(Random(0, W), Random(0, H));
   end;
 end;
 
@@ -664,9 +668,11 @@ begin
 
   if (not EIOS_HasFocus(R_EIOS)) then
     EIOS_GainFocus(R_EIOS);
-  //Login
+
+  Player.Login;
+
   Wait(60,600, wdLeft);
-  if Random(2)=0 then Self.CheckSkill();
+  if Random(10)=0 then Self.CheckSkill();
 end;
 
 function RAntiban.TimeUntilBreak(Break: RBreakTask; Format: TTimeFormat = TIME_BARE): String;

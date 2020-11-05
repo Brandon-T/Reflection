@@ -1,9 +1,29 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
 {$include_once Mainscreen.simba}
+{$include_once Worlds.simba}
 {$include_once srl/shared.simba}
 
+(*
+PLAYER
+======
+
+  Functions for your player and other visible players.
+*)
+
+
 type
+  RPlayer = record
+    LoginName: String;
+    Password: String;
+    BankPin: String;
+    isMember: Boolean;
+    isActive: Boolean;
+    World: Int32; // if not defined, will use random world using the filter
+    WorldFilter: TRSWorldFilters;
+    Data: Pointer;
+  end;
+
   TRSPlayer = record
     Name: String;
     Tile: TPoint;
@@ -32,7 +52,156 @@ const
   //YAW UTILITY
   YAW_MIN    = 0;
   YAW_MAX    = 2047;
+  
+  //VARBITS
+  VARBIT_IS_POISONED         = 102;
+  VARBIT_IS_ATTACKING_PLAYER = 1075;
+  VARBIT_IN_WILDERNESS       = 5963;   
 
+var
+  Player: RPlayer;
+(*
+RPlayer Functions
+=================
+
+  Login functions for your player.
+*)
+
+{*
+RPlayer.HandleResponse
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the response was found during login.
+*}
+Function RPlayer.HandleResponse(Response: String; Attempts: Int32): Boolean;
+type
+  TResponse = record
+    Text: String;
+    Attempts: Int32;
+    WaitTime: Int32;
+ end;
+var
+  Responses: array of TResponse;
+  i: Int32;
+begin
+  Responses := [
+                ['Invalid username or password.', 5, 0],
+                ['Please enter your username/email address.', 5, 0],
+                ['Error connecting to server.', 20, 10000],
+                ['Your account has not logged out', 5, 60000],
+                ['Login server offline.', 20, 60000],
+                ['Error loading your profile.', 20, 60000],
+                ['Connection timed out.', 20, 30000],
+                ['Login limit exceeded', 20, 30000],
+                ['This world is full', 20, 15000],
+                ['Your account has been disabled', 1, 0]
+               ];
+
+  for i := 0 to High(Responses) do
+    if (Pos(Responses[i].Text, Response) > 0) then
+    begin
+      Writeln('Found response "%s"', [Responses[i].Text]);
+
+      if (Attempts >= Responses[i].Attempts) then
+        Exit(False);
+      if (Responses[i].WaitTime > 0) then
+        Wait(Responses[i].WaitTime + Random(1000));
+
+      Exit(True);
+    end;
+
+  Writeln('Unknown login response "%s"', [Response], dtFatal);
+end;
+
+{*
+RPlayer.LoginToLobby
+~~~~~~~~~~~~~~~~~~~~
+Returns true if the player was logged into the lobby.
+*}
+Function RPlayer.LoginToLobby: Boolean;
+var
+  Response: String;
+  Attempts: Int32;
+begin
+  while (Attempts < 25) do
+  begin
+    Inc(Attempts);
+
+    if R_IsLoggedIn() then
+      Exit(True);
+    if R_IsLobbyOpen() then
+      Exit(True);
+    if (not R_LoginScreen.Open()) then
+      Exit(False);
+
+    if R_LoginScreen.EnterDetails(Self.LoginName, Self.Password) then
+    begin
+      Response := R_LoginScreen.WaitResponse();
+
+      if R_WaitIsLobbyOpen(5000) then
+        Exit(True);
+      if (Response <> '') and (not Self.HandleResponse(Response, Attempts)) then
+        Break;
+    end;
+  end;
+
+  WriteLn('Failed logging into lobby');
+end;
+
+{*
+RPlayer.Login
+~~~~~~~~~~~~~
+Returns true if the player was logged in.
+*}
+Function RPlayer.Login: Boolean;
+var
+  Attempts: Int32;
+begin
+  while (Attempts < 20) do
+  begin
+    Inc(Attempts);
+
+    if R_IsLoggedIn then
+      Exit(True);
+
+    if R_IsLobbyOpen then
+      Result := R_EnterGame
+    else begin
+      R_LoginScreen.Open();
+
+      if (Self.World < 1) then
+      begin
+        if Self.isMember then
+          Self.WorldFilter.Properties += TYPE_FREE
+        else
+          Self.WorldFilter.Properties += TYPE_MEMBERS;
+
+        Self.World := WorldPanel.GetWorld(Self.WorldFilter);
+      end;
+      if (R_LoginScreen.GetCurrentWorld() <> Self.World) then
+      begin
+        if R_LoginScreen.OpenWorldSwitcher() and WaitUntil(WorldPanel.IsOpen, 50, Random(6000, 8000)) then
+          WorldPanel.SelectWorld(Self.World);
+        if (R_LoginScreen.GetCurrentWorld() <> Self.World) then
+          Continue;
+      end;
+
+      if (Self.LoginToLobby()) then
+        R_EnterGame;
+      
+      if (R_IsLoggedIn) then
+        Result := True;
+    end;
+
+    Wait(Random(200, 400));
+  end;
+end;
+
+(*
+TRSPlayer Functions
+===================
+
+  In-game functions for your player and other visible players.
+*)
 
 {*
 R_GetMe
@@ -145,6 +314,48 @@ begin
   Result := Me.Destination;
   Me.Free;
 end;
+
+{*
+R_IsPoisoned
+~~~~~~~~~~~~
+Returns true if the player is poisoned.
+
+Example:
+  if R_IsPoisoned then
+    ...
+*}
+Function R_IsPoisoned: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IS_POISONED) = 1;
+end;
+
+{*
+R_IsAttackingPlayer
+~~~~~~~~~~~~~~~~~~~
+Returns true if the player is attacking another player.
+
+Example:
+  if R_IsAttackingPlayer then
+    ...
+*}
+Function R_IsAttackingPlayer: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IS_ATTACKING_PLAYER) <> -1;
+end;
+
+{*
+R_IsInWilderness
+~~~~~~~~~~~~~~~~
+Returns true if the player is in the wilderness.
+
+Example:
+  if R_IsInWilderness then
+    ...
+*}
+Function R_IsInWilderness: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IN_WILDERNESS) = 1;
+end;    
 
 {*
 R_GetDirectionToMove - Utility Function

@@ -190,6 +190,9 @@ type
     BATTLEFRONT_TELEPORT,
     UNKNOWN_13);
 
+const
+  R_SPELLBOOK_VARBIT = 4070;
+
 {*
 R_CastSpell - Utility Function
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -199,6 +202,7 @@ Function R_CastSpell(Child: Int32): Boolean;
 var
   Widget: RSWidget;
 begin
+  R_OpenGameTab(GAMETAB_MAGIC);
   Widget := RSWidget.Get(R_SPELLBOOK_CONTAINER.Group, Child);
   if Widget.ref = nil then
     Exit;
@@ -223,7 +227,8 @@ Example:
 *}
 Function R_CastSpell(Spell: TStandardSpell): Boolean; overload;
 begin
-  Result := R_CastSpell(Ord(Spell));
+  if (RSClient.GetVarBit(R_SPELLBOOK_VARBIT) = 0) then
+    Result := R_CastSpell(Ord(Spell));
 end;
 
 {*
@@ -237,7 +242,8 @@ Example:
 *}
 Function R_CastSpell(Spell: TAncientSpell): Boolean; overload;
 begin
-  Result := R_CastSpell(Ord(Spell));
+  if (RSClient.GetVarBit(R_SPELLBOOK_VARBIT) = 1) then
+    Result := R_CastSpell(Ord(Spell));
 end;
 
 {*
@@ -251,7 +257,8 @@ Example:
 *}
 Function R_CastSpell(Spell: TLunarSpell): Boolean; overload;
 begin
-  Result := R_CastSpell(Ord(Spell));
+  if (RSClient.GetVarBit(R_SPELLBOOK_VARBIT) = 2) then
+    Result := R_CastSpell(Ord(Spell));
 end;
 
 {*
@@ -265,7 +272,8 @@ Example:
 *}
 Function R_CastSpell(Spell: TArceuusSpell): Boolean; overload;
 begin
-  Result := R_CastSpell(Ord(Spell));
+  if (RSClient.GetVarBit(R_SPELLBOOK_VARBIT) = 3) then
+    Result := R_CastSpell(Ord(Spell));
 end;
 
 {*

@@ -143,10 +143,42 @@ type
     BRACELET_ONYX,
     BRACELET_ZENYTE);
 
+  TNPCContact = (
+    NPC_HONEST_JIMMY = R_NPC_CONTACT_HONEST_JIMMY.Child,
+    NPC_BERT_THE_SANDMAN = R_NPC_CONTACT_BERT_THE_SANDMAN.Child,
+    NPC_ADVISOR_GHRIM = R_NPC_CONTACT_ADVISOR_GHRIM.Child,
+    NPC_DARK_MAGE = R_NPC_CONTACT_DARK_MAGE.Child,
+    NPC_LANTHUS = R_NPC_CONTACT_LANTHUS.Child,
+    NPC_SPRIA = R_NPC_CONTACT_SPRIA.Child,
+    NPC_TURAEL = R_NPC_CONTACT_TURAEL.Child,
+    NPC_MAZCHNA = R_NPC_CONTACT_MAZCHNA.Child,
+    NPC_VANNAKA = R_NPC_CONTACT_VANNAKA.Child,
+    NPC_CHAELDAR = R_NPC_CONTACT_CHAELDAR.Child,
+    NPC_NIEVE = R_NPC_CONTACT_NIEVE.Child,
+    NPC_DURADEL = R_NPC_CONTACT_DURADEL.Child,
+    NPC_KRYSTILIA = R_NPC_CONTACT_KRYSTILIA.Child,
+    NPC_KONAR = R_NPC_CONTACT_KONAR.Child,
+    NPC_MURPHY = R_NPC_CONTACT_MURPHY.Child,
+    NPC_CYRISUS = R_NPC_CONTACT_CYRISUS.Child,
+    NPC_SMOGGY = R_NPC_CONTACT_SMOGGY.Child,
+    NPC_GINEA = R_NPC_CONTACT_GINEA.Child,
+    NPC_WATSON = R_NPC_CONTACT_WATSON.Child,
+    NPC_BARBARIAN_GUARD = R_NPC_CONTACT_BARBARIAN_GUARD.Child,
+    NPC_AMY = R_NPC_CONTACT_AMY.Child
+    );
+
+const
+  //VARBITS
+  VARBIT_BLAST_FURNACE_BAR_DISPENSER    = 936;
+  VARBIT_MOTHERLOAD_SACK_NUMBER         = 5558;
+  VARBIT_MOTHERLOAD_SACK_UPGRADED       = 5556;
+  VARBIT_TITHE_FARM_POINTS              = 4893;
+  VARBIT_TITHE_FARM_SACK_AMOUNT         = 4900;
+  VARBIT_TITHE_FARM_SACK_ICON           = 5370;
 
 {*
 R_WidgetIsHidden
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 Returns true if a widget is hidden.
 
 Example:
@@ -188,64 +220,10 @@ EMOTES
 ~~~~~~
 Functions for using emotes.
 *}
-Function R_EmoteIDs: Array of RWidget;
-begin
-  Result := [
-    R_EMOTE_YES,
-    R_EMOTE_NO,
-    R_EMOTE_BOW,
-    R_EMOTE_ANGRY,
-    R_EMOTE_THINK,
-    R_EMOTE_WAVE,
-    R_EMOTE_SHRUG,
-    R_EMOTE_CHEER,
-    R_EMOTE_BECKON,
-    R_EMOTE_LAUGH,
-    R_EMOTE_JUMP_FOR_JOY,
-    R_EMOTE_YAWN,
-    R_EMOTE_DANCE,
-    R_EMOTE_JIG,
-    R_EMOTE_SPIN,
-    R_EMOTE_HEADBANG,
-    R_EMOTE_CRY,
-    R_EMOTE_BLOW_KISS,
-    R_EMOTE_PANIC,
-    R_EMOTE_RASPBERRY,
-    R_EMOTE_CLAP,
-    R_EMOTE_SALUTE,
-    R_EMOTE_GOBLIN_BOW,
-    R_EMOTE_GOBLIN_SALUTE,
-    R_EMOTE_GLASS_BOX,
-    R_EMOTE_CLIMB_ROPE,
-    R_EMOTE_LEAN,
-    R_EMOTE_GLASS_WALL,
-    R_EMOTE_IDEA,
-    R_EMOTE_STAMP,
-    R_EMOTE_FLAP,
-    R_EMOTE_SLAP_HEAD,
-    R_EMOTE_ZOMBIE_WALK,
-    R_EMOTE_ZOMBIE_DANCE,
-    R_EMOTE_SCARED,
-    R_EMOTE_RABBIT_HOP,
-    R_EMOTE_SIT_UP,
-    R_EMOTE_PUSH_UP,
-    R_EMOTE_STAR_JUMP,
-    R_EMOTE_JOG,
-    R_EMOTE_ZOMBIE_HAND,
-    R_EMOTE_HYPERMOBILE_DRINKER,
-    R_EMOTE_SKILL_CAPE,
-    R_EMOTE_AIR_GUITAR,
-    R_EMOTE_URI_TRANSFORM,
-    R_EMOTE_SMOOTH_DANCE,
-    R_EMOTE_CRAZY_DANCE,
-    R_EMOTE_PREMIER_SHIELD,
-    R_EMOTE_EXPLORE
-  ];
-end;
 
 {*
 R_Emotes
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
 Returns true if a widget is valid.
 
 Example:
@@ -259,7 +237,7 @@ end;
 
 {*
 R_WaitEmotes
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 Returns true if a widget is valid within the time specified.
 
 Example:
@@ -272,8 +250,132 @@ begin
 end;
 
 {*
+R_EmoteToBox
+~~~~~~~~~~~~
+Utility function that converts a given Emote in the Emotes Gametab
+  to mainscreen coordinates.
+
+Example:
+    R_EmoteToBox(EMOTE_YES);
+*}
+Function R_EmoteToBox(Emote: TEmote): TBox;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(R_EMOTE_CONTAINER_CHILD.Group, R_EMOTE_CONTAINER_CHILD.Child, Ord(Emote));
+  Result := Widget.Bounds;
+  Widget.Free;
+end;
+
+{*
+R_ScrollToEmote
+~~~~~~~~~~~~~~~
+Scrolls to the proper emote in the emote tab.
+
+Example:
+    R_ScrollToEmote(EMOTE_SHRUG, RSScroll.SCROLLBAR);
+*}
+Function R_ScrollToEmote(Emote: TEmote; ScrollType: RSScroll = RSScroll.SCROLLWHEEL): Boolean;
+var
+  ScrollBar, ScrollArrow, ListContainer: RSWidget;
+  ListContainerBounds: TBox;
+  T: Timer;
+  Direction: Boolean;
+  P: TPoint;
+begin
+  ListContainer := RSWidget.Get(R_EMOTE_CONTAINER.Group, R_EMOTE_CONTAINER.Child);
+  if ListContainer.ref = nil then
+    Exit(False);
+
+  ListContainerBounds := ListContainer.Bounds;
+  ListContainer.Free;
+
+  if ListContainerBounds.Contains(R_EmoteToBox(Emote)) then
+    Exit(True);
+
+  Direction := ListContainerBounds.Middle.Y > R_EmoteToBox(Emote).Middle.Y;
+
+  //Scroll the interface using the mouse-wheel
+  if ScrollType = RSScroll.SCROLLWHEEL then
+  begin
+    Mouse.Move(ListContainerBounds);
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle) do
+    begin
+      if T.ElapsedTime > 5000 then
+        Exit(False);
+
+      Mouse.Scroll(1, Direction);
+    end;
+
+    Exit(ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle));
+  end;
+
+  //Scroll the interface using the scroll-bar
+  if ScrollType = RSScroll.SCROLLBAR then
+  begin
+    ScrollBar := RSWidget.Get(R_EMOTE_SCROLL_BAR.Group, R_EMOTE_SCROLL_BAR.Child, R_EMOTE_SCROLL_BAR.Index);
+    if ScrollBar.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollBar.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollBar.Free;
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle) do
+    begin
+      if T.ElapsedTime > 5000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+
+      P := Mouse.GetPosition;
+      if Direction then
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
+      else
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y + RandomRange(3, 7));
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle));
+  end;
+
+  //Scroll the interface using the arrows
+  if ScrollType = RSScroll.SCROLLARROWS then
+  begin
+    if Direction then
+      ScrollArrow := RSWidget.Get(R_EMOTE_SCROLL_ARROW_UP.Group, R_EMOTE_SCROLL_ARROW_UP.Child, R_EMOTE_SCROLL_ARROW_UP.Index)
+    else
+      ScrollArrow := RSWidget.Get(R_EMOTE_SCROLL_ARROW_DOWN.Group, R_EMOTE_SCROLL_ARROW_DOWN.Child, R_EMOTE_SCROLL_ARROW_DOWN.Index);
+
+    if ScrollArrow.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollArrow.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollArrow.Free;
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle) do
+    begin
+      if T.ElapsedTime > 20000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ListContainerBounds.Contains(R_EmoteToBox(Emote).Middle));
+  end;
+end;
+
+{*
 R_DoEmote
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~
 Returns true if the emote is clicked.
 
 Example:
@@ -282,14 +384,13 @@ Example:
 *}
 Function R_DoEmote(Emote: TEmote): Boolean;
 var
-  ID: RWidget;
   Widget: RSWidget;
 begin
-  ID := R_EmoteIDs[Ord(Emote)];
-  if (not R_Emotes) or R_WidgetIsHidden(ID) then
-    Exit(False);
+  R_OpenGametab(GAMETAB_EMOTES);
 
-  Widget := RSWidget.Get(ID.Group, ID.Child);
+  Writeln(R_ScrollToEmote(Emote, RSScroll.SCROLLWHEEL));
+
+  Widget := RSWidget.Get(R_EMOTE_CONTAINER_CHILD.Group, R_EMOTE_CONTAINER_CHILD.Child, Ord(Emote));
   if Widget.ref <> nil then
   begin
     Mouse.Click(Widget.Bounds, MOUSE_LEFT);
@@ -340,7 +441,7 @@ end;
 
 {*
 R_AnvilScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Returns true if the anvil screen is valid.
 
 Example:
@@ -354,7 +455,7 @@ end;
 
 {*
 R_WaitAnvilScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 Returns true if the anvil screen is valid within the time specified.
 
 Example:
@@ -368,7 +469,7 @@ end;
 
 {*
 R_SmithAnvil
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 Returns true if the specified item was smithed.
 
 Example:
@@ -526,7 +627,7 @@ end;
 
 {*
 R_SkillMenu
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 Returns true if the multi-skill menu is open.
 
 Example:
@@ -540,7 +641,7 @@ end;
 
 {*
 R_ChooseSkillOption
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 Selects the desired skill option.
 
 Example:
@@ -583,7 +684,7 @@ end;
 
 {*
 R_ChooseSkillOption
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 Selects the desired skill option.
 
 Example:
@@ -624,13 +725,13 @@ end;
 
 {*
 CRAFTING JEWELRY
-~~~~~
+~~~~~~~~~~~~~~~~
 Functions for crafting jewelry at the furnace.
 *}
 
 {*
 R_JewelryScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 Returns true if the jewelry screen is valid.
 
 Example:
@@ -644,7 +745,7 @@ end;
 
 {*
 R_WaitJewelryScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 Returns true if the Jewelry screen is valid within the time specified.
 
 Example:
@@ -658,7 +759,7 @@ end;
 
 {*
 R_JewelrySetAmount
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 Chooses the amount of jewelry items to craft using the furnace.
   Amount = 0: All
 
@@ -745,7 +846,7 @@ end;
 
 {*
 R_CraftJewelry
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Returns true if the specified item was crafted.
   Acceptable Inputs:
     RING_GOLD
@@ -780,7 +881,7 @@ end;
 
 {*
 R_CraftJewelry
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Returns true if the specified item was crafted.
   Acceptable Inputs:
     NECKLACE_GOLD
@@ -814,7 +915,7 @@ end;
 
 {*
 R_CraftJewelry
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Returns true if the specified item was crafted.
   Acceptable Inputs:
     AMULET_GOLD
@@ -848,7 +949,7 @@ end;
 
 {*
 R_CraftJewelry
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Returns true if the specified item was crafted.
   Acceptable Inputs:
     BRACELET_GOLD
@@ -878,4 +979,257 @@ begin
     Result := True;
     Widget.Free;
   end;
+end;
+
+
+{*
+NPC CONTACT
+~~~~~~~~~~~
+Functions for crafting jewelry at the furnace.
+*}
+
+{*
+R_NPCContact
+~~~~~~~~~~~~
+Returns true if NPC Contact interface is open.
+
+Example:
+    if R_NPCContact then
+      ...
+*}
+Function R_NPCContact(): Boolean;
+begin
+  Result := RSWidget.IsValid(R_NPC_CONTACT_CONTAINER.Group, R_NPC_CONTACT_CONTAINER.Child);
+end;
+
+{*
+R_CloseNPCContact
+~~~~~~~~~~~~~~~~~
+Closes the NPC Contact interface.
+
+Example:
+    R_CloseNPCContact;
+*}
+Function R_CloseNPCContact(): Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (RSWidget.IsValid(R_NPC_CONTACT_CONTAINER.Group, R_NPC_CONTACT_CONTAINER.Child)) and (not R_WidgetIsHidden(R_NPC_CONTACT_CLOSE)) then
+  begin
+    Widget := RSWidget.Get(R_NPC_CONTACT_CLOSE.Group, R_NPC_CONTACT_CLOSE.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end
+end;
+
+{*
+R_NPCToBox
+~~~~~~~~~~
+Utility function that converts a given NPC in the NPC Contact interface
+  to mainscreen coordinates.
+
+Example:
+    R_NPCToBox(NPC_AMY);
+*}
+Function R_NPCToBox(NPC: TNPCContact): TBox;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(R_INTERFACE_NPC_CONTACT, Ord(NPC));
+  Result := Widget.Bounds;
+  Widget.Free;
+end;
+
+{*
+R_ScrollToNPC
+~~~~~~~~~~~~~
+Scrolls to the proper world in the world switcher.
+
+Example:
+    R_ScrollToNPC(NPC_AMY, RSScroll.SCROLLBAR);
+*}
+Function R_ScrollToNPC(NPC: TNPCContact; ScrollType: RSScroll = RSScroll.SCROLLWHEEL): Boolean;
+var
+  ScrollBar, ScrollArrow, ListContainer: RSWidget;
+  ListContainerBounds: TBox;
+  T: Timer;
+  Direction: Boolean;
+  P: TPoint;
+begin
+  ListContainer := RSWidget.Get(R_NPC_CONTACT_LIST.Group, R_NPC_CONTACT_LIST.Child);
+  if ListContainer.ref = nil then
+    Exit(False);
+
+  //Adds a buffer to make sure that the npc is completely clickable
+  ListContainerBounds := [ListContainer.Bounds.X1, ListContainer.Bounds.Y1 + 15, ListContainer.Bounds.X2, ListContainer.Bounds.Y2 - 15];
+  ListContainer.Free;
+
+  if ListContainerBounds.Contains(R_NPCToBox(NPC)) then
+    Exit(True);
+
+  Direction := ListContainerBounds.Middle.Y > R_NPCToBox(NPC).Middle.Y;
+
+  //Scroll the interface using the mouse-wheel
+  if ScrollType = RSScroll.SCROLLWHEEL then
+  begin
+    Mouse.Move(ListContainerBounds);
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_NPCToBox(NPC)) do
+    begin
+      if T.ElapsedTime > 5000 then
+        Exit(False);
+
+      Mouse.Scroll(3, Direction);
+    end;
+
+    Exit(ListContainerBounds.Contains(R_NPCToBox(NPC).Middle));
+  end;
+
+  //Scroll the interface using the scroll-bar
+  if ScrollType = RSScroll.SCROLLBAR then
+  begin
+    ScrollBar := RSWidget.Get(R_NPC_CONTACT_SCROLL_BAR.Group, R_NPC_CONTACT_SCROLL_BAR.Child, R_NPC_CONTACT_SCROLL_BAR.Index);
+    if ScrollBar.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollBar.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollBar.Free;
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_NPCToBox(NPC)) do
+    begin
+      if T.ElapsedTime > 5000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+
+      P := Mouse.GetPosition;
+      if Direction then
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
+      else
+        Mouse.Move(P.X + RandomRange(-1, 1), P.Y + RandomRange(3, 7));
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ListContainerBounds.Contains(R_NPCToBox(NPC).Middle));
+  end;
+
+  //Scroll the interface using the arrows
+  if ScrollType = RSScroll.SCROLLARROWS then
+  begin
+    if Direction then
+      ScrollArrow := RSWidget.Get(R_NPC_CONTACT_SCROLL_ARROW_UP.Group, R_NPC_CONTACT_SCROLL_ARROW_UP.Child, R_NPC_CONTACT_SCROLL_ARROW_UP.Index)
+    else
+      ScrollArrow := RSWidget.Get(R_NPC_CONTACT_SCROLL_ARROW_DOWN.Group, R_NPC_CONTACT_SCROLL_ARROW_DOWN.Child, R_NPC_CONTACT_SCROLL_ARROW_DOWN.Index);
+
+    if ScrollArrow.ref = nil then
+      Exit(False);
+
+    Mouse.Move(ScrollArrow.Bounds);
+    Mouse.Hold(MOUSE_LEFT);
+    ScrollArrow.Free;
+
+    T.Start;
+    while not ListContainerBounds.Contains(R_NPCToBox(NPC)) do
+    begin
+      if T.ElapsedTime > 20000 then
+      begin
+        Mouse.Release(MOUSE_LEFT);
+        Exit(False);
+      end;
+    end;
+
+    Mouse.Release(MOUSE_LEFT);
+    Exit(ListContainerBounds.Contains(R_NPCToBox(NPC).Middle));
+  end;
+end;
+
+{*
+R_SelectNPC
+~~~~~~~~~~~
+Clicks on the selected NPC if it is visible in the NPC Contact interface.
+
+Example:
+    R_SelectNPC(NPC_AMY);
+*}
+Function R_SelectNPC(NPC: TNPCContact): Boolean;
+var
+  Widget: RSWidget;
+begin
+  if (not RSWidget.IsValid(R_NPC_CONTACT_LIST.Group, Ord(NPC))) or R_WidgetIsHidden(R_NPC_CONTACT_LIST) then
+    Exit(False);
+
+  Widget := RSWidget.Get(R_INTERFACE_NPC_CONTACT, Ord(NPC));
+  if (Widget.ref <> nil) and (RSWidget.Get(R_NPC_CONTACT_LIST.Group, R_NPC_CONTACT_LIST.Child).Bounds.Contains(Widget.Bounds)) then
+  begin
+    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Result := True;
+    Widget.Free;
+  end;
+end;
+
+
+{*
+BLAST FURNACE
+~~~~~~~~~~~~~
+Functions for working at the Blast Furnace.
+*}
+
+{*
+R_BarDispenserStatus
+~~~~~~~~~~~~~~~~~~~~
+Gets the status of the Bar Dispenser.
+  0 = No bars being processed
+	1 = Ores are being processed on the conveyor belt, bar dispenser cannot be checked
+	2 = Bars are cooling down
+	3 = Bars can be collected
+
+Example:
+    if R_BarDispenserStatus = 3 then
+      ...
+*}
+Function R_BlastFurnaceBarDispenserStatus: Int32;
+begin
+  Result := RSClient.GetVarBit(VARBIT_BLAST_FURNACE_BAR_DISPENSER);
+end;
+
+
+{*
+MOTHERLOAD MINE
+~~~~~~~~~~~~~~~
+Functions for working at the Motherload Mine.
+*}
+
+{*
+R_MotherloadSackTotal
+~~~~~~~~~~~~~~~~~~~~~
+Returns the total number of items in the sack.
+
+Example:
+    if R_MotherloadSackTotal then
+      ...
+*}
+Function R_MotherloadSackTotal: Int32;
+begin
+  Result := RSClient.GetVarBit(VARBIT_MOTHERLOAD_SACK_NUMBER);
+end;
+
+{*
+R_IsMotherloadSackUpgraded
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the Motherload Sack is upgraded.
+Example:
+    if R_IsMotherloadSackUpgraded then
+      ...
+*}
+Function R_IsMotherloadSackUpgraded: Boolean;
+begin
+  Result := RSClient.GetVarBit(VARBIT_MOTHERLOAD_SACK_UPGRADED) = 1;
 end;

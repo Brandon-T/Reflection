@@ -5,6 +5,8 @@
 type
   RSObjectType = (GAME_OBJECT, WALL_DECORATION, BOUNDARY_OBJECT, FLOOR_DECORATION);
 
+  RSScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
+
   RSType = packed record
     ref: Pointer;
   end;
