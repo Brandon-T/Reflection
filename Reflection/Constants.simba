@@ -881,6 +881,10 @@ const //Widgets
   R_EMOTE_CRAZY_DANCE: RWidget =                     [R_INTERFACE_EMOTE, 1, 46];
   R_EMOTE_PREMIER_SHIELD: RWidget =                  [R_INTERFACE_EMOTE, 1, 47];
   R_EMOTE_EXPLORE: RWidget =                         [R_INTERFACE_EMOTE, 1, 48];
+  R_EMOTE_SCROLL_BAR: RWidget =                      [R_INTERFACE_EMOTE, 2, 1];
+  R_EMOTE_SCROLL_ARROW_UP: RWidget =                 [R_INTERFACE_EMOTE, 2, 4];
+  R_EMOTE_SCROLL_ARROW_DOWN: RWidget =               [R_INTERFACE_EMOTE, 2, 5];
+
 
   { MULTI SKILL MENU }
   R_MULTI_CONTAINER: RWidget =                       [R_INTERFACE_MULTI_SKILL, 0];
