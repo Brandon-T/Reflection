@@ -21,7 +21,13 @@
 {$include_once Timing.simba}
 {$include_once Walking.simba}
 {$include_once Worlds.simba}
+{$include_once Updater.simba}
 
 begin
+  If Not IsReflectionUpToDate then
+  begin
+    TerminateScript('Reflection Out Of Date');
+  end;
+
   RSetup;
 end;

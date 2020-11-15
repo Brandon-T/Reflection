@@ -1,0 +1,113 @@
+{$include_once Internal/Hooks.simba}
+
+const
+  REFLECTION_REPO_USERNAME = 'Brandon-T';
+
+Function IsRepoOutOfDate: Boolean;
+var
+  http_client: Int32;
+  regex: TRegExpr;
+  url: String;
+  versionString: String;
+begin
+  url := 'https://raw.githubusercontent.com/' + REFLECTION_REPO_USERNAME + '/Reflection/master/Internal/Hooks.simba';
+
+  http_client := InitializeHttpClient(True);
+  if http_client < 0 then
+  begin
+    Exit(False); //Assume up to date..
+  end;
+
+  SetHTTPHeader(http_client, 'Accept', 'text/plain');
+  SetHTTPContentType(http_client, 'text/plain');
+  {$IFDEF WINDOWS}
+  SetHTTPUserAgent(http_client, 'Simba/1.4 (Windows NT 10.0; Win64; x64; rv:1400) Gecko/20100101 Simba/1400');
+  {$ELSE}
+  SetHTTPUserAgent(http_client, 'Simba/1.4 (Linux x86_64; rv:1400) Gecko/20100101 Simba/1400');
+  {$ENDIF}
+  versionString := GetHTTPPage(http_client, url);
+  FreeHTTPClient(http_client);
+
+  if Length(versionString) = 0 then
+  begin
+    Exit(False); //Assume up to date..
+  end;
+
+  regex.Init;
+  regex.setExpression('ReflectionRevision = ''([0-9]+)'';');
+  if regex.Exec(versionString) then
+  begin
+    versionString := regex.getMatch(1);
+    if Length(versionString) = 0 then
+    begin
+      Exit(True); //Invalid version.. assume out of date..
+    end;
+
+    Exit(StrToIntDef(ReflectionRevision, 0) < StrToIntDef(versionString, 0));
+  end;
+  regex.Free;
+  Exit(False); //Assume up to date..
+end;
+
+Function GetLatestGamepackRevision: Int32;
+var
+  I: Int32;
+  port: Int32;
+  host: String;
+  version: UInt32;
+  packet: Array of UInt8;
+  strPacket: String;
+  readString: String;
+  socket: Int32;
+begin
+  port := 43594;
+  host := 'oldschool1.runescape.com';
+  version := StrToIntDef(ReflectionRevision, 0) + I;
+
+  if version <= 0 then
+  begin
+    Exit(-1);
+  end;
+
+  For I := version to version + 10 do
+  begin
+    packet := [15, 0, 0, UInt8(version shr 8), UInt8(version)];
+
+    socket := CreateSocket;
+    if socket < 0 then
+    begin
+      Exit(-1);
+    end;
+
+    SetLength(strPacket, Length(packet));
+    MemMove(packet[0], strPacket[1], Length(packet));
+
+    SetSocketTimeout(socket, 5000);
+    ConnectSocket(socket, host, IntToStr(port));
+    SendSocket(socket, strPacket);
+
+    try
+      readString := RecvSocket(socket);
+      if Length(readString) > 0 then
+      begin
+        if UInt8(readString[1]) = 6 then
+        begin
+          Inc(version);
+          continue;
+        end;
+        Exit(version);
+      end;
+    except
+      writeln('Failed');
+    finally
+      CloseSocket(socket);
+      FreeSocket(socket);
+    end;
+  end;
+  Exit(-1);
+end;
+
+Function IsReflectionUpToDate: Boolean;
+begin
+  Result := (Not IsRepoOutOfDate) and (GetLatestGamepackRevision = StrToIntDef(ReflectionRevision, 0));
+end;
