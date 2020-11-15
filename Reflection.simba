@@ -24,10 +24,7 @@
 {$include_once Updater.simba}
 
 begin
-  If Not IsReflectionUpToDate then
-  begin
-    TerminateScript('Reflection Out Of Date');
-  end;
-
+  VerifyReflectionInclude;
+  VerifyRemoteInputPlugins;
   RSetup;
 end;

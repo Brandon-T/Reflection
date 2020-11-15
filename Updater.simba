@@ -107,7 +107,102 @@ begin
   Exit(-1);
 end;
 
+Function DownloadOrCheckRequiredPlugins: Boolean;
+var
+  I: Int32;
+  FileNames: Array of String;
+  FileMap: Array of String;
+  HTTP_Client: Int32;
+begin
+  HTTP_Client := -1;
+
+  //ELSEIF is broken in Simba..
+
+  {$IFDEF WINDOWS}
+    {$IFDEF CPU32}
+    FileNames := ['libRemoteInput-i686.dll'];
+    FileMap := ['libRemoteInput32.dll'];
+    {$ELSE}
+    FileNames := ['libRemoteInput-x86_64.dll'];
+    FileMap := ['libRemoteInput64.dll'];
+    {$ENDIF}
+  {$ENDIF}
+
+  {$IFDEF DARWIN}
+  FileNames := ['libRemoteInput-x86_64.dylib'];
+  FileMap := ['libRemoteInput64.dylib'];
+  {$ENDIF}
+
+  {$IFDEF LINUX}
+    {$IFDEF CPUARM}
+    FileNames := ['libRemoteInput-armhf.so'];
+    FileMap := ['libRemoteInput32.so'];
+    {$ENDIF}
+
+    {$IFDEF CPUAARCH64}
+    FileNames := ['libRemoteInput-aarch64.so'];
+    FileMap := ['libRemoteInput64.so'];
+    {$ENDIF}
+
+    {$IFNDEF CPUARM}
+      {$IFNDEF CPUAARCH64}
+      FileNames := ['libRemoteInput-x86_64.so'];
+      FileMap := ['libRemoteInput64.dll'];
+      {$ENDIF}
+    {$ENDIF}
+  {$ENDIF}
+
+  For I := 0 to High(FileNames) do
+  begin
+    If (Not FileExists(PLUGINPATH + FileNames[I]) and Not FileExists(PLUGINPATH + FileMap[I])) then
+    begin
+      If HTTP_Client < 0 then
+      begin
+        HTTP_Client := InitializeHTTPClient(True);
+        if HTTP_Client < 0 then
+        begin
+          Exit(False);
+        end;
+      end;
+
+      GetHTTPPageEx(HTTP_Client, 'https://github.com/' + REFLECTION_REPO_USERNAME + '/Reflection/releases/download/autobuild/' + FileNames[I], PLUGINPATH + FileNames[I]);
+    end;
+
+    RenameFile(PLUGINPATH + FileNames[I], PLUGINPATH + FileMap[I]);
+  end;
+
+  If HTTP_Client >= 0 then
+  begin
+    FreeHTTPClient(HTTP_Client);
+  end;
+
+  For I := 0 to High(FileMap) do
+  begin
+    If (Not FileExists(PLUGINPATH + FileMap[I])) then
+    begin
+      Exit(False);
+    end;
+  end;
+  Exit(True);
+end;
+
 Function IsReflectionUpToDate: Boolean;
 begin
   Result := (Not IsRepoOutOfDate) and (GetLatestGamepackRevision = StrToIntDef(ReflectionRevision, 0));
+end;
+
+Procedure VerifyRemoteInputPlugins;
+begin
+  If Not DownloadOrCheckRequiredPlugins then
+  begin
+    RaiseException('Could not verify or install RemoteInput plugins.\nPlease Visit: https://github.com/' + REFLECTION_REPO_USERNAME + 'Reflection/releases');
+  end;
+end;
+
+Procedure VerifyReflectionInclude;
+begin
+  If Not IsReflectionUpToDate then
+  begin
+    RaiseException('Could not verify or install Reflection Include.\nPlease Visit: https://github.com/' + REFLECTION_REPO_USERNAME + 'Reflection');
+  end;
 end;
