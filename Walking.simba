@@ -1,0 +1,89 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once srl/shared.simba}
+
+{*
+R_TileToMM
+~~~~~~~~~~
+Converts the input tile to a point on the minimap.
+
+Example:
+  Mouse.Move(R_TileToMM(R_GetMe.Tile));
+*}
+Function R_TileToMM(Tile: RSTile): TPoint;
+begin
+  Result := Tile.ToLocal.TileToMM;
+end;
+
+{*
+R_MMToMS
+~~~~~~~~~~
+Converts the input point to a mainscreen point.
+
+Example:
+  Mouse.Move(R_MMToMS(R_TileToMM(R_GetMe.Tile)));
+*}
+Function R_MMToMS(P: TPoint): TPoint;
+begin
+  Result := TPoint(RSTile(P).MMToTile.TileToMS);
+end;
+
+{*
+R_MMToTile
+~~~~~~~~~~
+Converts the input point to a RSTile.
+
+Example:
+  Mouse.Move(R_MMToTile(R_TileToMM(R_GetMe.Tile)));
+*}
+Function R_MMToTile(P: TPoint): RSTile;
+begin
+  Result := RSTile(P).MMToTile;
+end;
+
+{*
+R_TileHeight
+~~~~~~~~~~~~
+Returns the height of a given tile.
+
+Example:
+  if (R_TileHeight > 13) then
+    ...
+*}
+Function R_TileHeight(Tile: RSTile): Int32;
+begin
+  Result := Tile.GetHeight;
+end;
+
+{*
+R_TileBounds
+~~~~~~~~~~~~
+Returns the mainscreen bounds of a given tile.
+
+Example:
+  TileBounds := R_TileBounds(R_GetMe.Tile);
+*}
+Function R_TileBounds(Tile: RSTile): TRectangle;
+var
+  Rect: T2DRectangle;
+begin
+  Rect := Tile.Project;
+
+  Result.Top := Rect.NW;
+  Result.Right := Rect.NE;
+  Result.Btm   := Rect.SE;
+  Result.Left  := Rect.SW;
+end;
+
+{*
+R_GetMidTile
+~~~~~~~~~~~~
+Returns the middle tile between the two tiles.
+
+Example:
+  MidTile := R_GetMidTile([2543, 3254], [2513, 3267]);
+*}
+Function R_GetMidTile(Tile1, Tile2: RSTile): RSTile;
+begin
+  Result := Point(Round((Tile1.X + Tile2.X)/2), Round((Tile1.Y+Tile2.Y)/2));
+end;

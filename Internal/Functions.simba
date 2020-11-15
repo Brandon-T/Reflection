@@ -1,0 +1,792 @@
+{$include_once Hooks.simba}
+{$IFNDEF FUNCTIONS}
+{$DEFINE FUNCTIONS}
+
+//Used to check for leaks in the include..
+{type
+  MemoryPointer = Array of Pointer;
+
+var
+  MemoryTracker: MemoryPointer;
+
+procedure MemoryPointer.DeleteIndex(index: integer);
+var
+  i: Integer;
+begin
+  if (index >= 0) and (index < Length(self)) then
+  begin
+    for i := index + 1 to high(self) do
+    begin
+      self[i - 1] := self[i];
+    end;
+
+    SetLength(self, Length(self) - 1);
+  end;
+end;
+
+function MemoryPointer.IndexOf(value: pointer): Int32;
+var
+  i: Integer;
+begin
+  for i := 0 to high(self) do
+    if self[i] = value then
+      exit(i);
+
+  exit(-1);
+end;
+
+Procedure MemoryPointer.Add(ptr: Pointer);
+begin
+  self += ptr;
+end;
+
+Procedure MemoryPointer.Add(ptr: Array of Pointer); overload;
+begin
+  self += ptr;
+end;
+
+Procedure MemoryPointer.Remove(ptr: Pointer);
+var
+  J: Integer;
+begin
+  J := self.IndexOf(ptr);
+  if J >= 0 then
+    Delete(self, J, 1);
+end;
+
+Procedure MemoryPointer.Remove(ptrs: Array of Pointer); overload;
+var
+  I: Integer;
+begin
+  for i := 0 to high(ptrs) do
+  begin
+    self.Remove(ptrs[I]);
+  end;
+end;}
+
+// MARK: - OBJECT
+
+Function RGetObject(eios: Pointer; instance: Pointer; constref hook: THook): Pointer;
+begin
+  Result := RIGetObject(eios, instance, PRIField(@hook));
+end;
+
+Procedure RFreeObject(eios: Pointer; instance: Pointer);
+begin
+  if instance <> nil then
+    RIReleaseObject(eios, instance);
+end;
+
+Procedure RFreeObjects(eios: Pointer; constref instances: array of Pointer);
+begin
+  if Length(instances) > 0 then
+    RIReleaseObjects(eios, instances);
+end;
+
+Function RObjectsEqual(eios: Pointer; first, second: Pointer): Boolean;
+begin
+  result := RIObjectsEqual(eios, first, second);
+end;
+
+Function RObjectInstanceOf(eios: Pointer; instance: Pointer; cls: String): Boolean;
+begin
+  result := RIObjectIsInstanceOf(eios, instance, cls);
+end;
+
+
+// MARK: - SINGLE ELEMENTS
+
+Function RGetBool(eios: Pointer; instance: Pointer; constref hook: THook): Boolean;
+begin
+  result := RIGetBool(eios, instance, PRIField(@hook));
+end;
+
+Function RGetChar(eios: Pointer; instance: Pointer; constref hook: THook): Char;
+begin
+  result := RIGetChar(eios, instance, PRIField(@hook));
+end;
+
+Function RGetByte(eios: Pointer; instance: Pointer; constref hook: THook): Byte;
+begin
+  result := RIGetByte(eios, instance, PRIField(@hook));
+end;
+
+Function RGetShort(eios: Pointer; instance: Pointer; constref hook: THook): Int16;
+begin
+  result := RIGetShort(eios, instance, PRIField(@hook));
+end;
+
+Function RGetInt(eios: Pointer; instance: Pointer; constref hook: THook): Int32;
+begin
+  result := RIGetInt(eios, instance, PRIField(@hook)) * Int32(hook.multiplier);
+end;
+
+Function RGetLong(eios: Pointer; instance: Pointer; constref hook: THook): Int64;
+begin
+  result := RIGetLong(eios, instance, PRIField(@hook)) * Int64(hook.multiplier);
+end;
+
+Function RGetFloat(eios: Pointer; instance: Pointer; constref hook: THook): Single;
+begin
+  result := RIGetFloat(eios, instance, PRIField(@hook));
+end;
+
+Function RGetDouble(eios: Pointer; instance: Pointer; constref hook: THook): Double;
+begin
+  result := RIGetDouble(eios, instance, PRIField(@hook));
+end;
+
+Function RGetString(eios: Pointer; instance: Pointer; constref hook: THook): String;
+begin
+  Result := RIGetString(eios, instance, PRIField(@hook));
+end;
+
+
+// MARK: - ARRAY POINTERS
+
+Function RGetArray(eios: Pointer; instance: Pointer; constref hook: THook): Pointer;
+begin
+  result := RIGetArray(eios, instance, PRIField(@hook));
+end;
+
+Function RGetArray(eios: Pointer; instance: Pointer; var size: SizeUInt; constref hook: THook): Pointer; overload;
+begin
+  result := RIGetArray(eios, instance, @size, PRIField(@hook));
+end;
+
+Function RGetArraySize(eios: Pointer; instance: Pointer): SizeUInt;
+begin
+  result := RIGetArraySize(eios, instance);
+end;
+
+Function RGetArraySize(eios: Pointer; instance: Pointer; index: SizeUInt): SizeUInt; overload;
+begin
+  result := RIGetArraySize(eios, instance, index);
+end;
+
+
+// MARK: - Array of 1-Dimension
+
+Function RGetBoolArray(eios: Pointer; instance: Pointer; index: SizeUInt): Boolean;
+type
+  PBool = ^Boolean;
+begin
+  Result := PBool(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, index))^;
+end;
+
+Function RGetCharArray(eios: Pointer; instance: Pointer; index: SizeUInt): Char;
+begin
+  Result := PChar(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_CHAR, index))^;
+end;
+
+Function RGetByteArray(eios: Pointer; instance: Pointer; index: SizeUInt): Byte;
+type
+  PByte = ^Byte;
+begin
+  Result := PByte(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BYTE, index))^;
+end;
+
+Function RGetShortArray(eios: Pointer; instance: Pointer; index: SizeUInt): Int16;
+type
+  PShort = ^Int16;
+begin
+  Result := PShort(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_SHORT, index))^;
+end;
+
+Function RGetIntArray(eios: Pointer; instance: Pointer; index: SizeUInt): Int32;
+type
+  PInt = ^Int32;
+begin
+  Result := PInt(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_INT, index))^;
+end;
+
+Function RGetLongArray(eios: Pointer; instance: Pointer; index: SizeUInt): Int64;
+type
+  PLong = ^Int64;
+begin
+  Result := PLong(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_LONG, index))^;
+end;
+
+Function RGetFloatArray(eios: Pointer; instance: Pointer; index: SizeUInt): Single;
+type
+  PFloat = ^Single;
+begin
+  Result := PFloat(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_FLOAT, index))^;
+end;
+
+Function RGetDoubleArray(eios: Pointer; instance: Pointer; index: SizeUInt): Double;
+type
+  PDouble = ^Double;
+begin
+  Result := PDouble(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_DOUBLE, index))^;
+end;
+
+Function RGetStringArray(eios: Pointer; instance: Pointer; index: SizeUInt): String;
+type
+  PString = ^String;
+begin
+  Result := PString(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_STRING, index))^;
+end;
+
+Function RGetObjectArray(eios: Pointer; instance: Pointer; index: SizeUInt): Pointer;
+begin
+  Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, index);
+end;
+
+Function RGetBoolArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Boolean; overload;
+type
+  TBooleanArray = array of Boolean;
+begin
+  Result := TBooleanArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, index, count));
+end;
+
+Function RGetBoolArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Boolean; overload;
+type
+  TBooleanArray = array of Boolean;
+begin
+  Result := TBooleanArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_BOOLEAN, indices));
+end;
+
+Function RGetCharArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Char; overload;
+type
+  TCharArray = array of Char;
+begin
+  Result := TCharArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_CHAR, index, count));
+end;
+
+Function RGetCharArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Char; overload;
+type
+  TCharArray = array of Char;
+begin
+  Result := TCharArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_CHAR, indices));
+end;
+
+Function RGetByteArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Byte; overload;
+type
+  TByteArray = array of Byte;
+begin
+  Result := TByteArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BYTE, index, count));
+end;
+
+Function RGetByteArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Byte; overload;
+type
+  TByteArray = array of Byte;
+begin
+  Result := TByteArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_BYTE, indices));
+end;
+
+Function RGetShortArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Int16; overload;
+type
+  TShortArray = array of Int16;
+begin
+  Result := TShortArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_SHORT, index, count));
+end;
+
+Function RGetShortArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Int16; overload;
+type
+  TShortArray = array of Int16;
+begin
+  Result := TShortArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_SHORT, indices));
+end;
+
+Function RGetIntArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Int32; overload;
+type
+  TIntArray = array of Int32;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_INT, index, count));
+end;
+
+Function RGetIntArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Int32; overload;
+type
+  TIntArray = array of Int32;
+begin
+  Result := TIntArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_INT, indices));
+end;
+
+Function RGetLongArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Int64; overload;
+type
+  TIntArray = array of Int64;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_LONG, index, count));
+end;
+
+Function RGetLongArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Int64; overload;
+type
+  TIntArray = array of Int64;
+begin
+  Result := TIntArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_LONG, indices));
+end;
+
+Function RGetFloatArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Single; overload;
+type
+  TFloatArray = array of Single;
+begin
+  Result := TFloatArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_FLOAT, index, count));
+end;
+
+Function RGetFloatArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Single; overload;
+type
+  TFloatArray = array of Single;
+begin
+  Result := TFloatArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_FLOAT, indices));
+end;
+
+Function RGetDoubleArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Double; overload;
+type
+  TDoubleArray = array of Double;
+begin
+  Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, index, count));
+end;
+
+Function RGetDoubleArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Double; overload;
+type
+  TDoubleArray = array of Double;
+begin
+  Result := TDoubleArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_DOUBLE, indices));
+end;
+
+Function RGetStringArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, index, count));
+end;
+
+Function RGetStringArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_STRING, indices));
+end;
+
+Function RGetObjectArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Pointer; overload;
+type
+  TObjectArray = array of Pointer;
+begin
+  Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, index, count));
+end;
+
+Function RGetObjectArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Pointer; overload;
+type
+  TObjectArray = array of Pointer;
+begin
+  Result := TObjectArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_OBJECT, indices));
+end;
+
+
+// MARK: - Array of 2-Dimensions
+
+Function RGetBoolArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Boolean;
+type
+  PBool = ^Boolean;
+begin
+  Result := PBool(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, x, y))^;
+end;
+
+Function RGetCharArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Char;
+begin
+  Result := PChar(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_CHAR, x, y))^;
+end;
+
+Function RGetByteArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Byte;
+type
+  PByte = ^Byte;
+begin
+  Result := PByte(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BYTE, x, y))^;
+end;
+
+Function RGetShortArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Int16;
+type
+  PShort = ^Int16;
+begin
+  Result := PShort(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_SHORT, x, y))^;
+end;
+
+Function RGetIntArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Int32;
+type
+  PInt = ^Int32;
+begin
+  Result := PInt(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_INT, x, y))^;
+end;
+
+Function RGetLongArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Int64;
+type
+  PLong = ^Int64;
+begin
+  Result := PLong(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_LONG, x, y))^;
+end;
+
+Function RGetFloatArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Single;
+type
+  PFloat = ^Single;
+begin
+  Result := PFloat(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_FLOAT, x, y))^;
+end;
+
+Function RGetDoubleArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Double;
+type
+  PDouble = ^Double;
+begin
+  Result := PDouble(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_DOUBLE, x, y))^;
+end;
+
+Function RGetStringArray2D(eios: Pointer; instance: Pointer; x, y: Int32): String;
+type
+  PString = ^String;
+begin
+  Result := PString(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_STRING, x, y))^;
+end;
+
+Function RGetObjectArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Pointer;
+begin
+  Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, x, y);
+end;
+
+Function RGetBoolArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Boolean; overload;
+type
+  TBooleanArray = array of Boolean;
+begin
+  Result := TBooleanArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, count, x, y));
+end;
+
+Function RGetCharArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Char; overload;
+type
+  TCharArray = array of Char;
+begin
+  Result := TCharArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_CHAR, count, x, y));
+end;
+
+Function RGetByteArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Byte; overload;
+type
+  TByteArray = array of Byte;
+begin
+  Result := TByteArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BYTE, count, x, y));
+end;
+
+Function RGetShortArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Int16; overload;
+type
+  TShortArray = array of Int16;
+begin
+  Result := TShortArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_SHORT, count, x, y));
+end;
+
+Function RGetIntArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Int32; overload;
+type
+  TIntArray = array of Int32;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_INT, count, x, y));
+end;
+
+Function RGetLongArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Int64; overload;
+type
+  TIntArray = array of Int64;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_LONG, count, x, y));
+end;
+
+Function RGetFloatArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Single; overload;
+type
+  TFloatArray = array of Single;
+begin
+  Result := TFloatArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_FLOAT, count, x, y));
+end;
+
+Function RGetDoubleArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Double; overload;
+type
+  TDoubleArray = array of Double;
+begin
+  Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, count, x, y));
+end;
+
+Function RGetStringArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, count, x, y));
+end;
+
+Function RGetObjectArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Pointer; overload;
+type
+  TObjectArray = array of Pointer;
+begin
+  Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y));
+end;
+
+
+// MARK: - Array of 3-Dimensions
+
+Function RGetBoolArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Boolean;
+type
+  PBool = ^Boolean;
+begin
+  Result := PBool(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, x, y, z))^;
+end;
+
+Function RGetCharArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Char;
+begin
+  Result := PChar(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_CHAR, x, y, z))^;
+end;
+
+Function RGetByteArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Byte;
+type
+  PByte = ^Byte;
+begin
+  Result := PByte(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BYTE, x, y, z))^;
+end;
+
+Function RGetShortArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Int16;
+type
+  PShort = ^Int16;
+begin
+  Result := PShort(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_SHORT, x, y, z))^;
+end;
+
+Function RGetIntArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Int32;
+type
+  PInt = ^Int32;
+begin
+  Result := PInt(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_INT, x, y, z))^;
+end;
+
+Function RGetLongArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Int64;
+type
+  PLong = ^Int64;
+begin
+  Result := PLong(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_LONG, x, y, z))^;
+end;
+
+Function RGetFloatArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Single;
+type
+  PFloat = ^Single;
+begin
+  Result := PFloat(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_FLOAT, x, y, z))^;
+end;
+
+Function RGetDoubleArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Double;
+type
+  PDouble = ^Double;
+begin
+  Result := PDouble(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_DOUBLE, x, y, z))^;
+end;
+
+Function RGetStringArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): String;
+type
+  PString = ^String;
+begin
+  Result := PString(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_STRING, x, y, z))^;
+end;
+
+Function RGetObjectArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Pointer;
+begin
+  Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, x, y, z);
+end;
+
+Function RGetBoolArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Boolean; overload;
+type
+  TBooleanArray = array of Boolean;
+begin
+  Result := TBooleanArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, count, x, y, z));
+end;
+
+Function RGetCharArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Char; overload;
+type
+  TCharArray = array of Char;
+begin
+  Result := TCharArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_CHAR, count, x, y, z));
+end;
+
+Function RGetByteArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Byte; overload;
+type
+  TByteArray = array of Byte;
+begin
+  Result := TByteArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BYTE, count, x, y, z));
+end;
+
+Function RGetShortArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Int16; overload;
+type
+  TShortArray = array of Int16;
+begin
+  Result := TShortArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_SHORT, count, x, y, z));
+end;
+
+Function RGetIntArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Int32; overload;
+type
+  TIntArray = array of Int32;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_INT, count, x, y, z));
+end;
+
+Function RGetLongArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Int64; overload;
+type
+  TIntArray = array of Int64;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_LONG, count, x, y, z));
+end;
+
+Function RGetFloatArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Single; overload;
+type
+  TFloatArray = array of Single;
+begin
+  Result := TFloatArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_FLOAT, count, x, y, z));
+end;
+
+Function RGetDoubleArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Double; overload;
+type
+  TDoubleArray = array of Double;
+begin
+  Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, count, x, y, z));
+end;
+
+Function RGetStringArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, count, x, y, z));
+end;
+
+Function RGetObjectArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Pointer; overload;
+type
+  TObjectArray = array of Pointer;
+begin
+  Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y, z));
+end;
+
+
+// MARK: - Array of 4-Dimensions
+
+Function RGetBoolArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Boolean;
+type
+  PBool = ^Boolean;
+begin
+  Result := PBool(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, x, y, z, w))^;
+end;
+
+Function RGetCharArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Char;
+begin
+  Result := PChar(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_CHAR, x, y, z, w))^;
+end;
+
+Function RGetByteArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Byte;
+type
+  PByte = ^Byte;
+begin
+  Result := PByte(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_BYTE, x, y, z, w))^;
+end;
+
+Function RGetShortArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Int16;
+type
+  PShort = ^Int16;
+begin
+  Result := PShort(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_SHORT, x, y, z, w))^;
+end;
+
+Function RGetIntArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Int32;
+type
+  PInt = ^Int32;
+begin
+  Result := PInt(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_INT, x, y, z, w))^;
+end;
+
+Function RGetLongArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Int64;
+type
+  PLong = ^Int64;
+begin
+  Result := PLong(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_LONG, x, y, z, w))^;
+end;
+
+Function RGetFloatArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Single;
+type
+  PFloat = ^Single;
+begin
+  Result := PFloat(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_FLOAT, x, y, z, w))^;
+end;
+
+Function RGetDoubleArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Double;
+type
+  PDouble = ^Double;
+begin
+  Result := PDouble(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_DOUBLE, x, y, z, w))^;
+end;
+
+Function RGetStringArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): String;
+type
+  PString = ^String;
+begin
+  Result := PString(RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_STRING, x, y, z, w))^;
+end;
+
+Function RGetObjectArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Pointer;
+begin
+  Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, x, y, z, w);
+end;
+
+Function RGetBoolArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Boolean; overload;
+type
+  TBooleanArray = array of Boolean;
+begin
+  Result := TBooleanArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BOOLEAN, count, x, y, z, w));
+end;
+
+Function RGetCharArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Char; overload;
+type
+  TCharArray = array of Char;
+begin
+  Result := TCharArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_CHAR, count, x, y, z, w));
+end;
+
+Function RGetByteArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Byte; overload;
+type
+  TByteArray = array of Byte;
+begin
+  Result := TByteArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_BYTE, count, x, y, z, w));
+end;
+
+Function RGetShortArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Int16; overload;
+type
+  TShortArray = array of Int16;
+begin
+  Result := TShortArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_SHORT, count, x, y, z, w));
+end;
+
+Function RGetIntArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Int32; overload;
+type
+  TIntArray = array of Int32;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_INT, count, x, y, z, w));
+end;
+
+Function RGetLongArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Int64; overload;
+type
+  TIntArray = array of Int64;
+begin
+  Result := TIntArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_LONG, count, x, y, z, w));
+end;
+
+Function RGetFloatArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Single; overload;
+type
+  TFloatArray = array of Single;
+begin
+  Result := TFloatArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_FLOAT, count, x, y, z, w));
+end;
+
+Function RGetDoubleArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Double; overload;
+type
+  TDoubleArray = array of Double;
+begin
+  Result := TDoubleArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_DOUBLE, count, x, y, z, w));
+end;
+
+Function RGetStringArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of String; overload;
+type
+  TStringArray = array of String;
+begin
+  Result := TStringArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_STRING, count, x, y, z, w));
+end;
+
+Function RGetObjectArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Pointer; overload;
+type
+  TObjectArray = array of Pointer;
+begin
+  Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y, z, w));
+end;
+{$ENDIF}

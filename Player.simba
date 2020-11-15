@@ -1,0 +1,584 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once Mainscreen.simba}
+{$include_once Worlds.simba}
+{$include_once srl/shared.simba}
+
+(*
+PLAYER
+======
+
+  Functions for your player and other visible players.
+*)
+
+
+type
+  RPlayer = record
+    LoginName: String;
+    Password: String;
+    BankPin: String;
+    isMember: Boolean;
+    isActive: Boolean;
+    World: Int32; // if not defined, will use random world using the filter
+    WorldFilter: TRSWorldFilters;
+    Data: Pointer;
+  end;
+
+  TRSPlayer = record
+    Name: String;
+    Tile: TPoint;
+    Destination: TPoint;
+    CombatLevel: Int32;
+    Equipment: Array of Int32;
+    AnimationId: Int32;
+    Health: Int32;
+    Orientation: Int32;
+  end;
+
+  TCameraHeight = (
+    MIN_HEIGHT = 0,
+    MAX_HEIGHT = 100);
+
+  TCameraZoom = (
+    MIN_ZOOM = 0,
+    HALF_ZOOM = 50,
+    MAX_ZOOM = 100);
+
+const
+  //PITCH UTILITY
+  PITCH_MIN  = 128;
+  PITCH_MAX  = 383;
+
+  //YAW UTILITY
+  YAW_MIN    = 0;
+  YAW_MAX    = 2047;
+  
+  //VARBITS
+  VARBIT_IS_POISONED         = 102;
+  VARBIT_IS_ATTACKING_PLAYER = 1075;
+  VARBIT_IN_WILDERNESS       = 5963;   
+
+var
+  Player: RPlayer;
+(*
+RPlayer Functions
+=================
+
+  Login functions for your player.
+*)
+
+{*
+RPlayer.HandleResponse
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the response was found during login.
+*}
+Function RPlayer.HandleResponse(Response: String; Attempts: Int32): Boolean;
+type
+  TResponse = record
+    Text: String;
+    Attempts: Int32;
+    WaitTime: Int32;
+ end;
+var
+  Responses: array of TResponse;
+  i: Int32;
+begin
+  Responses := [
+                ['Invalid username or password.', 5, 0],
+                ['Please enter your username/email address.', 5, 0],
+                ['Error connecting to server.', 20, 10000],
+                ['Your account has not logged out', 5, 60000],
+                ['Login server offline.', 20, 60000],
+                ['Error loading your profile.', 20, 60000],
+                ['Connection timed out.', 20, 30000],
+                ['Login limit exceeded', 20, 30000],
+                ['This world is full', 20, 15000],
+                ['Your account has been disabled', 1, 0]
+               ];
+
+  for i := 0 to High(Responses) do
+    if (Pos(Responses[i].Text, Response) > 0) then
+    begin
+      Writeln('Found response "%s"', [Responses[i].Text]);
+
+      if (Attempts >= Responses[i].Attempts) then
+        Exit(False);
+      if (Responses[i].WaitTime > 0) then
+        Wait(Responses[i].WaitTime + Random(1000));
+
+      Exit(True);
+    end;
+
+  Writeln('Unknown login response "%s"', [Response], dtFatal);
+end;
+
+{*
+RPlayer.LoginToLobby
+~~~~~~~~~~~~~~~~~~~~
+Returns true if the player was logged into the lobby.
+*}
+Function RPlayer.LoginToLobby: Boolean;
+var
+  Response: String;
+  Attempts: Int32;
+begin
+  while (Attempts < 25) do
+  begin
+    Inc(Attempts);
+
+    if R_IsLoggedIn() then
+      Exit(True);
+    if R_IsLobbyOpen() then
+      Exit(True);
+    if (not R_LoginScreen.Open()) then
+      Exit(False);
+
+    if R_LoginScreen.EnterDetails(Self.LoginName, Self.Password) then
+    begin
+      Response := R_LoginScreen.WaitResponse();
+
+      if R_WaitIsLobbyOpen(5000) then
+        Exit(True);
+      if (Response <> '') and (not Self.HandleResponse(Response, Attempts)) then
+        Break;
+    end;
+  end;
+
+  WriteLn('Failed logging into lobby');
+end;
+
+{*
+RPlayer.Login
+~~~~~~~~~~~~~
+Returns true if the player was logged in.
+*}
+Function RPlayer.Login: Boolean;
+var
+  Attempts: Int32;
+begin
+  while (Attempts < 20) do
+  begin
+    Inc(Attempts);
+
+    if R_IsLoggedIn then
+      Exit(True);
+
+    if R_IsLobbyOpen then
+      Result := R_EnterGame
+    else begin
+      R_LoginScreen.Open();
+
+      if (Self.World < 1) then
+      begin
+        if Self.isMember then
+          Self.WorldFilter.Properties += TYPE_FREE
+        else
+          Self.WorldFilter.Properties += TYPE_MEMBERS;
+
+        Self.World := WorldPanel.GetWorld(Self.WorldFilter);
+      end;
+      if (R_LoginScreen.GetCurrentWorld() <> Self.World) then
+      begin
+        if R_LoginScreen.OpenWorldSwitcher() and WaitUntil(WorldPanel.IsOpen, 50, Random(6000, 8000)) then
+          WorldPanel.SelectWorld(Self.World);
+        if (R_LoginScreen.GetCurrentWorld() <> Self.World) then
+          Continue;
+      end;
+
+      if (Self.LoginToLobby()) then
+        R_EnterGame;
+      
+      if (R_IsLoggedIn) then
+        Result := True;
+    end;
+
+    Wait(Random(200, 400));
+  end;
+end;
+
+(*
+TRSPlayer Functions
+===================
+
+  In-game functions for your player and other visible players.
+*)
+
+{*
+R_GetMe
+~~~~~~~
+Returns a TRSPlayer containing information about the signed in account.
+
+Example:
+  Me := R_GetMe;
+*}
+Function R_GetMe: TRSPlayer;
+var
+  LocalPlayer: RSPlayer;
+  Definition: RSPlayerDefinition;
+begin
+  LocalPlayer := RSPlayer.Me;
+  Definition := LocalPlayer.Definition;
+  Result.Name := LocalPlayer.Name;
+  Result.Tile := LocalPlayer.Tile;
+  Result.Destination := LocalPlayer.Destination;
+  Result.CombatLevel := LocalPlayer.CombatLevel;
+  Result.Equipment := Definition.Equipment;
+  Result.AnimationId := LocalPlayer.AnimationId;
+  Result.Health := LocalPlayer.Health;
+  Result.Orientation := LocalPlayer.Orientation;
+  Definition.Free;
+  LocalPlayer.Free;
+end;
+
+{*
+R_GetPlayers
+~~~~~~~~~~~~
+Returns an array of TRSPlayer containing all visible players.
+
+Example:
+  AllPlayers := R_GetPlayers;
+*}
+Function R_GetPlayers: Array of TRSPlayer;
+var
+  I: Int32;
+  Players: Array of RSPlayer;
+  Definition: RSPlayerDefinition;
+begin
+  Players := RSPlayer.AllPlayers;
+  SetLength(Result, Length(Players));
+  for I := 0 to high(Players) do
+  begin
+    Definition := Players[I].Definition;
+    Result[I].Name := Players[I].Name;
+    Result[I].Tile := Players[I].Tile;
+    Result[I].Destination := Players[I].Destination;
+    Result[I].CombatLevel := Players[I].CombatLevel;
+    Result[I].Equipment := [];
+    Result[I].AnimationId := Players[I].AnimationId;
+    Result[I].Health := Players[I].Health;
+    Result[I].Orientation := Players[I].Orientation;
+    Definition.Free;
+  end;
+  RSTypeArray(Players).Free;
+end;
+
+{*
+R_GetAnimation
+~~~~~~~~~~~~~~
+Returns the Animation ID of your player.
+
+Example:
+  MyAnimation := R_GetAnimation;
+*}
+Function R_GetAnimation: Int32;
+var
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Result := Me.AnimationId;
+  Me.Free;
+end;
+
+{*
+R_IsMoving
+~~~~~~~~~~
+Returns true if the player is moving.
+
+Example:
+  if R_IsMoving then
+    ...
+*}
+Function R_IsMoving: Boolean;
+var
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Result := Me.IsMoving;
+  Me.Free;
+end;
+
+{*
+R_GetDestination
+~~~~~~~~~~~~~~~~
+Returns the destination tile of the player.
+
+Example:
+  if (R_GetMe.Tile.DistanceTo(R_GetDestination) < 9) then
+    ...
+*}
+Function R_GetDestination: RSTile;
+var
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Result := Me.Destination;
+  Me.Free;
+end;
+
+{*
+R_IsPoisoned
+~~~~~~~~~~~~
+Returns true if the player is poisoned.
+
+Example:
+  if R_IsPoisoned then
+    ...
+*}
+Function R_IsPoisoned: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IS_POISONED) = 1;
+end;
+
+{*
+R_IsAttackingPlayer
+~~~~~~~~~~~~~~~~~~~
+Returns true if the player is attacking another player.
+
+Example:
+  if R_IsAttackingPlayer then
+    ...
+*}
+Function R_IsAttackingPlayer: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IS_ATTACKING_PLAYER) <> -1;
+end;
+
+{*
+R_IsInWilderness
+~~~~~~~~~~~~~~~~
+Returns true if the player is in the wilderness.
+
+Example:
+  if R_IsInWilderness then
+    ...
+*}
+Function R_IsInWilderness: Boolean;
+begin
+  Result := RSVarps.VarpMain(VARBIT_IN_WILDERNESS) = 1;
+end;    
+
+{*
+R_GetDirectionToMove - Utility Function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Returns the direction to turn camera based off current camera position and
+  the desired point.
+
+  Results:
+    0: Left
+    1: Right
+*}
+Function R_GetDirectionToMove(DesiredPoint: Int32): Int32;
+var
+  Val1, Val2, MiddlePoint: Integer;
+begin
+  Val1 := RSCamera.Yaw + Round(YAW_MAX / 2);
+  Val2 := RSCamera.Yaw - Round(YAW_MAX / 2);
+
+  if (Val1 <= YAW_MAX) and (Val1 >= YAW_MIN) then
+  begin
+    MiddlePoint := Val1;
+    if (DesiredPoint <= MiddlePoint) and (DesiredPoint >= RSCamera.Yaw) then
+      Result := 1
+    else Result := 0;
+  end else if (Val2 <= YAW_MAX) and (Val2 >= YAW_MIN) then
+  begin
+    MiddlePoint := Val2;
+    if (DesiredPoint >= MiddlePoint) and (DesiredPoint <= RSCamera.Yaw) then
+      Result := 0
+    else Result := 1;
+  end else
+    Result := -1;
+end;
+
+
+{*
+R_SetCameraAngle
+~~~~~~~~~~~~~~~~
+Returns true if the camera height is set to the specified height as a percentage.
+  Accepts a value from 0 -> 360.
+Example:
+  if R_SetCameraAngle(160) then
+    ...
+*}
+Function R_SetCameraAngle(Degrees: Int32): Boolean;
+var
+  DesiredAngle, AngleEdge1, AngleEdge2: Integer;
+  RandomizedRange: Int32;
+begin
+  If (Degrees < 0) or (Degrees > 360) then
+    Exit(False);
+
+  DesiredAngle := Round(Degrees * (256 / 45));
+  RandomizedRange := RandomRange(35, 75);
+  AngleEdge1 := DesiredAngle - RandomizedRange;
+  AngleEdge2 := DesiredAngle + RandomizedRange;
+
+  if (AngleEdge1 < 0) then
+    AngleEdge1 := AngleEdge1 + YAW_MAX
+  else if (AngleEdge2 > YAW_MAX) then
+    AngleEdge2 := AngleEdge2 - YAW_MAX;
+
+  //Special Case
+  if (Min(AngleEdge1, AngleEdge2) = AngleEdge2) then
+  begin
+    While InRange(RSCamera.Yaw, AngleEdge2, AngleEdge1) do
+    begin
+      if (R_GetDirectionToMove(DesiredAngle) = 0)then
+      begin
+        if Keyboard.IsKeyDown(VK_RIGHT) then
+          Keyboard.KeyUp(VK_RIGHT);
+
+        if not Keyboard.IsKeyDown(VK_LEFT) then
+          Keyboard.KeyDown(VK_LEFT);
+
+      end else if (R_GetDirectionToMove(DesiredAngle) = 1) then
+      begin
+        if Keyboard.IsKeyDown(VK_LEFT) then
+          Keyboard.KeyUp(VK_LEFT);
+
+        if not Keyboard.IsKeyDown(VK_RIGHT) then
+          Keyboard.KeyDown(VK_RIGHT);
+      end;
+      Wait(25, RandomRange(50, 75));
+    end;
+    Result := Not InRange(RSCamera.Yaw, AngleEdge2, AngleEdge1);
+  end else
+  begin
+    While not InRange(RSCamera.Yaw, AngleEdge1, AngleEdge2) do
+    begin
+      if (R_GetDirectionToMove(DesiredAngle) = 0)then
+      begin
+        if Keyboard.IsKeyDown(VK_RIGHT) then
+          Keyboard.KeyUp(VK_RIGHT);
+
+        if not Keyboard.IsKeyDown(VK_LEFT) then
+          Keyboard.KeyDown(VK_LEFT);
+
+      end else if (R_GetDirectionToMove(DesiredAngle) = 1) then
+      begin
+        if Keyboard.IsKeyDown(VK_LEFT) then
+          Keyboard.KeyUp(VK_LEFT);
+
+        if not Keyboard.IsKeyDown(VK_RIGHT) then
+          Keyboard.KeyDown(VK_RIGHT);
+      end;
+      Wait(25, RandomRange(50, 75));
+    end;
+    Result := InRange(RSCamera.Yaw, AngleEdge1, AngleEdge2);
+  end;
+  if Keyboard.IsKeyDown(VK_RIGHT) then
+    Keyboard.KeyUp(VK_RIGHT)
+  else if Keyboard.IsKeyDown(VK_LEFT) then
+    Keyboard.KeyUp(VK_LEFT);
+end;
+
+{*
+R_SetCameraHeightPercent
+~~~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the camera height is set to the specified height as a percentage.
+  Accepts a value from 0 -> 100.
+Example:
+  if R_SetCameraHeightPercent(100) then
+    ...
+*}
+Function R_SetCameraHeightPercent(Height: Int32): Boolean;
+var
+  DesiredPitch: Extended;
+  RandomizedRange: Int32;
+begin
+  If (Height < Ord(MIN_HEIGHT)) or (Height > Ord(MAX_HEIGHT)) then
+    Exit(False);
+
+  DesiredPitch := ((PITCH_MAX - PITCH_MIN) * (Height / 100)) + PITCH_MIN;
+  RandomizedRange := RandomRange(5, 30);
+  While (not InRange(RSCamera.Pitch, DesiredPitch - RandomizedRange, DesiredPitch + RandomizedRange)) do
+  begin
+    if (RSCamera.Pitch > DesiredPitch) then
+    begin
+      if Keyboard.IsKeyDown(VK_UP) then
+        Keyboard.KeyUp(VK_UP);
+
+      if not Keyboard.IsKeyDown(VK_DOWN) then
+        Keyboard.KeyDown(VK_DOWN);
+
+    end else if (RSCamera.Pitch < DesiredPitch) then
+    begin
+      if Keyboard.IsKeyDown(VK_DOWN) then
+        Keyboard.KeyUp(VK_DOWN);
+
+      if not Keyboard.IsKeyDown(VK_UP) then
+        Keyboard.KeyDown(VK_UP);
+    end;
+    Wait(25, RandomRange(50, 75));
+  end;
+  if Keyboard.IsKeyDown(VK_DOWN) then
+    Keyboard.KeyUp(VK_DOWN)
+  else if Keyboard.IsKeyDown(VK_UP) then
+    Keyboard.KeyUp(VK_UP);
+
+  Result := InRange(RSCamera.Pitch, DesiredPitch - RandomizedRange, DesiredPitch + RandomizedRange);
+end;
+
+{*
+R_SetCameraHeight
+~~~~~~~~~~~~~~~~~
+Returns true if the camera height was set to the specified height.
+  Acceptable Inputs:
+    - MAX_HEIGHT
+    - MIN_HEIGHT
+Example:
+  if R_SetCameraHeight(MAX_HEIGHT) then
+    ...
+*}
+Function R_SetCameraHeight(Height: TCameraHeight): Boolean;
+begin
+  Result := R_SetCameraHeightPercent(Ord(Height));
+end;
+
+{*
+R_SetCameraZoomPercent
+~~~~~~~~~~~~~~~~~
+Returns true if the camera zoom was set to the specified zoom.
+
+Example:
+  if R_SetCameraZoomPercent(75) then
+    ...
+*}
+Function R_SetCameraZoomPercent(Zoom: Int32): Boolean;
+var
+  Widget: RSWidget;
+  RandomizedRange: Int32;
+begin
+  Widget := RSWidget.Get(R_SETTINGS_DISPLAY_ZOOM_SLIDER.Group, R_SETTINGS_DISPLAY_ZOOM_SLIDER.Child);
+  RandomizedRange := RandomRange(7, 20);
+
+  Mouse.Move(R_MainscreenBounds, False);
+
+  While (not InRange(Widget.RelativeX, Zoom - RandomizedRange, Zoom + RandomizedRange)) do
+  begin
+    if (Widget.RelativeX > Zoom) then
+      Mouse.Scroll(RandomRange(1, 3), False)
+    else if (Widget.RelativeX < Zoom) then
+     Mouse.Scroll(RandomRange(1, 3), True);
+  end;
+  Result := InRange(Widget.RelativeX, Zoom - RandomizedRange, Zoom + RandomizedRange);
+  Widget.Free;
+end;
+
+{*
+R_SetCameraZoom
+~~~~~~~~~~~~~~~~~
+Returns true if the camera zoom was set to the specified zoom.
+  Acceptable Inputs:
+    - MAX_ZOOM
+    - HALF_ZOOM
+    - MIN_ZOOM
+
+Example:
+  if R_SetCameraZoom(MAX_ZOOM) then
+    ...
+*}
+Function R_SetCameraZoom(Zoom: TCameraZoom): Boolean;
+begin
+  Result := R_SetCameraZoomPercent(Ord(Zoom));
+end;

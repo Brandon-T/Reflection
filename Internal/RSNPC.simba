@@ -1,0 +1,140 @@
+{$include_once RSStructures.simba}
+{$include_once Static.simba}
+{$include_once RSClient.simba}
+{$include_once RSNPCDefinition.simba}
+{$include_once RSActor.simba}
+
+Function RSNPC.Definition: RSNPCDefinition; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, NPC_DEFINITION);
+end;
+
+Function RSNPC.AllNPCs: Array of RSNPC; static;
+var
+  NPCs: Pointer;
+  NPCsArray: Array of Pointer;
+  Indices: Array of Int32;
+  I, NPCsSize, Actual: SizeUInt;
+begin
+  Indices := RSClient.NPCIndices();
+  if Length(Indices) < 1 then
+    Exit;
+
+  NPCsSize := 0;
+  NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCS);
+  if NPCs = nil then
+    Exit;
+
+  NPCsArray := RGetObjectArray(R_EIOS, NPCs, Indices);
+  RFreeObject(R_EIOS, NPCs);
+
+  SetLength(Result, Length(NPCsArray));
+
+  for I := 0 to High(NPCsArray) do
+  begin
+    if NPCsArray[I] <> nil then
+    begin
+      Result[Actual].ref := NPCsArray[I];
+      Inc(Actual);
+    end;
+  end;
+  SetLength(Result, Actual);
+end;
+
+Function RSNPC.Model: RSModel; constref;
+var
+  Definition: RSNPCDefinition;
+begin
+  Definition := self.Definition;
+  if Definition.ref = nil then
+    Exit;
+  Result := Definition.CachedModel;
+  Definition.Free;
+end;
+
+Function RSNPC.AnimatedModel: RSAnimatedModel; constref;
+var
+  AnimationId, AnimationDelay: Int32;
+  AnimationFrame, MovementId: Int32;
+  MovementFrame: Int32;
+  Model: RSModel;
+  IdleSequence: RSAnimationSequence;
+  MovementSequence: RSAnimationSequence;
+
+  AnimationCache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  Model := self.Model;
+
+  if Model.ref <> nil then
+  begin
+    AnimationDelay := 0;
+    AnimationId := self.AnimationId;
+    MovementId := self.MovementSequenceId;
+    AnimationFrame := self.AnimationFrame;
+    MovementFrame := self.MovementFrame;
+
+    if (AnimationId <> -1) and (AnimationDelay = 0) then
+    begin
+      AnimationCache := RSAnimationSequence.AnimationSequenceCache;
+      if AnimationCache.ref <> nil then
+      begin
+        HashTable := AnimationCache.HashTable;
+        if HashTable.ref <> nil then
+        begin
+          IdleSequence.ref := HashTable.GetObject(AnimationId).ref;
+        end;
+      end;
+
+      Garbage += [HashTable, AnimationCache];
+    end;
+
+    if (MovementId <> -1) and ((MovementId <> self.CurrentSequenceId) or (IdleSequence.ref = nil)) then
+    begin
+      AnimationCache := RSAnimationSequence.AnimationSequenceCache;
+      if AnimationCache.ref <> nil then
+      begin
+        HashTable := AnimationCache.HashTable;
+        if HashTable.ref <> nil then
+        begin
+          MovementSequence.ref := HashTable.GetObject(MovementId).ref;
+        end;
+      end;
+
+      Garbage += [HashTable, AnimationCache];
+    end;
+
+    Garbage.Free;
+    Exit(RSNPCDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
+  end;
+
+  Result.ref := Model.ref;
+  Result.vertices := [];
+  {$IFDEF MODEL_TRIANGLES}
+  Result.triangles := [];
+  {$ENDIF}
+
+  Garbage.Free;
+end;
+
+function RSNPC.ToTPA(): TPointArray
+var
+  objModel: RSModel;
+  objTile: RSTile;
+  triangles: array of T2DTriangle;
+  points: TPointArray;
+  i: Int32;
+begin
+  objModel := Self.Model;
+  objTile := Self.LocalTile;
+  triangles := objModel.Project(objTile.X, objTile.Y, objTile.GetHeight(), 0);
+  objModel.free;
+  for i := 0 to high(triangles) do
+  begin
+    points += triangles[i].A;
+    points += triangles[i].B;
+    points += triangles[i].C;
+  end;
+  Result := points;
+end;

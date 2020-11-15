@@ -1,0 +1,301 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once GameTab.simba}
+{$include_once Mouse.simba}
+{$include_once Timing.simba}
+
+type
+  TAttackSpell = (
+    CANCEL = 0,
+    ATTACK_WIND_STRIKE = 1,
+    ATTACK_WATER_STRIKE,
+    ATTACK_EARTH_STRIKE,
+    ATTACK_FIRE_STRIKE,
+    ATTACK_WIND_BOLT,
+    ATTACK_WATER_BOLT,
+    ATTACK_EARTH_BOLT,
+    ATTACK_FIRE_BOLT,
+    ATTACK_WIND_BLAST,
+    ATTACK_WATER_BLAST,
+    ATTACK_EARTH_BLAST,
+    ATTACK_FIRE_BLAST,
+    ATTACK_WIND_WAVE,
+    ATTACK_WATER_WAVE,
+    ATTACK_EARTH_WAVE,
+    ATTACK_FIRE_WAVE,
+    ATTACK_SMOKE_RUSH = 31,
+    ATTACK_SHADOW_RUSH = 32,
+    ATTACK_BLOOD_RUSH = 33,
+    ATTACK_ICE_RUSH = 34,
+    ATTACK_SMOKE_BURST = 35,
+    ATTACK_SHADOW_BURST = 36,
+    ATTACK_BLOOD_BURST = 37,
+    ATTACK_ICE_BURST = 38,
+    ATTACK_SMOKE_BLITZ = 39,
+    ATTACK_SHADOW_BLITZ = 40,
+    ATTACK_BLOOD_BLITZ = 41,
+    ATTACK_ICE_BLITZ = 42,
+    ATTACK_SMOKE_BARRAGE = 43,
+    ATTACK_SHADOW_BARRAGE = 44,
+    ATTACK_BLOOD_BARRAGE = 45,
+    ATTACK_ICE_BARRAGE = 46,
+    ATTACK_WIND_SURGE = 48,
+    ATTACK_WATER_SURGE = 49,
+    ATTACK_EARTH_SURGE = 50,
+    ATTACK_FIRE_SURGE = 51
+  );
+
+(*
+COMBAT
+======
+
+  Functions that interact with the Combat tab.
+  Examples:
+    - Get all available attack styles
+    - Change attack styles
+    - Use special attack
+    - Enable Auto Retaliate
+*)
+
+{*
+R_SelectAttackStyle
+~~~~~~~~~~~~~~~~~~~~~~
+Sets the attack style to the specified attack style.
+  Options:
+    Smash
+    Block
+    Impale
+    Spike
+    ...
+
+Example:
+    R_SelectAttackStyle("Pound");
+*}
+Function R_SelectAttackStyle(Style: String; ReturnToTab: Boolean = False): Boolean;
+var
+  Widget, CheckWidget: RSWidget;
+  WeaponStyles: Array of RWidget;
+  I, PreviousTab: Integer;
+begin
+  WeaponStyles := [R_COMBAT_STYLE_ONE, R_COMBAT_STYLE_TWO, R_COMBAT_STYLE_THREE,R_COMBAT_STYLE_FOUR];
+
+  for I := 0 to High(WeaponStyles) do
+  begin
+    Widget := RSWidget.Get(WeaponStyles[I].Group, WeaponStyles[I].Child + 3);
+    CheckWidget := RSWidget.Get(WeaponStyles[I].Group, WeaponStyles[I].Child + 1, 4);
+    if (Widget.ref <> nil) and (CheckWidget.ref <> nil) and (Lowercase(Widget.Text) = Lowercase(Style)) then
+    begin
+      if (CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
+      begin
+        if (not R_IsGameTabOpen(GAMETAB_COMBAT)) then
+        begin
+          PreviousTab := R_CurrentGameTab;
+          R_OpenGameTab(GAMETAB_COMBAT);
+        end;
+
+        Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+
+        if ReturnToTab then
+          R_OpenGameTab(PreviousTab);
+
+        Widget.Free;
+        CheckWidget.Free;
+        Break;
+      end;
+    end;
+    Result := True;
+    Widget.Free;
+    CheckWidget.Free;
+  end;
+end;
+
+{*
+R_SelectAttackSpell
+~~~~~~~~~~~~~~~~~~~~~~
+Sets the attack spell to the specified attack style.
+
+Example:
+    R_SelectAttackSpell(WIND_STRIKE, False);
+*}
+Function R_SelectAttackSpell(Spell: TAttackSpell; Defensive: Boolean = False): Boolean;
+var
+  Widget, CheckWidget, SpellWidget: RSWidget;
+begin
+  if Defensive then
+  begin
+    Widget := RSWidget.Get(R_COMBAT_SPELL_DEFENSIVE.Group, R_COMBAT_SPELL_DEFENSIVE.Child);
+    CheckWidget := RSWidget.Get(R_COMBAT_SPELL_DEFENSIVE.Group, R_COMBAT_SPELL_DEFENSIVE.Child, 4);
+  end else
+  begin
+    Widget := RSWidget.Get(R_COMBAT_SPELL.Group, R_COMBAT_SPELL.Child);
+    CheckWidget := RSWidget.Get(R_COMBAT_SPELL.Group, R_COMBAT_SPELL.Child, 0);
+  end;
+
+  if (Widget.ref <> nil) and (CheckWidget.ref <> nil) then
+  begin
+    if (CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
+    begin
+      R_OpenGameTab(GAMETAB_COMBAT);
+
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Wait(250, RandomRange(612, 1330));
+
+      SpellWidget := RSWidget.Get(R_COMBAT_SPELL_CONTAINER.Group, R_COMBAT_SPELL_CONTAINER.Child, Ord(Spell));
+
+      if (SpellWidget.ref <> nil) then
+      begin
+        Mouse.Click(SpellWidget.Bounds, MOUSE_LEFT);
+        Result := True;
+      end;
+
+      SpellWidget.Free;
+    end else
+      Result := True;
+    Widget.Free;
+    CheckWidget.Free;
+  end;
+end;
+
+{*
+R_GetCombatStyles
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the possible attack styles.
+
+Example:
+    AttackStyle := R_GetCombatStyles;
+    R_SelectAttackStyle(AttackStyle[RandomRange(0, High(AttackStyle))]);
+*}
+Function R_GetCombatStyles(): TStringArray;
+var
+  Widget: RSWidget;
+  WeaponStyles, SpellStyles: Array of RWidget;
+  Options: TStringArray;
+  I: Int32;
+begin
+  WeaponStyles := [R_COMBAT_STYLE_ONE, R_COMBAT_STYLE_TWO, R_COMBAT_STYLE_THREE, R_COMBAT_STYLE_FOUR];
+  SpellStyles := [R_COMBAT_SPELL_DEFENSIVE_TEXT, R_COMBAT_SPELL_TEXT];
+
+  for I := 0 to High(WeaponStyles) do
+  begin
+    Widget := RSWidget.Get(WeaponStyles[I].Group, WeaponStyles[I].Child + 3);
+    if (Widget.ref <> nil) then
+    begin
+      Options.Append(Widget.Text);
+      Widget.Free;
+    end;
+    Widget.Free;
+  end;
+
+  for I := 0 to High(SpellStyles) do
+  begin
+    Widget := RSWidget.Get(SpellStyles[I].Group, SpellStyles[I].Child);
+    if (Widget.ref <> nil) then
+    begin
+      if (SPellStyles[I] = R_COMBAT_SPELL_DEFENSIVE_TEXT) then
+        Options.Append('Defensive ' + Widget.Text)
+      else Options.Append(Widget.Text);
+      Widget.Free;
+    end;
+    Widget.Free;
+  end;
+
+  Result := Options;
+end;
+
+{*
+R_AutoRetaliate
+~~~~~~~~~~~~~~~~~~~~~~
+Sets Auto Retaliate to the specified setting.
+
+Example:
+    R_AutoRetaliate(On: Boolean = True);
+*}
+Function R_AutoRetaliate(On: Boolean = True; ReturnToTab: Boolean = False): Boolean;
+var
+  Widget, CheckWidget: RSWidget;
+  State, PreviousTab: Integer;
+begin
+  if On then
+    State := R_BUTTON_CENTER_HIGHLIGHT_RED
+  else State := R_BUTTON_CENTER_HIGHLIGHT_GREY;
+
+  Widget := RSWidget.Get(R_COMBAT_AUTO_RETALIATE.Group, R_COMBAT_AUTO_RETALIATE.Child);
+  CheckWidget := RSWidget.Get(R_COMBAT_AUTO_RETALIATE.Group, R_COMBAT_AUTO_RETALIATE.Child + 2, 4);
+  if (Widget.ref <> nil) and (CheckWidget.ref <> nil) then
+  begin
+    if (CheckWidget.TextureID <> State) then
+    begin
+      if (not R_IsGameTabOpen(GAMETAB_COMBAT)) then
+      begin
+        PreviousTab := R_CurrentGameTab;
+        R_OpenGameTab(GAMETAB_COMBAT);
+      end;
+
+      Wait(80, RandomRange(150, 784));
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+
+      if ReturnToTab then
+      begin
+        Wait(80, RandomRange(150, 784));
+        R_OpenGameTab(PreviousTab);
+      end;
+    end;
+    Result := True;
+  end;
+  Widget.Free;
+end;
+
+{*
+R_GetWeaponCategory
+~~~~~~~~~~~~~~~~~~~~~~
+Get weapon category using the combat interface.
+
+Example:
+    Writeln(R_GetWeaponCategory);
+*}
+Function R_GetWeaponCategory(): String;
+var
+  Widget: RSWidget;
+  Category: String;
+begin
+  Widget := RSWidget.Get(R_COMBAT_WEAPON_CATEGORY.Group, R_COMBAT_WEAPON_CATEGORY.Child);
+  if (Widget.ref <> nil) then
+  begin
+    Result := copy(Widget.Text, pos(':', Widget.Text) + 2, High(Widget.Text));
+  end;
+  Widget.Free;
+end;
+
+{*
+R_GetCombatLevel
+~~~~~~~~~~~~~~~~~~~~~~
+Get player's combat level.
+
+Example:
+    Writeln(R_GetCombatLevel);
+*}
+Function R_GetCombatLevel(): Int32;
+begin
+  Result := RSPlayer.Me.CombatLevel;
+end;
+
+{*
+R_GetEquippedWeapon
+~~~~~~~~~~~~~~~~~~~~~~
+Get main weapon name according to the Combat tab.
+
+Example:
+    Writeln(R_GetEquippedWeapon);
+*}
+Function R_GetEquippedWeapon(): String;
+var
+  Widget: RSWidget;
+  Category: String;
+begin
+  Widget := RSWidget.Get(R_COMBAT_WEAPON.Group, R_COMBAT_WEAPON.Child);
+  if (Widget.ref <> nil) then
+  begin
+    Result := Widget.Text;
+  end;
+  Widget.Free;
+end;

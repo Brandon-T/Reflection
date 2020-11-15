@@ -1,0 +1,28 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+
+
+Function RSCamera.X: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAX);
+end;
+
+Function RSCamera.Y: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAY);
+end;
+
+Function RSCamera.Z: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAZ);
+end;
+
+Function RSCamera.Pitch: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAPITCH);
+end;
+
+Function RSCamera.Yaw: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAYAW);
+end;

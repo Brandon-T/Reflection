@@ -1,0 +1,255 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once srl/shared.simba}
+
+
+
+Function PointInPolygon(p: TPoint; const poly: array of TPoint): boolean;
+var
+  i, j: integer;
+begin
+ result := false;
+ j := high(poly);
+
+ for i := low(poly) to high(poly) do
+ begin
+  if ((((poly[i].y <= p.y) and (p.y < poly[j].y)) or ((poly[j].y <= p.y) and
+     (p.y < poly[i].y)) ) and (p.x < ((poly[j].x - poly[i].x) *
+     (p.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x))) then
+     result := not result;
+
+  j := i;
+ end;
+end;
+
+Function LineSegmentsIntersect(A, B, C, D: TPoint): Boolean;
+var
+  A1, B1, C1: Double;
+  A2, B2, C2: Double;
+  Divisor: Double;
+  PX, PY: Double;
+begin
+  A1 := B.Y - A.Y;
+  B1 := A.X - B.X;
+  C1 := A1 * A.X + B1 * A.Y;
+
+  A2 := D.Y - C.Y;
+  B2 := C.X - D.X;
+  C2 := A2 * C.X + B2 * C.Y;
+
+  Divisor := A1 * B2 - A2 * B1;
+  PX := (C1 * B2 - C2 * B1) / Divisor;
+
+  if ((PX > A.X) and (PX > B.X)) or ((PX > C.X) and (PX > D.X)) or ((PX < A.X) and (PX < B.X)) or ((PX < C.X) and (PX < D.X)) then
+    Exit(False);
+
+  PY := (A1 * C2 - A2 * C1) / Divisor;
+  if ((PY > A.Y) and (PY > B.Y)) or ((PY > C.Y) and (PY > D.Y)) or ((PY < A.Y) and (PY < B.Y)) or ((PY < C.Y) and (PY < D.Y)) then
+    Exit(False);
+
+  Result := True;
+end;
+
+Procedure TPointArray.SortByAngleFrom(Q: TPoint; Angle: Double);
+  Function AngleDifference(A, B: Double): Double;
+  begin
+    Result := FixD(A - B);
+  end;
+
+  Function AngleBetween(A, B: TPoint): Double;
+  begin
+    Result := ArcTan2(B.Y - A.Y, B.X - A.X);
+  end;
+var
+  I: Int32;
+  TIA: Array of Int32;
+begin
+  SetLength(TIA, Length(self));
+  For I := 0 to High(self) do
+  begin
+    TIA[I] := Round(AngleDifference(Angle, AngleBetween(Q, self[I])) * 10000);
+  end;
+  QuickTPASort(TIA, self, 0, high(self), false);
+end;
+
+Function ConvexHullMonotoneChain(Points: Array of TPoint): Array of TPoint;
+  Function Cross(O, A, B: TPoint): Int32;
+  begin
+     Result := ((A.X - O.X) * (B.Y - O.Y)) - ((A.Y - O.Y) * (B.X - O.X));
+  end;
+var
+  I: Int32;
+  N, K, T: Int32;
+begin
+  N := Length(Points);
+  K := 0;
+  if N <= 3 then
+    Exit(Points);
+
+  SetLength(Result, 2 * N);
+  SortTPAByX(Points, True);
+
+  for I := 0 to N - 1 do
+  begin
+    while (K >= 2) and (Cross(Result[K - 2], Result[K - 1], Points[I]) <= 0) do
+      K -= 1;
+
+    Result[K] := Points[I];
+    K += 1;
+  end;
+
+  T := K + 1;
+  for I := N - 1 downto 1 do
+  begin
+    while (K >= T) and (Cross(Result[K - 2], Result[K - 1], Points[I - 1]) <= 0) do
+      K -= 1;
+
+    Result[K] := Points[I - 1];
+    K += 1;
+  end;
+
+  SetLength(Result, K - 1);
+end;
+
+Function ConvexHull(Points: Array of TPoint): Array of TPoint;
+var
+  I: Int32;
+  P, Left, Right, Top, Bottom: TPoint;
+  Cull, Filtered: Array of TPoint;
+begin
+  Left := Points[0];
+  Right := Points[0];
+  Top := Points[0];
+  Bottom := Points[0];
+
+  for I := 0 to High(Points) do
+  begin
+    P := Points[I];
+    if P.X < Left.X then
+      Left := P;
+
+    if P.X > Right.X then
+      Right := P;
+
+    if P.Y < Top.Y then
+      Top := P;
+
+    if P.Y > Bottom.Y then
+      Bottom := P;
+  end;
+
+  Cull := [Left, Top, Right, Bottom];
+  Filtered := CopyTPA(Cull);
+
+  for I := 0 to High(Points) do
+  begin
+    if not PointInPolygon(Points[I], Cull) then
+      Filtered += Points[I];
+  end;
+
+  Result := ConvexHullMonotoneChain(Filtered);
+end;
+
+Function ConcaveHull(points: Array of TPoint; K: Int32): Array of TPoint;
+  Function kNearestNeighbours(points: Array of TPoint; p: TPoint; k: Int32): Array of TPoint;
+  var
+    I: Int32;
+  begin
+    SortTPAFrom(points, p);
+    SetLength(Result, Min(K, Length(points)));
+    for i := 0 to high(Result) do
+      Result[I] := Points[I];
+  end;
+
+  Function MinYPoint(points: Array of TPoint): TPoint;
+  var
+    I: Int32;
+  begin
+    Result := points[0];
+
+    for i := 1 to high(points) do
+    begin
+      if points[i].Y < Result.Y then
+        Result := points[i];
+    end;
+  end;
+
+  Function AngleBetween(A, B: TPoint): Double;
+  begin
+    Result := ArcTan2(B.Y - A.Y, B.X - A.X);
+  end;
+var
+  i, j, kk, step, lastPoint: Int32;
+  prevAngle: Double;
+  firstPoint, currentPoint: TPoint;
+  sortedPoints, pointSet, hull: TPointArray;
+  its, insideCheck: Boolean;
+begin
+  kk := Max(K, 3);
+  pointSet := CopyTPA(points);
+  ClearDoubleTPA(pointSet);
+
+  if Length(pointSet) < 3 then
+    Exit(pointSet);
+
+
+  kk := Min(kk, Length(pointSet) - 1);
+
+  firstPoint := minYPoint(pointSet);
+  hull += firstPoint;
+  currentPoint := firstPoint;
+  pointSet.remove(firstPoint);
+
+  prevAngle := 0.0;
+  step := 2;
+
+  while ((currentPoint <> firstPoint) or (step = 2)) and (Length(pointSet) > 0) do
+  begin
+    if step = 5 then
+      pointSet += firstPoint;
+
+    sortedPoints := kNearestNeighbours(pointSet, currentPoint, kk);
+    sortedPoints.SortByAngleFrom(currentPoint, prevAngle);
+
+    its := True;
+    i := -1;
+    while its and (i < Length(sortedPoints) - 1) do
+    begin
+      Inc(I);
+      lastPoint := 0;
+      if sortedPoints[i] = firstPoint then
+        lastPoint := 1;
+
+      j := 2;
+      its := false;
+      while (not its) and (j < Length(hull) - lastPoint) do
+      begin
+        its := LineSegmentsIntersect(hull[step - 2], sortedPoints[i], hull[step - 2 - j], hull[step - 1 - j]);
+        Inc(J);
+      end;
+    end;
+
+    if its then
+      Exit(ConcaveHull(points, K + 1));
+
+    currentPoint := sortedPoints[I];
+    hull += currentPoint;
+    pointSet.remove(currentPoint);
+
+    prevAngle := AngleBetween(hull[step - 1], hull[step - 2]);
+    Inc(step);
+  end;
+
+  insideCheck := true;
+  I := Length(pointSet) - 1;
+  while insideCheck and (I > 0) do
+  begin
+    insideCheck := PointInPolygon(pointSet[I], hull);
+    Dec(I);
+  end;
+
+  if not insideCheck then
+    Exit(ConcaveHull(points, K + 1));
+
+  Exit(hull);
+end;

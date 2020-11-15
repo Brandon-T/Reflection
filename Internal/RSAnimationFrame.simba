@@ -1,0 +1,62 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+{$include_once RSCache.simba}
+{$include_once RSIterableHashTable.simba}
+
+
+Function RSAnimationFrame.Animation(Index: Int32): RSAnimation; constref;
+var
+  Frames: Pointer;
+  FramesSize: SizeUInt;
+begin
+  FramesSize := 0;
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONFRAMES_FRAMES);
+  if Frames = nil then
+    Exit;
+
+  Result.ref := RGetObjectArray(R_EIOS, Frames, Index);
+  RFreeObject(R_EIOS, Frames);
+end;
+
+Function RSAnimationFrame.Animations: Array of RSAnimation; constref;
+var
+  Frames: Pointer;
+  I, FramesSize: SizeUInt;
+  FramesArray: Array of Pointer;
+begin
+  FramesSize := 0;
+  Frames := RGetArray(R_EIOS, ref, FramesSize, ANIMATIONFRAMES_FRAMES);
+  if Frames = nil then
+    Exit;
+
+  FramesArray := RGetObjectArray(R_EIOS, Frames, 0, FramesSize);
+  RFreeObject(R_EIOS, Frames);
+
+  SetLength(Result, FramesSize);
+
+  for I := 0 to FramesSize - 1 do
+  begin
+    Result[I].ref := FramesArray[I];
+  end;
+end;
+
+Function RSAnimationFrame.GetFrame(FrameID: Int64): RSAnimationFrame; static;
+var
+  FrameCache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  FrameCache := RSClient.AnimationFrameCache;
+  if FrameCache.ref = nil then
+    Exit;
+
+  HashTable := FrameCache.HashTable;
+  if HashTable.ref <> nil then
+  begin
+    Result.ref := HashTable.GetObject(FrameID).ref;
+  end;
+
+  Garbage := [HashTable, FrameCache];
+  Garbage.Free;
+end;

@@ -1,0 +1,32 @@
+{$include_once srl/shared.simba}
+{$include_once Timing.simba}
+
+{*
+R_DidRedClick
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if red 'X' appeared. Will return false if not used after a mouse click.
+
+Example:
+  Mouse.Click(MOUSE_LEFT);
+  if R_DidRedClick then
+    Result := True;
+*} 
+Function R_DidRedClick(): Boolean;
+begin
+  Result := WaitUntil((RGetInt(R_EIOS, nil, Client_CrossHairColor) = 2), 50, 200);
+end;
+
+{*
+R_DidYellowClick
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if yellow 'X' appeared. Will return false if not used after a mouse click.
+
+Example:
+  Mouse.Click(MOUSE_LEFT);
+  if R_DidYellowClick then
+    Result := True;
+*} 
+Function R_DidYellowClick(): Boolean;
+begin
+  Result := WaitUntil((RGetInt(R_EIOS, nil, Client_CrossHairColor) = 1), 50, 200);
+end;

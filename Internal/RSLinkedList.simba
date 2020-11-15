@@ -1,0 +1,12 @@
+{$include_once RSStructures.simba}
+{$include_once RSNode.simba}
+
+Function RSLinkedList.Head: RSNode;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, LINKEDLIST_HEAD);
+end;
+
+Function RSLinkedList.Current: RSNode;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, LINKEDLIST_CURRENT);
+end;

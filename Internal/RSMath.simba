@@ -1,0 +1,437 @@
+{$include_once Structures.simba}
+{$include_once Static.simba}
+{$include_once RSCamera.simba}
+{$include_once RSClient.simba}
+{$include_once RSModel.simba}
+{$include_once RSAnimatedModel.simba}
+
+Function TVector.WorldToScreen(LocalX, LocalY, LocalZ, Orientation, CameraX, CameraY, CameraZ, SinYaw, CosYaw, SinPitch, CosPitch, ViewPortWidth, ViewPortHeight, ViewPortScale: Int32): TPoint; constref;
+var
+  P: TVector;
+  X, Y, Z, Calculation: Int32;
+begin
+  // Swap Angles because Models in RS are rotated
+  P := [self.X, self.Z, self.Y];
+
+  // Rotate based on orientation
+  if Orientation > 0 then
+  begin
+    P := [Sar(((P.X * COSINE[Orientation]) + (P.Y * SINE[Orientation])), 16),
+          Sar(((P.Y * COSINE[Orientation]) - (P.X * SINE[Orientation])), 16),
+          P.Z];
+  end;
+
+  // Translate to local coords
+  P.X += LocalX;
+  P.Y += LocalY;
+  P.Z += LocalZ;
+
+  // Translate to camera
+  P.X -= CameraX;
+  P.Y -= CameraY;
+  P.Z -= CameraZ;
+
+  // Project to canvas
+  X := P.X;
+  Y := P.Y;
+  Z := P.Z;
+
+  Calculation := Sar(((X * CosYaw) + (Y * SinYaw)), 16);
+  Y := Sar(((Y * CosYaw) - (X * SinYaw)), 16);
+  X := Calculation;
+  Calculation := Sar(((Z * CosPitch) - (Y * SinPitch)), 16);
+  Z := Sar(((Y * CosPitch) + (Z * SinPitch)), 16);
+  Y := Calculation;
+
+  if (Z >= 50) then
+  begin
+    Result.X := (X * viewPortScale div Z) + (ViewPortWidth div 2);
+    Result.Y := (Y * viewPortScale div Z) + (ViewPortHeight div 2);
+    Exit;
+  end;
+
+  Result.X := -1;
+  Result.Y := -1;
+end;
+
+Function TVector.WorldToScreen(LocalX, LocalY, LocalZ, Orientation: Int32): TPoint; constref; overload;
+var
+  CameraX, CameraY, CameraZ, CameraYaw, CameraPitch: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+begin
+  CameraX := RSCamera.X;
+  CameraY := RSCamera.Y;
+  CameraZ := RSCamera.Z;
+  CameraYaw := RSCamera.Yaw;
+  CameraPitch := RSCamera.Pitch;
+
+  ViewPortScale := RSClient.ViewPortScale;
+  ViewPortWidth := RSClient.ViewPortWidth;
+  ViewPortHeight := RSClient.ViewPortHeight;
+
+  SinPitch := SINE[cameraPitch];
+  CosPitch := COSINE[cameraPitch];
+  SinYaw := SINE[cameraYaw];
+  CosYaw := COSINE[cameraYaw];
+
+  Result := self.WorldToScreen(LocalX, LocalY, LocalZ,
+                               Orientation,
+                               CameraX, CameraY, CameraZ,
+                               SinYaw, CosYaw, SinPitch, CosPitch,
+                               ViewPortWidth, ViewPortHeight, ViewPortScale);
+end;
+
+Function TVector.WorldToScreen: TPoint; constref; overload;
+var
+  P: TVector;
+  Pitch, Yaw: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+begin
+  Pitch := RSCamera.Pitch;
+  Yaw := RSCamera.Yaw;
+  ViewPortScale := RSClient.ViewPortScale;
+  ViewPortWidth := RSClient.ViewPortWidth;
+  ViewPortHeight := RSClient.ViewPortHeight;
+
+  SinPitch := SINE[Pitch];
+  CosPitch := COSINE[Pitch];
+  SinYaw := SINE[Yaw];
+  CosYaw := COSINE[Yaw];
+
+  P := [self.X, self.Z, self.Y];
+
+  Result := P.WorldToScreen(0, 0, 0,
+                            -1,
+                            RSCamera.X, RSCamera.Y, RSCamera.Z,
+                            SinYaw, CosYaw, SinPitch, CosPitch,
+                            ViewPortWidth, ViewPortHeight, ViewPortScale);
+end;
+
+Function Project(constref Vertices: Array of TVector; LocalX, LocalY, LocalZ, Orientation: Int32): Array of TPoint;
+var
+  I, J: Int32;
+  CameraX, CameraY, CameraZ, CameraYaw, CameraPitch: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+  P: TPoint;
+  T: Int64;
+
+  Function isValidPoint(point: TPoint): Boolean;
+  begin
+    Result := (point.x <> -1) and (point.y <> -1);
+  end;
+begin
+  CameraX := RSCamera.X;
+  CameraY := RSCamera.Y;
+  CameraZ := RSCamera.Z;
+  CameraYaw := RSCamera.Yaw;
+  CameraPitch := RSCamera.Pitch;
+
+  ViewPortScale := RSClient.ViewPortScale;
+  ViewPortWidth := RSClient.ViewPortWidth;
+  ViewPortHeight := RSClient.ViewPortHeight;
+
+  SinPitch := SINE[cameraPitch];
+  CosPitch := COSINE[cameraPitch];
+  SinYaw := SINE[cameraYaw];
+  CosYaw := COSINE[cameraYaw];
+
+  J := 0;
+  SetLength(Result, Length(Vertices));
+
+  for I := 0 to high(Vertices) do
+  begin
+    P := Vertices[I].WorldToScreen(LocalX, LocalY, LocalZ,
+                                   Orientation, CameraX, CameraY, CameraZ,
+                                   SinYaw, CosYaw, SinPitch, CosPitch,
+                                   ViewPortWidth, ViewPortHeight, ViewPortScale);
+    if isValidPoint(P) then
+    begin
+      Result[J] := P;
+      Inc(J);
+    end;
+  end;
+
+  SetLength(Result, J);
+end;
+
+Function Project(constref Triangles: Array of TTriangle; LocalX, LocalY, LocalZ, Orientation: Int32): Array of TTriangle; overload;
+var
+  I, J: Int32;
+  CameraX, CameraY, CameraZ, CameraYaw, CameraPitch: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+  A, B, C: TPoint;
+
+  Function isValidPoint(constref point: TPoint): Boolean;
+  begin
+    Result := (point.x <> -1) and (point.y <> -1);
+  end;
+begin
+  CameraX := RSCamera.X;
+  CameraY := RSCamera.Y;
+  CameraZ := RSCamera.Z;
+  CameraYaw := RSCamera.Yaw;
+  CameraPitch := RSCamera.Pitch;
+
+  ViewPortScale := RSClient.ViewPortScale;
+  ViewPortWidth := RSClient.ViewPortWidth;
+  ViewPortHeight := RSClient.ViewPortHeight;
+
+  SinPitch := SINE[cameraPitch];
+  CosPitch := COSINE[cameraPitch];
+  SinYaw := SINE[cameraYaw];
+  CosYaw := COSINE[cameraYaw];
+
+  J := 0;
+  SetLength(Result, Length(Triangles));
+
+  for I := 0 to high(Triangles) do
+  begin
+    A := Triangles[I].A.WorldToScreen(LocalX, LocalY, LocalZ,
+                                      Orientation, CameraX, CameraY, CameraZ,
+                                      SinYaw, CosYaw, SinPitch, CosPitch,
+                                      ViewPortWidth, ViewPortHeight, ViewPortScale);
+
+    B := Triangles[I].B.WorldToScreen(LocalX, LocalY, LocalZ,
+                                      Orientation, CameraX, CameraY, CameraZ,
+                                      SinYaw, CosYaw, SinPitch, CosPitch,
+                                      ViewPortWidth, ViewPortHeight, ViewPortScale);
+
+    C := Triangles[I].C.WorldToScreen(LocalX, LocalY, LocalZ,
+                                      Orientation, CameraX, CameraY, CameraZ,
+                                      SinYaw, CosYaw, SinPitch, CosPitch,
+                                      ViewPortWidth, ViewPortHeight, ViewPortScale);
+
+    if isValidPoint(A) and isValidPoint(B) and isValidPoint(C) then
+    begin
+      Result[J].A.X := A.X;
+      Result[J].B.X := B.X;
+      Result[J].C.X := C.X;
+
+      Result[J].A.Y := A.Y;
+      Result[J].B.Y := B.Y;
+      Result[J].C.Y := C.Y;
+      Inc(J);
+    end;
+  end;
+
+  SetLength(Result, J);
+end;
+
+Function RSModel.Project(LocalX, LocalY, LocalZ, Orientation: Int32): Array of T2DTriangle; constref;
+var
+  I, J: Int32;
+  CameraX, CameraY, CameraZ, CameraYaw, CameraPitch: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+  Vertices: Array of TVector;
+  Indices: Array of TVector;
+  P, A, B, C: TPoint;
+
+  Function isValidPoint(point: TPoint): Boolean;
+  begin
+    Result := (point.x <> -1) and (point.y <> -1);
+  end;
+begin
+  CameraX := RSCamera.X;
+  CameraY := RSCamera.Y;
+  CameraZ := RSCamera.Z;
+  CameraYaw := RSCamera.Yaw;
+  CameraPitch := RSCamera.Pitch;
+
+  ViewPortScale := RSClient.ViewPortScale;
+  ViewPortWidth := RSClient.ViewPortWidth;
+  ViewPortHeight := RSClient.ViewPortHeight;
+
+  SinPitch := SINE[cameraPitch];
+  CosPitch := COSINE[cameraPitch];
+  SinYaw := SINE[cameraYaw];
+  CosYaw := COSINE[cameraYaw];
+
+  J := 0;
+  Vertices := self.Vertices;
+  Indices := self.Indices;
+
+  for I := 0 to high(Vertices) do
+  begin
+    P := Vertices[I].WorldToScreen(LocalX, LocalY, LocalZ,
+                                   Orientation, CameraX, CameraY, CameraZ,
+                                   SinYaw, CosYaw, SinPitch, CosPitch,
+                                   ViewPortWidth, ViewPortHeight, ViewPortScale);
+    Vertices[I].X := P.X;
+    Vertices[I].Y := P.Y;
+  end;
+
+  SetLength(Result, Length(Indices));
+  for i := 0 to High(Indices) do
+  begin
+    A.X := Vertices[Indices[I].X].X;
+    B.X := Vertices[Indices[I].Y].X;
+    C.X := Vertices[Indices[I].Z].X;
+
+    A.Y := Vertices[Indices[I].X].Y;
+    B.Y := Vertices[Indices[I].Y].Y;
+    C.Y := Vertices[Indices[I].Z].Y;
+
+    if IsValidPoint(A) and IsValidPoint(B) and IsValidPoint(C) then
+    begin
+      Result[J].A.X := A.X;
+      Result[J].B.X := B.X;
+      Result[J].C.X := C.X;
+
+      Result[J].A.Y := A.Y;
+      Result[J].B.Y := B.Y;
+      Result[J].C.Y := C.Y;
+      Inc(J);
+    end;
+  end;
+  SetLength(Result, J);
+end;
+
+Function RSAnimatedModel.Project(LocalX, LocalY, LocalZ, Orientation: Int32): Array of T2DTriangle; constref;
+var
+  I, J: Int32;
+  CameraX, CameraY, CameraZ, CameraYaw, CameraPitch: Int32;
+  ViewPortScale, ViewPortHeight, ViewPortWidth: Int32;
+  SinPitch, CosPitch, SinYaw, CosYaw: Int32;
+  Vertices: Array of TVector;
+  Indices: Array of TVector;
+  P, A, B, C: TPoint;
+
+  Function isValidPoint(point: TPoint): Boolean;
+  begin
+    Result := (point.x <> -1) and (point.y <> -1);
+  end;
+begin
+  CameraX := RSCamera.X;
+  CameraY := RSCamera.Y;
+  CameraZ := RSCamera.Z;
+  CameraYaw := RSCamera.Yaw;
+  CameraPitch := RSCamera.Pitch;
+
+  ViewPortScale := RSClient.ViewPortScale;
+  ViewPortWidth := RSClient.ViewPortWidth;
+  ViewPortHeight := RSClient.ViewPortHeight;
+
+  SinPitch := SINE[cameraPitch];
+  CosPitch := COSINE[cameraPitch];
+  SinYaw := SINE[cameraYaw];
+  CosYaw := COSINE[cameraYaw];
+
+  J := 0;
+  Vertices := self.Vertices;
+  Indices := RSModel(self.ref).Indices;
+
+  for I := 0 to high(Vertices) do
+  begin
+    P := Vertices[I].WorldToScreen(LocalX, LocalY, LocalZ,
+                                   Orientation, CameraX, CameraY, CameraZ,
+                                   SinYaw, CosYaw, SinPitch, CosPitch,
+                                   ViewPortWidth, ViewPortHeight, ViewPortScale);
+    Vertices[I].X := P.X;
+    Vertices[I].Y := P.Y;
+  end;
+
+  SetLength(Result, Length(Indices));
+  for i := 0 to High(Indices) do
+  begin
+    A.X := Vertices[Indices[I].X].X;    //Indices[0][I]
+    B.X := Vertices[Indices[I].Y].X;    //Indices[1][I]
+    C.X := Vertices[Indices[I].Z].X;    //Indices[2][I]
+
+    A.Y := Vertices[Indices[I].X].Y;
+    B.Y := Vertices[Indices[I].Y].Y;
+    C.Y := Vertices[Indices[I].Z].Y;
+
+    if IsValidPoint(A) and IsValidPoint(B) and IsValidPoint(C) then
+    begin
+      Result[J].A.X := A.X;
+      Result[J].B.X := B.X;
+      Result[J].C.X := C.X;
+
+      Result[J].A.Y := A.Y;
+      Result[J].B.Y := B.Y;
+      Result[J].C.Y := C.Y;
+      Inc(J);
+    end;
+  end;
+  SetLength(Result, J);
+end;
+
+Function RSTile.Project: T2DRectangle; constref;
+const
+  LocalTileSize = (1 shl 7);
+var
+  plane: Int32;
+  xSize, ySize: Int32;
+  swX, swY, neX, neY: Int32;
+  NW, NE, SW, SE: TVector;
+
+  Function IsValidTile(tile: TVector): Boolean;
+  begin
+    Result := ((tile.X >= 128) and (tile.Y >= 128) and (tile.X <= 13056) and (tile.Y <= 13056));
+  end;
+
+  Function TileHeight(X, Y, Plane: Int32): Int32;
+  var
+    xSize, ySize: Int32;
+    var1, var2, var3, var4: Int32;
+  begin
+    xSize := Sar(X, 7);
+    ySize := Sar(Y, 7);
+
+    if (xSize >= 0) and (ySize >= 0) and (xSize < 104) and (ySize < 104) then
+    begin
+      var1 := X and 127;
+      var2 := Y and 127;
+      var3 := Sar(((var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize]) + ((128 - var1) * CACHED_TILE_HEIGHTS[plane][xSize][ySize])), 7);
+      var4 := Sar(((CACHED_TILE_HEIGHTS[plane][xSize][ySize + 1] * (128 - var1)) + (var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize + 1])), 7);
+
+      Result := Sar(((128 - var2) * var3 + var2 * var4), 7);
+      Exit;
+    end;
+
+    Exit(0);
+  end;
+begin
+  {$IFDEF USE_REGION_CACHING}
+  UpdateRegionCache(self.X, self.Y);
+  {$ENDIF}
+
+  xSize := Sar(self.X, 7);
+  ySize := Sar(self.Y, 7);
+  plane := RSClient.Plane;
+  swX := self.X - (LocalTileSize div 2);
+	swY := self.Y - (LocalTileSize div 2);
+  neX := self.X + (LocalTileSize div 2);
+	neY := self.Y + (LocalTileSize div 2);
+
+  if (xSize >= 0) and (ySize >= 0) and (xSize < 104) and (ySize < 104) then
+  begin
+    if (plane < 3) and ((CACHED_TILE_SETTINGS[1][xSize][ySize] and 2) = 2) then
+    begin
+      Inc(plane);
+    end;
+
+    NW := [swX, neY, TileHeight(swX, neY, plane)];
+    NE := [neX, neY, TileHeight(neX, neY, plane)];
+    SE := [neX, swY, TileHeight(neX, swY, plane)];
+    SW := [swX, swY, TileHeight(swX, swY, plane)];
+
+    if IsValidTile(NW) and IsValidTile(NE) and IsValidTile(SE) and IsValidTile(SW) then
+    begin
+      Result.NW := NW.WorldToScreen;
+      Result.NE := NE.WorldToScreen;
+      Result.SE := SE.WorldToScreen;
+      Result.SW := SW.WorldToScreen;
+      Exit;
+    end;
+  end;
+  Result.NW := Point(-1, -1);
+  Result.NE := Point(-1, -1);
+  Result.SE := Point(-1, -1);
+  Result.SW := Point(-1, -1);
+end;

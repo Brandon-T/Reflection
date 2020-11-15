@@ -1,0 +1,324 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+
+const
+  EQUIPMENT_HELMET   = 0;
+  EQUIPMENT_CAPE     = 1;
+  EQUIPMENT_NECK     = 2;
+  EQUIPMENT_WEAPON   = 3;
+  EQUIPMENT_CHEST    = 4;
+  EQUIPMENT_SHIELD   = 5;
+  EQUIPMENT_LEGS     = 6;
+  EQUIPMENT_GLOVES   = 7;
+  EQUIPMENT_BOOTS    = 8;
+  EQUIPMENT_RING     = 9;
+  EQUIPMENT_AMMO     = 10;
+
+type
+  TRSEquipmentItem = record
+    ID: Int32;
+    Slot: Int32;
+    Name: String;
+    Bounds: TBox;
+  end;
+
+{*
+R_GetEquipmentIDs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a list of IDs for all equiped items.
+
+Example:
+    CurrentEquipment := R_GetEquipmentIDs;
+*}
+Function R_GetEquipmentIDs: Array of Int32;
+var
+  Equipment: Pointer;
+  EquipmentSize: SizeUInt;
+  Player: RSLocalPlayer;
+  Definition: RSPlayerDefinition;
+  Garbage: RSTypeArray;
+  IDs: Array of Int32;
+  I: Int32;
+begin
+  Player := RSPlayer.Me;
+  if Player.ref = nil then
+    Exit;
+
+  Garbage += Player;
+  Definition := Player.Definition;
+  if Definition.ref = nil then
+  begin
+    Garbage.Free;
+    Exit;
+  end;
+
+  Garbage += Definition;
+  EquipmentSize := 0;
+  Equipment := RGetArray(R_EIOS, Definition.ref, EquipmentSize, PLAYERDEFINITION_EQUIPMENT);
+  if Equipment = nil then
+  begin
+    Garbage.Free;
+    Exit;
+  end;
+
+  IDs := RGetIntArray(R_EIOS, Equipment, 0, EquipmentSize);
+  SetLength(Result, Length(IDs));
+
+  for I := 0 to High(IDs) do
+  begin
+    Result[I] := -1;
+    if IDs[I] > 512 then
+    begin
+      Result[I] := IDs[I] - 512;
+    end;
+  end;
+
+  Garbage += RSType(Equipment);
+  Garbage.Free;
+end;
+
+{*
+R_IsEquipped
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the specified item ID is equiped.
+
+Example:
+    if R_IsEquipped(312) then
+      ...
+*}
+Function R_IsEquipped(ID: Int32): Boolean;
+var
+  IDs: Array of Int32;
+  I: Int32;
+begin
+  IDs := R_GetEquipmentIDs;
+  for I := 0 to High(IDs) do
+    if IDs[I] = ID then
+      Result := True;
+end;
+
+{*
+R_IsEquipmentOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the equipment screen is visible.
+
+Example:
+    if R_IsEquipmentOpen then
+      ...
+*}
+Function R_IsEquipmentOpen: Boolean;
+var
+  Widget: RSWidget;
+begin
+  { Bank }
+  if RSWidget.IsValid(R_BANK_WORN_ITEMS.Group, R_BANK_WORN_ITEMS.Child) then
+  begin
+    Widget := RSWidget.Get(R_BANK_WORN_ITEMS.Group, R_BANK_WORN_ITEMS.Child, 0);
+    if Widget.ref <> nil then
+    begin
+      Result := Widget.TextureID = 196;
+      Widget.Free;
+      Exit;
+    end;
+  end;
+
+  { Main Screen }
+  if RSWidget.IsValid(R_MAIN_EQUIPMENT_CONTAINER.Group, R_MAIN_EQUIPMENT_CONTAINER.Child) then
+  begin
+    Exit(True);
+  end;
+
+  { Game Tab }
+  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
+  begin
+    if RSClient.IsResizeable then
+    begin
+      Widget := RSWidget.Get(R_GAMETAB_FIXED_EQUIPMENT.Group, R_GAMETAB_FIXED_EQUIPMENT.Child);
+      if Widget.ref <> nil then
+      begin
+        Result := Widget.TextureID <> -1; // = 1030
+        Widget.Free;
+        Exit;
+      end;
+    end else
+      begin
+        Widget := RSWidget.Get(R_GAMETAB_RESIZEABLE_EQUIPMENT.Group, R_GAMETAB_RESIZEABLE_EQUIPMENT.Child);
+        if Widget.ref <> nil then
+        begin
+          Result := Widget.TextureID <> -1; // = 1030
+          Widget.Free;
+          Exit;
+        end;
+      end;
+  end;
+end;
+
+{*
+R_GetAllEquipment
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSEquipmentItem of all equiped items.
+  This object contains ID, Slot, Name, and Bounds.
+
+Example:
+    if 'Rune platesk' in R_GetAllEquipment[X].Name then
+      ...
+*}
+Function R_GetAllEquipment: Array of TRSEquipmentItem;
+var
+  Garbage: RSTypeArray;
+
+  Function Find(info: RWidget; Slot: Int32): TRSEquipmentItem;
+  var
+    Widget: RSWidget;
+  begin
+    Widget := RSWidget.Get(info.Group, info.Child, -1);
+    Result.Name := Widget.Name;
+    Result.Bounds := Widget.Bounds;
+    Garbage += Widget;
+
+    Widget := RSWidget.Get(info.Group, info.Child, 1);
+    Result.ID := Widget.ItemID;
+    Result.Slot := Slot;
+    Garbage += Widget;
+  end;
+begin
+  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
+  begin
+    Result := [
+      Find(R_INTERFACE_EQUIPMENT_HELMET, EQUIPMENT_HELMET),
+      Find(R_INTERFACE_EQUIPMENT_CAPE, EQUIPMENT_CAPE),
+      Find(R_INTERFACE_EQUIPMENT_NECK, EQUIPMENT_NECK),
+      Find(R_INTERFACE_EQUIPMENT_WEAPON, EQUIPMENT_WEAPON),
+      Find(R_INTERFACE_EQUIPMENT_CHEST, EQUIPMENT_CHEST),
+      Find(R_INTERFACE_EQUIPMENT_SHIELD, EQUIPMENT_SHIELD),
+      Find(R_INTERFACE_EQUIPMENT_LEGS, EQUIPMENT_LEGS),
+      Find(R_INTERFACE_EQUIPMENT_GLOVES, EQUIPMENT_GLOVES),
+      Find(R_INTERFACE_EQUIPMENT_BOOTS, EQUIPMENT_BOOTS),
+      Find(R_INTERFACE_EQUIPMENT_RING, EQUIPMENT_RING),
+      Find(R_INTERFACE_EQUIPMENT_AMMO, EQUIPMENT_AMMO)
+    ];
+    Garbage.Free;
+    Exit;
+  end;
+
+  if RSWidget.IsValid(R_BANK_CONTAINER.Group, R_BANK_CONTAINER.Child) then
+  begin
+    Result := [
+      Find(R_BANK_EQUIPMENT_HELMET, EQUIPMENT_HELMET),
+      Find(R_BANK_EQUIPMENT_CAPE, EQUIPMENT_CAPE),
+      Find(R_BANK_EQUIPMENT_NECK, EQUIPMENT_NECK),
+      Find(R_BANK_EQUIPMENT_WEAPON, EQUIPMENT_WEAPON),
+      Find(R_BANK_EQUIPMENT_CHEST, EQUIPMENT_CHEST),
+      Find(R_BANK_EQUIPMENT_SHIELD, EQUIPMENT_SHIELD),
+      Find(R_BANK_EQUIPMENT_LEGS, EQUIPMENT_LEGS),
+      Find(R_BANK_EQUIPMENT_GLOVES, EQUIPMENT_GLOVES),
+      Find(R_BANK_EQUIPMENT_BOOTS, EQUIPMENT_BOOTS),
+      Find(R_BANK_EQUIPMENT_RING, EQUIPMENT_RING),
+      Find(R_BANK_EQUIPMENT_AMMO, EQUIPMENT_AMMO)
+    ];
+    Garbage.Free;
+    Exit;
+  end;
+
+  if RSWidget.IsValid(R_MAIN_EQUIPMENT_CONTAINER.Group, R_MAIN_EQUIPMENT_CONTAINER.Child) then
+  begin
+    Result := [
+      Find(R_MAIN_EQUIPMENT_HELMET, EQUIPMENT_HELMET),
+      Find(R_MAIN_EQUIPMENT_CAPE, EQUIPMENT_CAPE),
+      Find(R_MAIN_EQUIPMENT_NECK, EQUIPMENT_NECK),
+      Find(R_MAIN_EQUIPMENT_WEAPON, EQUIPMENT_WEAPON),
+      Find(R_MAIN_EQUIPMENT_CHEST, EQUIPMENT_CHEST),
+      Find(R_MAIN_EQUIPMENT_SHIELD, EQUIPMENT_SHIELD),
+      Find(R_MAIN_EQUIPMENT_LEGS, EQUIPMENT_LEGS),
+      Find(R_MAIN_EQUIPMENT_GLOVES, EQUIPMENT_GLOVES),
+      Find(R_MAIN_EQUIPMENT_BOOTS, EQUIPMENT_BOOTS),
+      Find(R_MAIN_EQUIPMENT_RING, EQUIPMENT_RING),
+      Find(R_MAIN_EQUIPMENT_AMMO, EQUIPMENT_AMMO)
+    ];
+    Garbage.Free;
+    Exit;
+  end;
+end;
+
+{*
+R_GetEquipment
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the TRSEquipmentItem in the specified slot.
+
+Example:
+    Writeln(R_GetEquipment(2).Name);
+*}
+Function R_GetEquipment(Slot: Int32): TRSEquipmentItem;
+var
+  Interfaces: Array of RWidget;
+  Garbage: RSTypeArray;
+
+  Function Find(info: RWidget; Slot: Int32): TRSEquipmentItem;
+  var
+    Widget: RSWidget;
+  begin
+    Widget := RSWidget.Get(info.Group, info.Child, -1);
+    Result.Name := Widget.Name;
+    Result.Bounds := Widget.Bounds;
+    Garbage += Widget;
+
+    Widget := RSWidget.Get(info.Group, info.Child, 1);
+    Result.ID := Widget.ItemID;
+    Result.Slot := Slot;
+    Garbage += Widget;
+  end;
+begin
+  if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
+  begin
+    Interfaces := [R_INTERFACE_EQUIPMENT_HELMET,
+                   R_INTERFACE_EQUIPMENT_CAPE,
+                   R_INTERFACE_EQUIPMENT_NECK,
+                   R_INTERFACE_EQUIPMENT_WEAPON,
+                   R_INTERFACE_EQUIPMENT_CHEST,
+                   R_INTERFACE_EQUIPMENT_SHIELD,
+                   R_INTERFACE_EQUIPMENT_LEGS,
+                   R_INTERFACE_EQUIPMENT_GLOVES,
+                   R_INTERFACE_EQUIPMENT_BOOTS,
+                   R_INTERFACE_EQUIPMENT_RING,
+                   R_INTERFACE_EQUIPMENT_AMMO];
+    Result := Find(Interfaces[Slot], Slot);
+    Garbage.Free;
+    Exit;
+  end;
+
+  if RSWidget.IsValid(R_BANK_CONTAINER.Group, R_BANK_CONTAINER.Child) then
+  begin
+    Interfaces := [R_BANK_EQUIPMENT_HELMET,
+                   R_BANK_EQUIPMENT_CAPE,
+                   R_BANK_EQUIPMENT_NECK,
+                   R_BANK_EQUIPMENT_WEAPON,
+                   R_BANK_EQUIPMENT_CHEST,
+                   R_BANK_EQUIPMENT_SHIELD,
+                   R_BANK_EQUIPMENT_LEGS,
+                   R_BANK_EQUIPMENT_GLOVES,
+                   R_BANK_EQUIPMENT_BOOTS,
+                   R_BANK_EQUIPMENT_RING,
+                   R_BANK_EQUIPMENT_AMMO];
+    Result := Find(Interfaces[Slot], Slot);
+    Garbage.Free;
+    Exit;
+  end;
+
+  if RSWidget.IsValid(R_MAIN_EQUIPMENT_CONTAINER.Group, R_MAIN_EQUIPMENT_CONTAINER.Child) then
+  begin
+    Interfaces := [R_MAIN_EQUIPMENT_HELMET,
+                   R_MAIN_EQUIPMENT_CAPE,
+                   R_MAIN_EQUIPMENT_NECK,
+                   R_MAIN_EQUIPMENT_WEAPON,
+                   R_MAIN_EQUIPMENT_CHEST,
+                   R_MAIN_EQUIPMENT_SHIELD,
+                   R_MAIN_EQUIPMENT_LEGS,
+                   R_MAIN_EQUIPMENT_GLOVES,
+                   R_MAIN_EQUIPMENT_BOOTS,
+                   R_MAIN_EQUIPMENT_RING,
+                   R_MAIN_EQUIPMENT_AMMO];
+    Result := Find(Interfaces[Slot], Slot);
+    Garbage.Free;
+    Exit;
+  end;
+end;

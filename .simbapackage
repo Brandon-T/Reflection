@@ -1,0 +1,5 @@
+name=Reflection
+directory=Includes
+extract_in_directory=true
+collapse=false
+blacklist=.git,.simbapackage,.gitignore,.gitattributes

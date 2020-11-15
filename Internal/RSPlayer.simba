@@ -1,0 +1,172 @@
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+{$include_once RSNameInfo.simba}
+{$include_once RSActor.simba}
+{$include_once RSPlayerDefinition.simba}
+{$include_once RSIterableHashTable.simba}
+{$include_once RSAnimation.simba}
+{$include_once RSText.simba}
+
+
+Function RSPlayer.Me: RSLocalPlayer; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYER);
+end;
+
+Function RSPlayer.AllPlayers: Array of RSPlayer; static;
+var
+  Players: Pointer;
+  PlayersArray: Array of Pointer;
+  Indices: Array of Int32;
+  I, PlayersSize, Actual: SizeUInt;
+begin
+  Indices := RSClient.PlayerIndices();
+  if Length(Indices) < 1 then
+    Exit;
+
+  PlayersSize := 0;
+  Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  if Players = nil then
+    Exit;
+
+  PlayersArray := RGetObjectArray(R_EIOS, Players, Indices);
+  RFreeObject(R_EIOS, Players);
+
+  SetLength(Result, Length(PlayersArray));
+
+  for I := 0 to High(PlayersArray) do
+  begin
+    if PlayersArray[I] <> nil then
+    begin
+      Result[Actual].ref := PlayersArray[I];
+      Inc(Actual);
+    end;
+  end;
+  SetLength(Result, Actual);
+end;
+
+Function RSPlayer.Name: String; constref;
+var
+  NameInfo: RSNameInfo;
+begin
+  NameInfo.ref := RGetObject(R_EIOS, ref, PLAYER_NAME);
+  if NameInfo.ref = nil then
+    Exit;
+
+  Result := NameInfo.Name.SanitizeRS;
+  NameInfo.Free;
+end;
+
+Function RSPlayer.IsVisible: Boolean; constref;
+begin
+  Result := RGetBool(R_EIOS, ref, PLAYER_VISIBLE);
+end;
+
+Function RSPlayer.Definition: RSPlayerDefinition; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, PLAYER_DEFINITION);
+end;
+
+Function RSPlayer.CombatLevel: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
+end;
+
+Function RSPlayer.Destination: RSTile;
+var
+  X, Y: Int32;
+begin
+  X := RSClient.DestinationX;
+  Y := RSClient.DestinationY;
+
+  if (X <= 0) or (Y <= 0) then
+  begin
+    Exit(Self.Tile);
+  end;
+
+  Result.X := X + RSClient.BaseX;
+  Result.Y := Y + RSClient.BaseY;
+end;
+
+Function RSPlayer.IsMoving: Boolean;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_QUEUESIZE) > 0;
+end;
+
+Function RSPlayer.Model: RSModel; constref;
+var
+  Definition: RSPlayerDefinition;
+begin
+  Definition := self.Definition;
+  if Definition.ref = nil then
+    Exit;
+
+  Result := Definition.CachedModel;
+  Definition.Free;
+end;
+
+Function RSPlayer.AnimatedModel: RSAnimatedModel; constref;
+var
+  AnimationId, AnimationDelay: Int32;
+  AnimationFrame, MovementId: Int32;
+  MovementFrame: Int32;
+  Model: RSModel;
+  IdleSequence: RSAnimationSequence;
+  MovementSequence: RSAnimationSequence;
+
+  AnimationCache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  Model := self.Model;
+
+  if Model.ref <> nil then
+  begin
+    AnimationDelay := 0;
+    AnimationId := self.AnimationId;
+    MovementId := self.MovementSequenceId;
+    AnimationFrame := self.AnimationFrame;
+    MovementFrame := self.MovementFrame;
+
+    if (AnimationId <> -1) and (AnimationDelay = 0) then
+    begin
+      AnimationCache := RSAnimationSequence.AnimationSequenceCache;
+      if AnimationCache.ref <> nil then
+      begin
+        HashTable := AnimationCache.HashTable;
+        if HashTable.ref <> nil then
+        begin
+          IdleSequence.ref := HashTable.GetObject(AnimationId).ref;
+        end;
+      end;
+
+      Garbage += [HashTable, AnimationCache];
+    end;
+
+    if (MovementId <> -1) and (not self.isIdle) and ((MovementId <> self.CurrentSequenceId) or (IdleSequence.ref = nil)) then
+    begin
+      AnimationCache := RSAnimationSequence.AnimationSequenceCache;
+      if AnimationCache.ref <> nil then
+      begin
+        HashTable := AnimationCache.HashTable;
+        if HashTable.ref <> nil then
+        begin
+          MovementSequence.ref := HashTable.GetObject(MovementId).ref;
+        end;
+      end;
+
+      Garbage += [HashTable, AnimationCache];
+    end;
+
+    Garbage.Free;
+    Exit(RSPlayerDefinition.GetModel(Model, IdleSequence, AnimationFrame, MovementSequence, MovementFrame));
+  end;
+
+  Result.ref := Model.ref;
+  Result.vertices := [];
+  {$IFDEF MODEL_TRIANGLES}
+  Result.triangles := [];
+  {$ENDIF}
+
+  Garbage.Free;
+end;

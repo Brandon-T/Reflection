@@ -1,0 +1,185 @@
+{$include_once RSStructures.simba}
+{$include_once RSCache.simba}
+{$include_once RSIterableHashTable.simba}
+{$include_once RSModel.simba}
+{$include_once RSGameShell.simba}
+
+Function RSObjectDefinition.ID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_ID);
+end;
+
+Function RSObjectDefinition.ModelIDs: Array of Int32; constref;
+var
+  IDs: Pointer;
+  IDsSize: SizeUInt;
+begin
+  IDsSize := 0;
+  IDs := RGetArray(R_EIOS, ref, IDsSize, OBJECTDEFINITION_MODELIDS);
+  if IDs = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, IDs, 0, IDsSize);
+  RFreeObject(R_EIOS, IDs);
+end;
+
+Function RSObjectDefinition.Models: Array of Int32; constref;
+var
+  Models: Pointer;
+  ModelsSize: SizeUInt;
+begin
+  ModelsSize := 0;
+  Models := RGetArray(R_EIOS, ref, ModelsSize, OBJECTDEFINITION_MODELS);
+  if Models = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Models, 0, ModelsSize);
+  RFreeObject(R_EIOS, Models);
+end;
+
+Function RSObjectDefinition.HasModels: Boolean; constref;
+var
+  Models: Pointer;
+begin
+  Models := RGetArray(R_EIOS, ref, OBJECTDEFINITION_MODELS);
+  Result := Models <> nil;
+  if Result then
+    RFreeObject(R_EIOS, Models);
+end;
+
+Function RSObjectDefinition.Name: String; constref;
+begin
+  Result := RGetString(R_EIOS, ref, OBJECTDEFINITION_NAME);
+end;
+
+Function RSObjectDefinition.Actions: Array of String; constref;
+var
+  Actions: Pointer;
+  ActionsSize: SizeUInt;
+begin
+  ActionsSize := 0;
+  Actions := RGetArray(R_EIOS, ref, ActionsSize, OBJECTDEFINITION_ACTIONS);
+  if Actions = nil then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Actions, 0, ActionsSize);
+  RFreeObject(R_EIOS, Actions);
+end;
+
+Function RSObjectDefinition.Transformations: Array of Integer; constref;
+var
+  IDs: Pointer;
+  IDsSize: SizeUInt;
+begin
+  IDsSize := 0;
+  IDs := RGetArray(R_EIOS, ref, IDsSize, OBJECTDEFINITION_TRANSFORMATIONS);
+  if IDs = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, IDs, 0, IDsSize);
+  RFreeObject(R_EIOS, IDs);
+end;
+
+Function RSObjectDefinition.HasTransformations: Boolean; constref;
+var
+  IDs: Pointer;
+begin
+  IDs := RGetArray(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMATIONS);
+  Result := IDs <> nil;
+  if Result then
+    RFreeObject(R_EIOS, IDs);
+end;
+
+Function RSObjectDefinition.DefinitionCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, OBJECTDEFINITION_DEFINITIONCACHE);
+end;
+
+Function RSObjectDefinition.ModelCache: RSCache; static;
+begin
+  Result.ref := RGetObject(R_EIOS, nil, OBJECTDEFINITION_MODELCACHE);
+end;
+
+Function RSObjectDefinition.Definition(ID: Int64): RSObjectDefinition; static;
+var
+  Cache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSObjectDefinition.DefinitionCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;
+
+Function RSObjectDefinition.Model(ID: Int64): RSModel; static;
+var
+  Cache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache := RSObjectDefinition.ModelCache;
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
+end;
+
+Function RSObjectDefinition.TransformVarbit: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMATIONVARBIT);
+end;
+
+Function RSObjectDefinition.TransformVarp: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, OBJECTDEFINITION_TRANSFORMATIONVARP);
+end;
+
+Function RSObjectDefinition.Transform: RSObjectDefinition; constref;
+var
+  TransformIndex: Int32;
+  TransformVarBit: Int32;
+  Transformations: Array of Int32;
+  DefinitionId: Int32;
+begin
+ TransformIndex := -1;
+ DefinitionId := -1;
+ TransformVarBit := self.TransformVarbit;
+ Transformations := self.Transformations;
+
+ if TransformVarBit <> -1 then
+ begin
+  TransformIndex := RSGameShell.GetVarBit(TransformVarBit);
+ end else
+  begin
+    TransformIndex := RSVarps.VarpMain(self.TransformVarp);
+  end;
+
+	if (TransformIndex >= 0) and (TransformIndex <= Length(Transformations) - 1) then
+  begin
+    DefinitionID := Transformations[TransformIndex];
+  end else
+    begin
+      DefinitionID := Transformations[Length(Transformations) - 1];
+    end;
+
+	if DefinitionID <> -1 then
+  begin
+    Result := self.Definition(DefinitionID);
+  end;
+end;

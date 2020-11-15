@@ -1,0 +1,183 @@
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+
+type
+  RSSceneCacheNode = record
+    ID: Int32;
+    Instanced: Boolean;
+    SceneTiles: Array of Array of Array of RSSceneTile;
+  end;
+
+var
+  CACHE_SCENE_TERMINATE: Boolean := False;
+  CACHED_SCENE_INDEX: Int32 := 0;
+  CACHED_SCENE_NODES: Array[0..0] of RSSceneCacheNode := [[]]; //0..3 = 4 Regions..
+  CACHED_SCENE_TILES: Array of Array of Array of RSSceneTile;
+
+{$IFDEF USE_REGION_CACHING}
+Procedure ReleaseSceneTilesCache(Index: Int32);
+var
+  I, J: Int32;
+begin
+  for I := 0 to high(CACHED_SCENE_NODES[Index].SceneTiles) do
+    for J := 0 to high(CACHED_SCENE_NODES[Index].SceneTiles[I]) do
+      RSTypeArray(CACHED_SCENE_NODES[Index].SceneTiles[I][J]).Free;
+
+  CACHED_SCENE_NODES[Index] := [];
+end;
+
+Procedure ReleaseAllSceneTilesCache();
+  var
+    I: Int32;
+  begin
+    for I := 0 to high(CACHED_SCENE_NODES) do
+    begin
+      ReleaseSceneTilesCache(I);
+    end;
+    CACHED_SCENE_NODES := [[]];
+  end;
+
+Procedure UpdateSceneTilesCache(X, Y: Int32);
+  Function FindRegion(ID: Int32; Instanced: Boolean): Int32;
+  var
+    I: Int32;
+  begin
+    for I := 0 to High(CACHED_SCENE_NODES) do
+    begin
+      if (CACHED_SCENE_NODES[I].ID > 0) and (CACHED_SCENE_NODES[I].ID = ID) and (CACHED_SCENE_NODES[I].Instanced = Instanced) then
+        Exit(I);
+    end;
+
+    Result := -1;
+  end;
+var
+  RegionID: Int32;
+  NodeIndex: Int32;
+  Region: RSRegion;
+begin
+  while(IsClientLoading) do
+  begin
+    Wait(300);
+  end;
+
+  if Not CACHE_SCENE_TERMINATE then
+  begin
+    CACHE_SCENE_TERMINATE := True;
+    AddOnTerminate('ReleaseAllSceneTilesCache');
+  end;
+
+  RegionID := (Sar(X, 6) shl 8) or Sar(Y, 6);
+  NodeIndex := FindRegion(RegionID, False);
+
+  if NodeIndex = -1 then
+  begin
+    Region := RSClient.Region;
+    if (Region.ref <> nil) then
+    begin
+      ReleaseSceneTilesCache(CACHED_SCENE_INDEX);
+
+      CACHED_SCENE_TILES := Region.SceneTiles();
+      Region.Free;
+
+      CACHED_SCENE_NODES[CACHED_SCENE_INDEX].ID := RegionID;
+      CACHED_SCENE_NODES[CACHED_SCENE_INDEX].Instanced := False;
+      CACHED_SCENE_NODES[CACHED_SCENE_INDEX].SceneTiles := CACHED_SCENE_TILES;
+      CACHED_SCENE_INDEX := (CACHED_SCENE_INDEX + 1) mod Length(CACHED_SCENE_NODES);
+
+      Exit;
+    end;
+
+    ReleaseAllSceneTilesCache();
+    Exit;
+  end;
+
+  CACHED_SCENE_TILES := CACHED_SCENE_NODES[NodeIndex].SceneTiles;
+end;
+{$ENDIF}
+
+Function RSRegion.SceneTiles: Array of Array of Array of RSSceneTile; constref;
+var
+  Tiles: Pointer;
+  I, J, TilesSize: SizeUInt;
+  SX, SY: Array of Pointer;
+type
+  RSSceneTileArray = Array of RSSceneTile;
+begin
+  TilesSize := 0;
+  Tiles := RGetArray(R_EIOS, ref, TilesSize, REGION_SCENETILES);
+  SX := RGetObjectArray(R_EIOS, Tiles, 0, TilesSize);
+  RFreeObject(R_EIOS, Tiles);
+
+  SetLength(Result, TilesSize);
+
+  for I := 0 to TilesSize - 1 do
+  begin
+    SY := RGetObjectArray(R_EIOS, SX[I], 0, RGetArraySize(R_EIOS, SX[I]));
+    SetLength(Result[I], Length(SY));
+
+    for J := 0 to High(SY) do
+    begin
+      Result[I][J] := RSSceneTileArray(RGetObjectArray(R_EIOS, SY[J], 0, RGetArraySize(R_EIOS, SY[J])));
+    end;
+
+    RFreeObjects(R_EIOS, SY);
+  end;
+  RFreeObjects(R_EIOS, SX);
+end;
+
+Function RSRegion.SceneTiles(Plane: Int32): Array of Array of RSSceneTile; constref; overload;
+var
+  Tiles: Pointer;
+  I: SizeUInt;
+  SX: Pointer;
+  SY: Array of Pointer;
+type
+  RSSceneTileArray = Array of RSSceneTile;
+begin
+  Tiles := RGetArray(R_EIOS, ref, REGION_SCENETILES);
+  SX := RGetObjectArray(R_EIOS, Tiles, Plane);
+  RFreeObject(R_EIOS, Tiles);
+
+  SY := RGetObjectArray(R_EIOS, SX, 0, RGetArraySize(R_EIOS, SX));
+  SetLength(Result, Length(SY));
+
+  for I := 0 to High(SY) do
+  begin
+    Result[I] := RSSceneTileArray(RGetObjectArray(R_EIOS, SY[I], 0, RGetArraySize(R_EIOS, SY[I])));
+  end;
+
+  RFreeObjects(R_EIOS, SY);
+end;
+
+Function RSRegion.SceneTile(X, Y, Z: Int32): RSSceneTile; constref;
+var
+  Tiles: Pointer;
+begin
+  Tiles := RGetArray(R_EIOS, ref, REGION_SCENETILES);
+  Result.ref := RGetObjectArray3D(R_EIOS, Tiles, X, Y, Z);
+  RFreeObject(R_EIOS, Tiles);
+end;
+
+Function RSRegion.InteractableObjects: Array of RSObject; constref;
+var
+  Objects: Pointer;
+  I, ObjectsSize: SizeUInt;
+  GameObjects: Array of Pointer;
+type
+  RSObjectArray = Array of RSObject;
+begin
+  ObjectsSize := 0;
+  Objects := RGetArray(R_EIOS, ref, REGION_INTERACTABLEOBJECTS);
+  if Objects = nil then
+    Exit;
+
+  SetLength(Result, ObjectsSize);
+  GameObjects := RGetObjectArray(R_EIOS, Objects, 0, ObjectsSize);
+  RFreeObject(R_EIOS, Objects);
+
+  for I := 0 to ObjectsSize - 1 do
+  begin
+    Result[I].ref := GameObjects[I];
+    Result[I].ObjectType := RSObjectType.GAME_OBJECT;
+  end;
+end;

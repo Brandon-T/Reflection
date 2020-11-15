@@ -1,0 +1,308 @@
+{$include_once Static.simba}
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+{$include_once RSPlayer.simba}
+{$include_once RSCamera.simba}
+{$include_once RSMath.simba}
+
+{Function sar(base: Int32; shift: byte): Int32; override;
+begin
+  result := base div (1 shl shift);
+end;}
+
+{*
+  Returns the ID of the region that contains this tile.
+  Does NOT work with LOCAL tile (Global & Base only).
+*}
+Function RSTile.RegionID: Int32; constref;
+begin
+  Result := (Sar(X, 6) shl 8) or Sar(Y, 6);
+end;
+
+Function RSTile.ToLocal: RSTile; constref;
+  Function sal(base: Int32; shift: byte): Int32;
+  begin
+    result := base * (1 shl shift);
+  end;
+begin
+  Result.X := Sal(self.X - RSClient.BaseX, 7) + Sal(1, 6);
+  Result.Y := Sal(self.Y - RSClient.BaseY, 7) + Sal(1, 6);
+end;
+
+Function RSTile.ToGlobal: RSTile; constref;
+begin
+  Result.X := RSClient.BaseX + self.X div 128;
+  Result.Y := RSClient.BaseY + self.Y div 128;
+end;
+
+{*
+  Converts a LOCAL Tile to a Global Tile within Instances.
+  If the tile is not currently in an instance, returns the result of `ToGlobal`.
+*}
+Function RSTile.LocalToWorldTile: RSTile; constref;
+var
+  SceneX, SceneY: Int32;
+  ChunkX, ChunkY: Int32;
+  Chunk, Rotation, Plane: Int32;
+  P: RSTile;
+begin
+  if RSClient.IsRegionInstanced then
+  begin
+    SceneX := Sar(self.X, 7);
+    SceneY := Sar(self.Y, 7);
+
+    ChunkX := SceneX div 8;
+		ChunkY := SceneY div 8;
+
+    if (ChunkX >= 13) or (ChunkY >= 13) then
+    begin
+      Result := [-1, -1];
+      Exit;
+    end;
+
+    Chunk := RSClient.RegionInstanceChunk(RSClient.Plane, ChunkX, ChunkY);
+    Rotation := Sar(Chunk, 1) and $03;
+
+    ChunkX := (Sar(Chunk, 14) and $3FF) * 8;
+    ChunkY := (Sar(Chunk, 3) and $7FF) * 8;
+    Plane := Sar(Chunk, 24) and $03;
+
+    P.X := ChunkX + (SceneX and 7);
+    P.Y := ChunkY + (SceneY and 7);
+
+    //Rotate
+    ChunkX := P.X and (not 7);
+    ChunkY := P.Y and (not 7);
+    Result.X := P.X and 7;
+    Result.Y := P.Y and 7;
+
+    if 4 - Rotation = 1 then
+    begin
+      Result := [ChunkX + Result.Y, ChunkY + (7 - Result.X)];
+      Exit;
+    end;
+
+    if 4 - Rotation = 2 then
+    begin
+      Result := [ChunkX + (7 - Result.X), ChunkY + (7 - ChunkY)];
+      Exit;
+    end;
+
+    if 4 - Rotation = 3 then
+    begin
+      Result := [ChunkX + (7 - Result.Y), ChunkY + Result.X];
+      Exit;
+    end;
+
+    Exit(P);
+  end;
+
+  Result := self.ToGlobal;
+end;
+
+{*
+  Converts a WORLD Tile to a Local Tile within Instances.
+  If the tile is not currently in an instance, returns the result of `ToLocal`.
+*}
+Function RSTile.WorldToLocalTile: RSTile; constref;
+var
+  X, Y: Int32;
+  ChunkX, ChunkY: Int32;
+  Rotation: Int32;
+  Chunks: Array of Array of Int32;
+  P: RSTile;
+begin
+  if RSClient.IsRegionInstanced then
+  begin
+    Chunks := RSClient.RegionInstanceChunks(RSClient.Plane);
+    for X := 0 to high(Chunks) do
+    begin
+      for Y := 0 to high(Chunks[X]) do
+      begin
+        if Chunks[X][Y] < 0 then
+          continue;
+
+        Rotation := Sar(Chunks[X][Y], 1) and $03;
+        ChunkX := (Sar(Chunks[X][Y], 14) and $3FF) * 8;
+        ChunkY := (Sar(Chunks[X][Y], 3) and $7FF) * 8;
+
+        if ((self.X >= ChunkX) and (self.X < ChunkX + 8) and (self.Y >= ChunkY) and (self.Y < ChunkY + 8)) then
+        begin
+          //Technically, there can be more than one area where this tile is located in,
+          //However, we return the tile in the FIRST region.
+          P.X := RSClient.BaseX + (X * 8) + (self.X and 7);
+          P.Y := RSClient.BaseY + (Y * 8) + (self.Y and 7);
+
+          //Rotation
+					ChunkX := P.X and (not 7);
+          ChunkY := P.Y and (not 7);
+          Result.X := P.X and 7;
+          Result.Y := P.Y and 7;
+
+          if 4 - Rotation = 1 then
+          begin
+            Result := [ChunkX + Result.Y, ChunkY + (7 - Result.X)];
+            Result := Result.ToLocal;
+            Exit;
+          end;
+
+          if 4 - Rotation = 2 then
+          begin
+            Result := [ChunkX + (7 - Result.X), ChunkY + (7 - ChunkY)];
+            Result := Result.ToLocal;
+            Exit;
+          end;
+
+          if 4 - Rotation = 3 then
+          begin
+            Result := [ChunkX + (7 - Result.Y), ChunkY + Result.X];
+            Result := Result.ToLocal;
+            Exit;
+          end;
+
+          Exit(P.ToLocal);
+        end;
+      end;
+    end;
+
+    Result := [-1, -1];
+    Exit;
+  end;
+
+  Result := self.ToLocal;
+end;
+
+{* Converts a Local Tile to MM point *}
+Function RSTile.TileToMM: TPoint; constref;
+const
+  MaxDrawDistance = 6400;
+var
+  X, Y, W, H: Int32;
+  LocalX, LocalY: Int32;
+  SinA, CosA, Angle: Int32;
+  Player: RSPlayer;
+begin
+  Player := RSPlayer.Me;
+  if Player.ref = nil then
+    Exit(Point(-1, -1));
+
+  LocalX := Player.LocalX;
+  LocalY := Player.LocalY;
+  Player.Free;
+
+  Angle := RSClient.MapAngle and $7FF;
+  X := (Self.X div 32) - (LocalX div 32);
+	Y := (Self.Y div 32) - (LocalY div 32);
+
+  if (X * X + Y * Y <= MaxDrawDistance) then
+  begin
+    SinA := SINE[Angle];
+    CosA := COSINE[Angle];
+    Result.X := Sar((X * CosA) + (Y * SinA), 16);  // + (mm_location.x + mm_width / 2)
+    Result.Y := Sar((X * SinA) - (Y * CosA), 16);  // + (mm_location.y + mm_height / 2)
+
+    if RSClient.IsResizeable then
+    begin
+      GetClientDimensions(W, H);
+      Result.X += (W - 82);   //MM.Center.X = 82 from the right.
+      Result.Y += 84;         //MM.Center.Y = 84 from the top.
+    end else
+      begin
+        GetClientDimensions(W, H);
+        Result.X += (W - 122);
+        Result.Y += 84;
+      end;
+
+    Exit(Result);
+  end;
+
+  Exit(Point(-1, -1));
+end;
+
+{* Converts a MM Point to a Local Tile *}
+Function RSTile.MMToTile: RSTile; constref;
+var
+  X, Y, XX, YY: Int32;
+  LocalX, LocalY: Int32;
+  DestX, DestY: Int32;
+  SinA, CosA, Angle: Int32;
+  Player: RSPlayer;
+begin
+  Player := RSPlayer.Me;
+  if Player.ref = nil then
+    Exit(Point(-1, -1));
+
+  LocalX := Player.LocalX;
+  LocalY := Player.LocalY;
+  Player.Free;
+
+  X := self.X - 642; //642 = (mm_location.x + mm_width / 2)
+  Y := self.Y - 84;  //84 = (mm_location.y + mm_height / 2)
+
+  Angle := RSClient.MapAngle and $7FF;
+  SinA := SINE[Angle];
+  CosA := COSINE[Angle];
+
+  XX := Sar((X * CosA) + (Y * SinA), 11);
+  YY := Sar((Y * CosA) - (X * SinA), 11);
+
+  DestX := Sar(LocalX + XX, 7);
+  DestY := Sar(LocalY - YY, 7);
+
+  Result.X := RSClient.BaseX + DestX;
+  Result.Y := RSClient.BaseY + DestY;
+
+  Result := Result.ToLocal;
+end;
+
+{* Converts a Local Tile to MS Point *}
+Function RSTile.TileToMS: TPoint; constref;
+var
+  P: TVector;
+begin
+  if ((self.X >= 128) and (self.Y >= 128) and (self.X <= 13056) and (self.Y <= 13056)) then
+  begin
+    P.X := self.X;
+    P.Y := self.Y;
+    P.Z := self.GetHeight();
+    Exit(P.WorldToScreen);
+  end;
+
+  Exit(Point(-1, -1));
+end;
+
+Function RSTile.GetHeight(plane: Int32): Int32; constref;
+var
+  xSize, ySize: Int32;
+  var1, var2, var3, var4: Int32;
+begin
+  {$IFDEF USE_REGION_CACHING}
+  UpdateRegionCache(self.x, self.y);
+  {$ENDIF}
+
+  xSize := Sar(self.x, 7);
+  ySize := Sar(self.y, 7);
+
+  if (xSize >= 0) and (ySize >= 0) and (xSize < 104) and (ySize < 104) then
+  begin
+    if (plane < 3) and ((CACHED_TILE_SETTINGS[1][xSize][ySize] and 2) = 2) then
+    begin
+      Inc(plane);
+    end;
+
+    var1 := self.X and 127;
+    var2 := self.Y and 127;
+    var3 := Sar(((var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize]) + ((128 - var1) * CACHED_TILE_HEIGHTS[plane][xSize][ySize])), 7);
+    var4 := Sar(((CACHED_TILE_HEIGHTS[plane][xSize][ySize + 1] * (128 - var1)) + (var1 * CACHED_TILE_HEIGHTS[plane][xSize + 1][ySize + 1])), 7);
+
+    Result := Sar(((128 - var2) * var3 + var2 * var4), 7);
+    Exit;
+  end;
+
+  Exit(0);
+end;
+
+Function RSTile.GetHeight: Int32; constref; overload;
+begin
+  Result := self.GetHeight(RSClient.Plane);
+end;

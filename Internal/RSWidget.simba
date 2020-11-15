@@ -1,0 +1,476 @@
+{$include_once RSStructures.simba}
+{$include_once RSHashTable.simba}
+{$include_once RSIterableHashTable.simba}
+{$include_once RSWidgetNode.simba}
+{$include_once RSText.simba}
+
+Function RSWidget.Name: String; constref;
+begin
+  Result := Trim(StripHTML(RGetString(R_EIOS, ref, WIDGET_NAME)));
+end;
+
+Function RSWidget.Text: String; constref;
+begin
+  Result := Trim(StripHTML(RGetString(R_EIOS, ref, WIDGET_TEXT)));
+end;
+
+Function RSWidget.ID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_WIDGETID);
+end;
+
+Function RSWidget.ParentID: Int32; constref;
+var
+  I: Int32;
+  HashTable: RSHashTable;
+  Head, Current: RSNode;
+  HeadUID, CurrentUID: Int64;
+  Garbage: RSTypeArray;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_PARENTID);
+  if Result > 0 then
+    Exit;
+
+  //if (Self.ID shr 16) = RSWidget.RootInterface() then
+  //  Exit(-1);
+
+  HashTable.ref := RGetObject(R_EIOS, nil, CLIENT_WIDGETNODECACHE);
+  if HashTable.ref = nil then
+  begin
+    Exit(-1);
+  end;
+
+  Result := Self.ID shr 16;
+  Garbage := [HashTable];
+
+  for I := 0 to HashTable.Size - 1 do
+  begin
+    Head := HashTable.Bucket(I);
+    if Head.ref = nil then
+      break;
+
+    Garbage += Head;
+    Current := Head.Next;
+    if Current.ref = nil then
+      break;
+
+    Garbage += Current;
+    HeadUID := Head.UID;
+
+    while HeadUID <> (CurrentUID := Current.UID) do
+    begin
+      if CurrentUID = -1 then
+        break;
+
+      if Result = RSWidgetNode(Current).ID then
+      begin
+        Garbage.Free;
+        Exit(CurrentUID);
+      end;
+
+      Current := Current.Next;
+      Garbage += Current;
+    end;
+  end;
+
+  Garbage.Free;
+  Exit(-1);
+end;
+
+Function RSWidget.GroupID: Int32; constref;
+begin
+  Result := Self.ID shr 16;
+end;
+
+Function RSWidget.ChildID: Int32; constref;
+begin
+  Result := Self.ID and $FFFF;
+end;
+
+Function RSWidget.ItemID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_ITEMID);
+end;
+
+Function RSWidget.InventoryIDs: Array of Int32; constref;
+var
+  IDs: Pointer;
+  IDsSize: SizeUInt;
+begin
+  IDsSize := 0;
+  IDs := RGetArray(R_EIOS, ref, IDsSize, WIDGET_INVIDS);
+  if IDs = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, IDs, 0, IDsSize);
+  RFreeObject(R_EIOS, IDs);
+end;
+
+Function RSWidget.StackSizes: Array of Int32; constref;
+var
+  Stacks: Pointer;
+  StacksSize: SizeUInt;
+begin
+  StacksSize := 0;
+  Stacks := RGetArray(R_EIOS, ref, StacksSize, WIDGET_STACKSIZES);
+  if Stacks = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Stacks, 0, StacksSize);
+  RFreeObject(R_EIOS, Stacks);
+end;
+
+Function RSWidget.ItemAmount: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_ITEMAMOUNT);
+end;
+
+Function RSWidget.TextureID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_TEXTUREID);
+end;
+
+Function RSWidget.Actions: Array of String; constref;
+var
+  Actions: Pointer;
+  ActionsSize: SizeUInt;
+begin
+  ActionsSize := 0;
+  Actions := RGetArray(R_EIOS, ref, ActionsSize, WIDGET_ACTIONS);
+  if Actions = nil then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Actions, 0, ActionsSize);
+  RFreeObject(R_EIOS, Actions);
+end;
+
+Function RSWidget.ActionType: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_ACTIONTYPE);
+end;
+
+Function RSWidget.TypeID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_TYPE);
+end;
+
+Function RSWidget.IsHidden: Boolean; constref;
+var
+  Par: RSWidget;
+begin
+  if RGetBool(R_EIOS, ref, WIDGET_ISHIDDEN) then
+    Exit(True);
+
+  Par := self.Parent();
+  if Par.ref <> nil then
+  begin
+    Result := Par.IsHidden;
+    Par.Free;
+    Exit;
+  end;
+
+  Result := self.GroupID <> RSWidget.RootInterface();
+end;
+
+Function RSWidget.Cycle: Int32;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_WIDGETCYCLE);
+end;
+
+Function RSWidget.AbsoluteX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_ABSOLUTEX);
+end;
+
+Function RSWidget.AbsoluteY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_ABSOLUTEY);
+end;
+
+Function RSWidget.RelativeX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_RELATIVEX);
+end;
+
+Function RSWidget.RelativeY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_RELATIVEY);
+end;
+
+Function RSWidget.ScrollX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_SCROLLX);
+end;
+
+Function RSWidget.ScrollY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_SCROLLY);
+end;
+
+Function RSWidget.Width: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_WIDTH);
+end;
+
+Function RSWidget.Height: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_HEIGHT);
+end;
+
+Function RSWidget.Parent: RSWidget; constref;
+var
+  ParentID: Int32;
+begin
+  ParentID := self.ParentID;
+  if ParentID > 0 then
+  begin
+    Result := RSWidget.GetParent(self.ParentID);
+  end;
+end;
+
+Function RSWidget.Child(Index: Int32): RSWidget; constref;
+var
+  Children: Pointer;
+  ChildrenSize: SizeUInt;
+begin
+  ChildrenSize := 0;
+  Children := RGetArray(R_EIOS, ref, ChildrenSize, WIDGET_CHILDREN);
+  if Children = nil then
+    Exit;
+
+  if (ChildrenSize = 0) or (Index >= ChildrenSize) then
+  begin
+    RFreeObject(R_EIOS, Children);
+    Exit;
+  end;
+
+  Result.ref := RGetObjectArray(R_EIOS, Children, Index);
+  RFreeObject(R_EIOS, Children);
+end;
+
+Function RSWidget.Children: Array of RSWidget; constref;
+var
+  Children: Pointer;
+  Widgets: Array of Pointer;
+  I, ChildrenSize: SizeUInt;
+begin
+  ChildrenSize := 0;
+  Children := RGetArray(R_EIOS, ref, ChildrenSize, WIDGET_CHILDREN);
+  if Children = nil then
+    Exit;
+
+  if ChildrenSize = 0 then
+  begin
+    RFreeObject(R_EIOS, Children);
+    Exit;
+  end;
+
+  SetLength(Result, ChildrenSize);
+  Widgets := RGetObjectArray(R_EIOS, Children, 0, ChildrenSize);
+  RFreeObject(R_EIOS, Children);
+
+  for I := 0 to ChildrenSize - 1 do
+  begin
+    Result[I].ref := Widgets[I];
+  end;
+end;
+
+Function RSWidget.BoundsIndex: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_BOUNDSINDEX);
+end;
+
+Function RSWidget.BoundsX: Int32; constref;
+var
+  Bounds: Pointer;
+begin
+  Bounds := RGetArray(R_EIOS, nil, CLIENT_WIDGETPOSITIONX);
+  if Bounds = nil then
+    Exit;
+  Result := RGetIntArray(R_EIOS, Bounds, self.BoundsIndex);
+  RFreeObject(R_EIOS, Bounds);
+end;
+
+Function RSWidget.BoundsY: Int32; constref;
+var
+  Bounds: Pointer;
+begin
+  Bounds := RGetArray(R_EIOS, nil, CLIENT_WIDGETPOSITIONY);
+  if Bounds = nil then
+    Exit;
+  Result := RGetIntArray(R_EIOS, Bounds, self.BoundsIndex);
+  RFreeObject(R_EIOS, Bounds);
+end;
+
+Function RSWidget.AbsoluteLocation: TPoint; constref;
+var
+  Parent, Current: RSWidget;
+begin
+  Result.X := 0;
+  Result.Y := 0;
+  Current.ref := self.ref;
+
+  if Current.ref = nil then
+    Exit(Point(-1, -1));
+
+  while (Parent := Current.Parent).ref <> nil do
+  begin
+    Result.X += Current.RelativeX;
+    Result.X -= Current.ScrollX;
+
+    Result.Y += Current.RelativeY;
+    Result.Y -= Current.ScrollY;
+
+    if Current.ref <> self.ref then
+      Current.Free;
+
+    Current.ref := Parent.ref;
+  end;
+
+  if Current.BoundsIndex <> -1 then
+  begin
+    Result.X += Current.BoundsX;
+    Result.Y += Current.BoundsY;
+
+    if Current.TypeID > 0 then
+    begin
+      Result.X += Current.RelativeX;
+      Result.Y += Current.RelativeY;
+    end;
+  end else
+    begin
+      Result.X += Current.RelativeX;
+      Result.Y += Current.RelativeY;
+    end;
+
+  if Current.ref <> self.ref then
+    Current.Free;
+
+  Parent.Free;
+end;
+
+Function RSWidget.Bounds: TBox; constref;
+var
+  Location: TPoint;
+begin
+  Location := self.AbsoluteLocation;
+  Result := [Location.X, Location.Y, Location.X + self.Width, Location.Y + self.Height];
+end;
+
+Function RSWidget.Get(ContainerIndex, Parent, Child: Int32 = -1): RSWidget; static;
+var
+  Widgets: Pointer;
+  wParent: RSWidget;
+begin
+  Widgets := RGetArray(R_EIOS, nil, CLIENT_WIDGETS);
+  if Widgets = nil then
+    Exit;
+
+  if Child = -1 then
+  begin
+    Result.ref := RGetObjectArray2D(R_EIOS, Widgets, ContainerIndex, Parent);
+    RFreeObject(R_EIOS, Widgets);
+    Exit;
+  end;
+
+  wParent.ref := RGetObjectArray2D(R_EIOS, Widgets, ContainerIndex, Parent);
+  if wParent.ref <> nil then
+  begin
+    Result := wParent.Child(Child);
+    wParent.Free;
+  end;
+
+  RFreeObject(R_EIOS, Widgets);
+end;
+
+Function RSWidget.GetParent(ParentID: Int32): RSWidget; static;
+begin
+  if ParentID < 0 then
+    Exit;
+
+  Result := RSWidget.Get(ParentID shr 16, ParentID and $FFFF);
+end;
+
+Function RSWidget.RootInterface: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_WIDGETROOTINTERFACE);
+end;
+
+Function RSWidget.ValidInterfaces: Array of Boolean; static;
+var
+  Widgets: Pointer;
+  WidgetsSize: SizeUInt;
+begin
+  WidgetsSize := 0;
+  Widgets := RGetArray(R_EIOS, nil, WidgetsSize, CLIENT_VALIDWIDGETS);
+  if Widgets = nil then
+    Exit;
+  Result := RGetBoolArray(R_EIOS, Widgets, 0, WidgetsSize);
+  RFreeObject(R_EIOS, Widgets);
+end;
+
+Function RSWidget.IsValid(Group, Child: Int32; Index: Int32 = -1): Boolean; static;
+var
+  Widget: RSWidget;
+begin
+  Widget := RSWidget.Get(Group, Child, Index);
+  Result := (Widget.ref <> nil) and not Widget.IsHidden;
+  Widget.Free;
+end;
+
+Function RSWidget.Widgets: Array of Array of RSWidget; static;
+var
+  Widgets: Pointer;
+  I, WidgetsSize: SizeUInt;
+  WX: Array of Pointer;
+  type
+    RSWidgetArray = Array of RSWidget;
+begin
+  WidgetsSize := 0;
+  Widgets := RGetArray(R_EIOS, nil, WidgetsSize, CLIENT_WIDGETS);
+  if Widgets = nil then
+    Exit;
+
+  if WidgetsSize > 0 then
+  begin
+    WX := RGetObjectArray(R_EIOS, Widgets, 0, WidgetsSize);
+    SetLength(Result, Length(WX));
+
+    for I := 0 to High(WX) do
+    begin
+      if (WX[I] <> nil) then
+      begin
+        Result[I] := RSWidgetArray(RGetObjectArray(R_EIOS, WX[I], 0, RGetArraySize(R_EIOS, WX[I])));
+      end;
+    end;
+  end;
+
+  RSTypeArray(WX).Free;
+  RFreeObject(R_EIOS, Widgets);
+end;
+
+Function RSWidget.Widgets(Index: Int32): Array of RSWidget; static; overload;
+var
+  Widgets: Pointer;
+  WidgetsSize: SizeUInt;
+  WX: Array of Pointer;
+  type
+    RSWidgetArray = Array of RSWidget;
+begin
+  WidgetsSize := 0;
+  Widgets := RGetArray(R_EIOS, nil, WidgetsSize, CLIENT_WIDGETS);
+  if Widgets = nil then
+    Exit;
+
+  if WidgetsSize > 0 then
+  begin
+    WX := RGetObjectArray(R_EIOS, Widgets, Index, 1);
+    if (Length(WX) > 0) and (WX[0] <> nil) then
+    begin
+      Result := RSWidgetArray(RGetObjectArray(R_EIOS, WX[0], 0, RGetArraySize(R_EIOS, WX[0])));
+      RSTypeArray(WX).Free;
+    end;
+  end;
+
+  RFreeObject(R_EIOS, Widgets);
+end;

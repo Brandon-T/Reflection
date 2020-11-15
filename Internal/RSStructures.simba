@@ -1,0 +1,138 @@
+{$include_once Static.simba}
+{$include_once Functions.simba}
+{$include_once Structures.simba}
+
+type
+  RSObjectType = (GAME_OBJECT, WALL_DECORATION, BOUNDARY_OBJECT, FLOOR_DECORATION);
+
+  RSScroll = (SCROLLWHEEL, SCROLLBAR, SCROLLARROWS);
+
+  RSType = packed record
+    ref: Pointer;
+  end;
+
+  PRSType = Array of ^RSType;
+  RSTypeArray = Array of RSType;
+  PRSTypeArray = Array of ^RSType;
+
+  RSTile = type TPoint;
+
+  RSSceneTile = type RSType;
+
+  RSRegion = type RSType;
+
+  RSClient = type RSType;
+
+  RSCamera = type RSType;
+
+  RSNode = type RSType;
+
+  RSLinkedList = type RSType;
+
+  RSNodeDeque = type RSType;
+
+  RSCache = type RSType;
+
+  RSHashTable = type RSType;
+
+  RSIterableHashTable = type RSType;
+
+  RSQueue = type RSType;
+
+  RSAnimableNode = type RSType;
+
+  RSModel = type RSType;
+
+  RSPlayerDefinition = type RSType;
+
+  RSNPCDefinition = type RSType;
+
+  RSObjectDefinition = type RSType;
+
+  RSEntity = type RSType;
+
+  RSActor = type RSType;
+
+  RSNPC = type RSActor;
+
+  RSPlayer = type RSActor;
+
+  RSLocalPlayer = type RSPlayer;
+
+  RSNameInfo = type RSType;
+
+  RSCombatInfoList = type RSType;
+  RSCombatInfo = type RSType;
+
+  RSAnimationSequence = type RSType;
+
+  RSAnimation = type RSType;
+
+  RSAnimationFrame = type RSType;
+
+  RSAnimationSkeleton = type RSType;
+
+  RSAnimatedModel = record(RSType)
+    vertices: Array of TVector;
+    {$IFDEF MODEL_TRIANGLES}
+    triangles: Array of TTriangle;
+    {$ENDIF}
+    skins: Array of Array of Int32;
+
+    modifierX, modifierY, modifierZ: Int32;
+  end;
+
+  RSGroundObject = type RSType;
+
+  RSItem = type RSType;
+
+  RSGroundItem = record
+    ID: Int32;
+    StackSize: Int32;
+    Tile: RSTile;
+  end;
+
+  RSItemNode = type RSType;
+
+  RSObject = record(RSType)
+    ObjectType: RSObjectType;
+  end;
+  RSObjectArray = array of RSObject;
+
+  RSItemDefinition = type RSType;
+
+  RSWidgetNode = type RSType;
+
+  RSWidget = type RSType;
+
+  RSVarps = type RSType;
+
+  RSVarbitDefinition = type RSType;
+
+  RSGameShell = type RSType;
+
+
+Procedure RSType.Free;
+begin
+  if ref <> nil then
+    RFreeObject(R_EIOS, ref);
+  ref := nil;
+end;
+
+Procedure RSTypeArray.Free;
+type
+  PPointerArray = Array of Pointer;
+begin
+  RFreeObjects(R_EIOS, PPointerArray(self));
+end;
+
+Procedure RSObjectArray.Free;
+var
+  I: Int32;
+  Garbage: Array of Pointer;
+begin
+  SetLength(Garbage, Length(self));
+  for I := 0 to high(self) do
+    Garbage[I] := self[I].ref;
+  RFreeObjects(R_EIOS, Garbage);
+end;

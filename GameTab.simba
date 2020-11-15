@@ -1,0 +1,295 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once srl/shared.simba} 
+
+const
+  GAMETAB_COMBAT             = 0;
+  GAMETAB_STATS              = 1;
+  GAMETAB_QUEST              = 2;
+  GAMETAB_INVENTORY          = 3;
+  GAMETAB_EQUIPMENT          = 4;
+  GAMETAB_PRAYER             = 5;
+  GAMETAB_MAGIC              = 6;
+  GAMETAB_CLAN               = 7;
+  GAMETAB_IGNORES            = 8;
+  GAMETAB_ACCOUNT_MANAGEMENT = 8;
+  GAMETAB_FRIENDS            = 9;
+  GAMETAB_LOGOUT             = 10;
+  GAMETAB_SETTINGS           = 11;
+  GAMETAB_EMOTES             = 12;
+  GAMETAB_MUSIC              = 13;
+
+  MM_LEVEL_HITPOINTS         = 0;
+  MM_LEVEL_PRAYER            = 1;
+  MM_LEVEL_RUN               = 2;
+  MM_LEVEL_COMBAT_SPECIAL    = 3;
+
+  GAMETAB_COMBAT_HOTKEY_VARBIT             = 4675;
+  GAMETAB_STATS_HOTKEY_VARBIT              = 4676;
+  GAMETAB_QUESTS_HOTKEY_VARBIT             = 4677;
+  GAMETAB_INVENTORY_HOTKEY_VARBIT          = 4678;
+  GAMETAB_EQUIPMENT_HOTKEY_VARBIT          = 4679;
+  GAMETAB_PRAYER_HOTKEY_VARBIT             = 4680;
+  GAMETAB_MAGIC_HOTKEY_VARBIT              = 4682;
+  GAMETAB_FRIENDS_HOTKEY_VARBIT            = 4684;
+  GAMETAB_ACCOUNT_MANAGEMENT_HOTKEY_VARBIT = 6517;
+  GAMETAB_LOGOUT_HOTKEY_VARBIT             = 4689;
+  GAMETAB_OPTIONS_HOTKEY_VARBIT            = 4686;
+  GAMETAB_EMOTES_HOTKEY_VARBIT             = 4687;
+  GAMETAB_CLAN_HOTKEY_VARBIT               = 4683;
+  GAMETAB_MUSIC_HOTKEY_VARBIT              = 4688;
+
+{*
+R_GameTabIDs
+~~~~~~~~~~~~
+Returns a list of RWidget containing all possible Game Tabs.
+
+Example:
+    writeln(R_GameTabIDs[GAMETAB_COMBAT]);
+*}
+Function R_GameTabIDs: Array of RWidget;
+begin
+  if not RSClient.IsResizeable then
+  begin
+    Result := [
+      R_GAMETAB_FIXED_COMBAT,
+      R_GAMETAB_FIXED_STATS,
+      R_GAMETAB_FIXED_QUEST,
+      R_GAMETAB_FIXED_INVENTORY,
+      R_GAMETAB_FIXED_EQUIPMENT,
+      R_GAMETAB_FIXED_PRAYER,
+      R_GAMETAB_FIXED_MAGIC,
+
+      R_GAMETAB_FIXED_CLAN,
+      R_GAMETAB_FIXED_IGNORES,
+      R_GAMETAB_FIXED_FRIENDS,
+      R_GAMETAB_FIXED_LOGOUT,
+      R_GAMETAB_FIXED_SETTINGS,
+      R_GAMETAB_FIXED_EMOTES,
+      R_GAMETAB_FIXED_MUSIC
+    ];
+    Exit;
+  end;
+
+  Result := [
+    R_GAMETAB_RESIZEABLE_COMBAT,
+    R_GAMETAB_RESIZEABLE_STATS,
+    R_GAMETAB_RESIZEABLE_QUEST,
+    R_GAMETAB_RESIZEABLE_INVENTORY,
+    R_GAMETAB_RESIZEABLE_EQUIPMENT,
+    R_GAMETAB_RESIZEABLE_PRAYER,
+    R_GAMETAB_RESIZEABLE_MAGIC,
+
+    R_GAMETAB_RESIZEABLE_CLAN,
+    R_GAMETAB_RESIZEABLE_ACCOUNT_MANAGEMENT,
+    R_GAMETAB_RESIZEABLE_FRIENDS,
+    R_GAMETAB_RESIZEABLE_LOGOUT,
+    R_GAMETAB_RESIZEABLE_SETTINGS,
+    R_GAMETAB_RESIZEABLE_EMOTES,
+    R_GAMETAB_RESIZEABLE_MUSIC
+  ];
+end;
+
+{*
+R_GetGameTabKey
+~~~~~~~~~~~~~~~
+Returns the key of the specified GameTab.
+
+Example:
+    Keyboard.PressKey(R_GetGameTabKey(GAMETAB_MUSIC));
+*}
+Function R_GetGameTabKey(Tab: Int32): UInt32;
+var
+  KeyArray: Array of UInt32;
+begin
+  KeyArray := [VK_ESCAPE, VK_F1, VK_F2, VK_F3, VK_F4, VK_F5, VK_F6, VK_F7, VK_F8, VK_F9, VK_F10, VK_F11, VK_F12, VK_ESCAPE];
+
+  if not RSClient.IsResizeable then
+  begin
+    Result := KeyArray[RSClient.GetVarBit([
+      GAMETAB_COMBAT_HOTKEY_VARBIT,
+      GAMETAB_STATS_HOTKEY_VARBIT,
+      GAMETAB_QUESTS_HOTKEY_VARBIT,
+      GAMETAB_INVENTORY_HOTKEY_VARBIT,
+      GAMETAB_EQUIPMENT_HOTKEY_VARBIT,
+      GAMETAB_PRAYER_HOTKEY_VARBIT,
+      GAMETAB_MAGIC_HOTKEY_VARBIT,
+
+      GAMETAB_CLAN_HOTKEY_VARBIT,
+      GAMETAB_ACCOUNT_MANAGEMENT_HOTKEY_VARBIT,
+      GAMETAB_FRIENDS_HOTKEY_VARBIT,
+      GAMETAB_LOGOUT_HOTKEY_VARBIT,
+      GAMETAB_OPTIONS_HOTKEY_VARBIT,
+      GAMETAB_EMOTES_HOTKEY_VARBIT,
+      GAMETAB_MUSIC_HOTKEY_VARBIT
+    ][Tab])];
+    Exit;
+  end;
+
+  Result := KeyArray[RSClient.GetVarBit([
+    GAMETAB_COMBAT_HOTKEY_VARBIT,
+    GAMETAB_STATS_HOTKEY_VARBIT,
+    GAMETAB_QUESTS_HOTKEY_VARBIT,
+    GAMETAB_INVENTORY_HOTKEY_VARBIT,
+    GAMETAB_EQUIPMENT_HOTKEY_VARBIT,
+    GAMETAB_PRAYER_HOTKEY_VARBIT,
+    GAMETAB_MAGIC_HOTKEY_VARBIT,
+
+    GAMETAB_CLAN_HOTKEY_VARBIT,
+    GAMETAB_ACCOUNT_MANAGEMENT_HOTKEY_VARBIT,
+    GAMETAB_FRIENDS_HOTKEY_VARBIT,
+    GAMETAB_LOGOUT_HOTKEY_VARBIT,
+    GAMETAB_OPTIONS_HOTKEY_VARBIT,
+    GAMETAB_EMOTES_HOTKEY_VARBIT,
+    GAMETAB_MUSIC_HOTKEY_VARBIT
+  ][Tab])];
+end;
+
+{*
+R_IsGameTabOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if specified Game Tab is open.
+
+Example:
+    if R_IsGameTabOpen[GAMETAB_COMBAT] then
+      ...
+*}
+Function R_IsGameTabOpen(Tab: Int32): Boolean;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  Result := False;
+  ID := R_GameTabIDs[Tab];
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  if Widget.ref <> nil then
+  begin
+    Result := Widget.TextureID <> -1;
+    Widget.Free;
+  end;
+end;
+
+{*
+R_OpenGameTab
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if specified Game Tab is open or if successfully opened.
+
+Example:
+    if R_OpenGameTab(GAMETAB_COMBAT), True) then
+      ...
+*}
+Function R_OpenGameTab(Tab: Int32; UseMouse: Boolean = True): Boolean;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  if UseMouse then
+  begin
+    ID := R_GameTabIDs[Tab];
+
+    if R_IsGameTabOpen(Tab) then
+      Exit(True);
+
+    Widget := RSWidget.Get(ID.Group, ID.Child);
+    if Widget.ref <> nil then
+    begin
+      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Result := True;
+      Widget.Free;
+    end;
+  end else
+  begin
+    Keyboard.PressKey(R_GetGameTabKey(GAMETAB_MUSIC));
+    if R_IsGameTabOpen(Tab) then
+      Result := True;
+  end;
+end;
+
+{*
+R_GameTabBounds
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the bounds of a specified Game Tab.
+
+Example:
+    Mouse.Move(R_GameTabBounds[GAMETAB_COMBAT]);
+*}
+Function R_GameTabBounds(Tab: Int32): TBox;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  Result := [-1, -1, -1, -1];
+  ID := R_GameTabIDs[Tab];
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  if Widget.ref <> nil then
+  begin
+    Result := Widget.Bounds;
+    Widget.Free;
+  end;
+end;
+
+{*
+R_CurrentGameTab
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the currently opened Game Tab.
+
+Example:
+    if R_CurrentGameTab = GAMETAB_COMBAT) then
+      ...
+*}
+Function R_CurrentGameTab: Int32;
+var
+  I: Int32;
+  IDs: Array of RWidget;
+  Widget: RSWidget;
+  Garbage: RSTypeArray;
+begin
+  Result := -1;
+  IDs := R_GameTabIDs;
+
+  for I := 0 to High(IDs) do
+  begin
+    Widget := RSWidget.Get(IDs[I].Group, IDs[I].Child);
+    if Widget.ref <> nil then
+    begin
+      Garbage += Widget;
+      if Widget.TextureID <> -1 then
+      begin
+        Garbage.Free;
+        Exit(I);
+      end;
+    end;
+  end;
+
+  Garbage.Free;
+end;
+
+{*
+R_GetMMLevels
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the value of the specified minimap orb.
+
+Example:
+    if R_GetMMLevels(MM_LEVEL_RUN) < 50) then
+      ...
+*}
+Function R_GetMMLevels(Level: Int32): Int32;
+var
+  ID: RWidget;
+  Widget: RSWidget;
+begin
+  Result := -1;
+
+  case Level of
+    MM_LEVEL_HITPOINTS: ID := R_INTERFACE_MINIMAP_ORB_HEALTH_LABEL;
+    MM_LEVEL_PRAYER: ID := R_INTERFACE_MINIMAP_ORB_PRAYER_LABEL;
+    MM_LEVEL_RUN: ID := R_INTERFACE_MINIMAP_ORB_RUN_LABEL;
+    MM_LEVEL_COMBAT_SPECIAL: ID := R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL_LABEL;
+  end;
+
+  Widget := RSWidget.Get(ID.Group, ID.Child);
+  Result := StrToInt(Widget.Text);
+  Widget.Free;
+end;

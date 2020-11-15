@@ -1,0 +1,311 @@
+{$include_once RSStructures.simba}
+{$include_once RSAnimableNode.simba}
+{$include_once RSClient.simba}
+{$include_once RSRegion.simba}
+{$include_once RSSceneTile.simba}
+{$include_once RSObjectDefinition.simba}
+
+Function RSObject.Get(ObjectType: RSObjectType; X, Y: Int32): RSObject; static;
+var
+  BaseX, BaseY: Int32;
+  Region: RSRegion;
+  Tile: RSSceneTile;
+begin
+  Region := RSClient.Region;
+  if Region.ref = nil then
+    Exit;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+
+  {$IFDEF USE_REGION_CACHING}
+  UpdateSceneTilesCache(X, Y);
+  Tile := CACHED_SCENE_TILES[RSClient.Plane][X - BaseX][Y - BaseY];
+  {$ELSE}
+  Tile := Region.SceneTile(RSClient.Plane, X - BaseX, Y - BaseY);
+  {$ENDIF}
+
+  if Tile.ref <> nil then
+  begin
+    case ObjectType of
+      GAME_OBJECT: Result := Tile.GameObject;
+      WALL_DECORATION: Result := Tile.WallDecoration;
+      BOUNDARY_OBJECT: Result := Tile.BoundaryObject;
+      FLOOR_DECORATION: Result := Tile.GroundDecoration;
+    end;
+
+    {$IFNDEF USE_REGION_CACHING}
+    Tile.Free;
+    {$ENDIF}
+  end;
+
+  Region.Free;
+end;
+
+Function RSObject.Get(ObjectType: RSObjectType): Array of RSObject; static; overload;
+var
+  I, X, Y: Int32;
+  BaseX, BaseY: Int32;
+  MinX, MinY: Int32;
+  MaxX, MaxY: Int32;
+  Region: RSRegion;
+  Tile: RSSceneTile;
+  Tiles: Array of Array of RSSceneTile;
+  Garbage: RSTypeArray;
+begin
+  Region := RSClient.Region;
+  if Region.ref = nil then
+    Exit;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+
+  MinX := BaseX;
+  MinY := BaseY;
+  MaxX := BaseX + 104;
+  MaxY := BaseY + 104;
+
+  {$IFDEF USE_REGION_CACHING}
+  UpdateSceneTilesCache(BaseX + 52, BaseY + 52);
+  Tiles := CACHED_SCENE_TILES[RSClient.Plane];
+  {$ELSE}
+  Tiles := Region.SceneTiles(RSClient.Plane);
+  {$ENDIF}
+  SetLength(Result, 104 * 104);
+  SetLength(Garbage, 104 * 104);
+
+  For Y := MinY To MaxY - 1 do
+  begin
+    For X := MinX To MaxX - 1 do
+    begin
+      Tile := Tiles[X - BaseX][Y - BaseY];
+      if Tile.ref <> nil then
+      begin
+        case ObjectType of
+          GAME_OBJECT: Result[I] := Tile.GameObject;
+          WALL_DECORATION: Result[I] := Tile.WallDecoration;
+          BOUNDARY_OBJECT: Result[I] := Tile.BoundaryObject;
+          FLOOR_DECORATION: Result[I] := Tile.GroundDecoration;
+        end;
+        if (Result[I].ref <> nil) then
+        begin
+          Garbage[I] := Tile;
+          Inc(I);
+        end;
+      end;
+    end;
+  end;
+
+  SetLength(Result, I);
+  SetLength(Garbage, I);
+
+  {$IFNDEF USE_REGION_CACHING}
+  Garbage.Free;
+  {$ENDIF}
+  Region.Free;
+end;
+
+Function RSObject.Hash: Int64; constref;
+begin
+  case self.ObjectType of
+    GAME_OBJECT: Result := RGetLong(R_EIOS, ref, GAMEOBJECT_ID);
+    WALL_DECORATION: Result := RGetLong(R_EIOS, ref, WALLDECORATION_ID);
+    BOUNDARY_OBJECT: Result := RGetLong(R_EIOS, ref, BOUNDARYOBJECT_ID);
+    FLOOR_DECORATION: Result := RGetLong(R_EIOS, ref, FLOORDECORATION_ID);
+  end;
+end;
+
+Function RSObject.ID: Int32; constref;
+begin
+  Result := (self.Hash shr 17) and $FFFFFFFF;
+end;
+
+Function RSObject.LocalTile: RSTile; constref;
+begin
+  case self.ObjectType of
+    GAME_OBJECT:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, GAMEOBJECT_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, GAMEOBJECT_LOCALY);
+      end;
+    WALL_DECORATION:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, WALLDECORATION_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, WALLDECORATION_LOCALY);
+      end;
+    BOUNDARY_OBJECT:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, BOUNDARYOBJECT_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, BOUNDARYOBJECT_LOCALY);
+      end;
+    FLOOR_DECORATION:
+      begin
+        Result.X := RGetInt(R_EIOS, ref, FLOORDECORATION_LOCALX);
+        Result.Y := RGetInt(R_EIOS, ref, FLOORDECORATION_LOCALY);
+      end;
+  end;
+end;
+
+Function RSObject.Tile: RSTile; constref;
+begin
+  Result := self.LocalTile;
+  Result.X := RSClient.BaseX + Result.X div 128;
+  Result.Y := RSClient.BaseY + Result.Y div 128;
+end;
+
+Function RSObject.Definition: RSObjectDefinition; constref;
+begin
+  Result := RSObjectDefinition.Definition(self.ID);
+end;
+
+Function RSObject.Renderable: RSEntity; constref;
+begin
+  case self.ObjectType of
+    GAME_OBJECT:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, GAMEOBJECT_RENDERABLE);
+      end;
+    WALL_DECORATION:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, WALLDECORATION_RENDERABLE);
+        if Result.ref = nil then
+        begin
+          Result.ref := RGetObject(R_EIOS, ref, WALLDECORATION_RENDERABLE2);
+        end;
+      end;
+    BOUNDARY_OBJECT:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, BOUNDARYOBJECT_RENDERABLE);
+        if Result.ref = nil then
+        begin
+          Result.ref := RGetObject(R_EIOS, ref, BOUNDARYOBJECT_RENDERABLE2);
+        end;
+      end;
+    FLOOR_DECORATION:
+      begin
+        Result.ref := RGetObject(R_EIOS, ref, FLOORDECORATION_RENDERABLE);
+      end;
+  end;
+end;
+
+Function RSObject.Model: RSModel; constref;
+var
+  UID: Int64;
+  Entity: RSEntity;
+  Definition: RSObjectDefinition;
+  Garbage: RSTypeArray;
+begin
+  Entity := self.Renderable;
+
+  //If it's a RSModel, return it..
+  if RObjectInstanceOf(R_EIOS, Entity.ref, MODEL_FITSSINGLETILE.cls) then
+  begin
+    Result.ref := Entity.ref;
+    Exit;
+  end;
+
+  //If it's a RSAnimableNode, return the model from cache..
+  if RObjectInstanceOf(R_EIOS, Entity.ref, ANIMABLENODE_ID.cls) then
+  begin
+    Definition := self.Definition;
+    if Definition.ref <> nil then
+    begin
+      if Definition.HasTransformations then
+      begin
+        Garbage += Definition;
+        Definition := Definition.Transform;
+        Garbage += Definition;
+      end;
+
+      if Definition.ref = nil then
+      begin
+        Garbage += Entity;
+        Garbage.Free;
+        Exit;
+      end;
+
+      if Not Definition.HasModels then
+      begin
+        UID := RSAnimableNode(Entity.ref).Orientation + (Definition.ID shl 10);
+      end else
+        begin
+          UID := RSAnimableNode(Entity.ref).Orientation + (RSAnimableNode(Entity.ref).Flags shl 3) + (Definition.ID shl 10);
+        end;
+
+      Garbage += Entity;
+      Result := RSObjectDefinition.Model(UID);
+      Garbage.Free;
+      Exit;
+    end;
+  end;
+
+  RFreeObject(R_EIOS, Entity.ref);
+end;
+
+Function RSObject.AnimatedModel: RSAnimatedModel; constref;
+var
+  UID: Int64;
+  Entity: RSEntity;
+  Definition: RSObjectDefinition;
+  AnimationSequence: RSAnimationSequence;
+  Garbage: RSTypeArray;
+begin
+  Entity := self.Renderable;
+
+  //If it's a RSModel, return it..
+  if RObjectInstanceOf(R_EIOS, Entity.ref, MODEL_FITSSINGLETILE.cls) then
+  begin
+    Result.ref := Entity.ref;
+    Exit;
+  end;
+
+  //If it's a RSAnimableNode, return the model from cache..
+  if RObjectInstanceOf(R_EIOS, Entity.ref, ANIMABLENODE_ID.cls) then
+  begin
+    Definition := self.Definition;
+    if Definition.ref <> nil then
+    begin
+      if Definition.HasTransformations then
+      begin
+        Garbage += Definition;
+        Definition := Definition.Transform;
+        Garbage += Definition;
+      end;
+
+      if Definition.ref = nil then
+      begin
+        Garbage += Entity;
+        Garbage.Free;
+        Exit;
+      end;
+
+      if Not Definition.HasModels then
+      begin
+        UID := RSAnimableNode(Entity.ref).Orientation + (Definition.ID shl 10);
+      end else
+        begin
+          UID := RSAnimableNode(Entity.ref).Orientation + (RSAnimableNode(Entity.ref).Flags shl 3) + (Definition.ID shl 10);
+        end;
+
+      Garbage += Entity;
+      Result.ref := RSObjectDefinition.Model(UID).ref;
+
+      if Result.ref <> nil then
+      begin
+        AnimationSequence := RSAnimableNode(Entity.ref);
+        if AnimationSequence.ref <> nil then
+        begin
+          Garbage += [RSType(Result.ref), AnimationSequence];
+          Result := AnimationSequence.TransformObjectModel(RSModel(Result.ref), RSAnimableNode(Entity.ref).AnimationFrameID);
+          Garbage.Free;
+          Exit;
+        end;
+      end;
+
+      Garbage.Free;
+      Exit;
+    end;
+  end;
+
+  RFreeObject(R_EIOS, Entity.ref);
+end;

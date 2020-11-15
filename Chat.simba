@@ -1,0 +1,224 @@
+{$include_once Internal/Reflection.simba}
+{$include_once Constants.simba}
+{$include_once Mouse.simba}
+{$include_once Timing.simba}
+
+type
+  TRSChatMessage = record
+    Name: String;
+    Message: String;
+    LineNumber: Int32;
+  end;
+
+{*
+R_ChatMessages
+~~~~~~~~~~~~~~~~~~~~~~
+Returns an array of TRSChatMessage containing all in-game
+  chat messages in your chat box.
+
+Example:
+    Messages := R_ChatMessages();
+    for I:=0 to High(Messages) do
+      ...
+*}
+Function R_ChatMessages(Limit: UInt32 = 0): Array of TRSChatMessage;
+var
+  I, J, Count: Int32;
+  ChatWidget: RSWidget;
+  Children: Array of RSWidget;
+  Name: String;
+  Message: String;
+begin
+  ChatWidget := RSWidget.Get(R_CHATBOX_MESSAGES_CHATLINES_TEXT.Group, R_CHATBOX_MESSAGES_CHATLINES_TEXT.Child);
+  if ChatWidget.ref = nil then
+    Exit;
+
+  J := 0;
+  Count := 0;
+  Children := ChatWidget.Children;
+  For I := 0 to High(Children) do
+  begin
+    if Limit > 0 then
+    begin
+      if Count = Limit then
+        break;
+
+      Inc(Count);
+    end;
+
+    Name := Children[I].Text.SanitizeRS;
+    Message := Children[I + 1].Text.SanitizeRS;
+
+    if (Name = '') and (Message = '') then
+      break;
+
+    if (Name <> '') and (Message = '') then
+      Swap(Name, Message);
+
+    Result += [Name, Message, J];
+    I += 1;
+    J += 1;
+  end;
+
+  ChatWidget.Free;
+end;
+
+{*
+R_ChatDialog
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the Chat Dialog is open.
+
+Example:
+    if R_ChatDialog then
+      ...
+*}
+Function R_ChatDialog: Boolean;
+var
+  Dialog: RSWidget;
+begin
+  Dialog := RSWidget.Get(R_CHATBOX_DIALOG.Group, R_CHATBOX_DIALOG.Child);
+  if Dialog.ref <> nil then
+  begin
+    Dialog.Free;
+    Exit(True);
+  end;
+
+  Dialog := RSWidget.Get(R_CHATBOX_PLAYER_DIALOG.Group, R_CHATBOX_PLAYER_DIALOG.Child);
+  if Dialog.ref <> nil then
+  begin
+    Dialog.Free;
+    Exit(True);
+  end;
+end;
+
+{*
+R_ChatInput
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if the chat input option is open (Chat screen with '*').
+
+Example:
+    if R_ChatInput then
+      ...
+*}
+Function R_ChatInput: Boolean;
+var
+  Input: RSWidget;
+begin
+  Input := RSWidget.Get(R_CHATBOX_MESSAGES_CHATINPUT.Group, R_CHATBOX_MESSAGES_CHATINPUT.Child);
+  if Input.ref <> nil then
+  begin
+    Mouse.Click(Input.Bounds, MOUSE_LEFT);
+    Input.Free;
+    Exit(True);
+  end;
+end;
+
+{*
+R_ChatChooseOptionIsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if chat option is open.
+
+Example:
+    if R_ChatChooseOptionIsOpen then
+      Keyboard.Send("2");
+      ...
+*}
+Function R_ChatChooseOptionIsOpen: Boolean;
+begin
+  Result := RSWidget.Get(R_CHATBOX_NPC_DIALOG_OPTION.Group, R_CHATBOX_NPC_DIALOG_OPTION.Child).ref <> nil;
+end;  
+
+{*
+R_ChatChooseOption
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if selected specified chat option.
+
+Example:
+    if R_ChatChooseOption(['Yes']) then
+      ...
+*}
+Function R_ChatChooseOption(options: Array of String; caseSensitive: Boolean = True): Boolean;
+var
+  I, J: Int32;
+  Dialog: RSWidget;
+  Items: Array of RSWidget;
+  Title: String;
+begin
+  Dialog := RSWidget.Get(R_CHATBOX_NPC_DIALOG_OPTION.Group, R_CHATBOX_NPC_DIALOG_OPTION.Child);
+  if Dialog.ref = nil then
+    Exit(False);
+
+  Items := Dialog.Children;
+  Dialog.Free;
+
+  For I := 1 to High(Items) do
+  begin
+    Title := Items[I].Text;
+    if Title <> '' then
+    begin
+      For J := 0 to High(Options) do
+      begin
+        if (caseSensitive and (Pos(Options[J], Title) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[J]), Lowercase(Title)) > 0)) then
+        begin
+          Mouse.Click(Items[I].Bounds, MOUSE_LEFT);
+          RSTypeArray(Items).Free;
+          Exit(True);
+        end;
+      end;
+    end;
+  end;
+end;
+
+{*
+R_ClickToContinueIsOpen
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if 'Click to continue' is open.
+
+Example:
+    if R_ClickToContinueIsOpen then
+      ...
+*}
+Function R_ClickToContinueIsOpen(): Boolean;
+begin
+  Result := (RSWidget.Get(R_CHATBOX_NPC_CLICK_TO_CONTINUE.Group, R_CHATBOX_NPC_CLICK_TO_CONTINUE.Child).ref <> nil)
+    or (RSWidget.Get(R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Group, R_CHATBOX_PLAYER_CLICK_TO_CONTINUE.Child).ref <> nil)
+    or (RSWidget.Get(R_INTERFACE_LEVEL_UP_CONTINUE.Group, R_INTERFACE_LEVEL_UP_CONTINUE.Child).ref <> nil)
+    or (RSWidget.Get(R_INTERFACE_CHAT_DIALOG_CONTINUE.Group, R_INTERFACE_CHAT_DIALOG_CONTINUE.Child).ref <> nil);
+end;
+
+{*
+R_ClickToContinue
+~~~~~~~~~~~~~~~~~~~~~~
+Returns true if clicked 'Click to continue'.
+
+Example:
+    if R_ClickToContinue then
+      ...
+*}
+Function R_ClickToContinue: Boolean;
+var
+  FoundWidget: RSWidget;
+  EachWidget : RWidget;
+  WidgetsToCheck : array of RWidget;
+begin
+
+  WidgetsToCheck := [
+    R_CHATBOX_NPC_CLICK_TO_CONTINUE,
+    R_CHATBOX_PLAYER_CLICK_TO_CONTINUE,
+    R_INTERFACE_LEVEL_UP_CONTINUE,
+    R_INTERFACE_CHAT_DIALOG_CONTINUE,
+    R_INTERFACE_NEW_ACTIONS_CONTINUE
+  ];
+
+  for EachWidget in WidgetsToCheck do begin
+    FoundWidget := RSWidget.Get(EachWidget.Group, EachWidget.Child);
+    if FoundWidget.ref <> nil then begin
+      if Result then begin
+        Wait(216, Random(300, 626));
+      end;
+      Mouse.Click(FoundWidget.Bounds, MOUSE_LEFT);
+      FoundWidget.Free;
+      Result := True;
+    end;
+  end;
+end;
