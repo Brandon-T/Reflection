@@ -240,7 +240,7 @@ begin
 
     Exit(True);
   end;
-end
+end;
 
 {*
 TRSLogin.EnterDetails

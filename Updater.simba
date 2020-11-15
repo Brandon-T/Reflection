@@ -1,8 +1,11 @@
+{$IFDEF REMOTEINPUT}
 {$include_once Internal/Hooks.simba}
+{$ENDIF}
 
 const
   REFLECTION_REPO_USERNAME = 'Brandon-T';
 
+{$IFDEF REMOTEINPUT}
 Function IsRepoOutOfDate: Boolean;
 var
   http_client: Int32;
@@ -106,6 +109,7 @@ begin
   end;
   Exit(-1);
 end;
+{$ENDIF}
 
 Function DownloadOrCheckRequiredPlugins: Boolean;
 var
@@ -165,6 +169,7 @@ begin
         end;
       end;
 
+      WriteLn('[RemoteInput]: Installing Plugin: ' + PLUGINPATH + FileMap[I]);
       GetHTTPPageEx(HTTP_Client, 'https://github.com/' + REFLECTION_REPO_USERNAME + '/Reflection/releases/download/autobuild/' + FileNames[I], PLUGINPATH + FileNames[I]);
     end;
 
@@ -183,13 +188,19 @@ begin
       Exit(False);
     end;
   end;
+
+  {$IFNDEF REMOTEINPUT}
+  WriteLn('[RemoteInput]: Plugins Installed');
+  {$ENDIF}
   Exit(True);
 end;
 
+{$IFDEF REMOTEINPUT}
 Function IsReflectionUpToDate: Boolean;
 begin
   Result := (Not IsRepoOutOfDate) and (GetLatestGamepackRevision = StrToIntDef(ReflectionRevision, 0));
 end;
+{$ENDIF}
 
 Procedure VerifyRemoteInputPlugins;
 begin
@@ -199,6 +210,7 @@ begin
   end;
 end;
 
+{$IFDEF REMOTEINPUT}
 Procedure VerifyReflectionInclude;
 begin
   If Not IsReflectionUpToDate then
@@ -206,3 +218,10 @@ begin
     RaiseException('Could not verify or install Reflection Include.\nPlease Visit: https://github.com/' + REFLECTION_REPO_USERNAME + 'Reflection');
   end;
 end;
+{$ENDIF}
+
+{$IFNDEF REMOTEINPUT}
+begin
+  VerifyRemoteInputPlugins;
+end.
+{$ENDIF}
