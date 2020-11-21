@@ -245,6 +245,7 @@ begin
   if Widget.ref = nil then
     Exit;
 
+  Garbage += Widget;
   ItemNodeCache := RSClient.ItemNodeCache;
   if ItemNodeCache.ref <> nil then
   begin
