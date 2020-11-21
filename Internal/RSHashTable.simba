@@ -73,6 +73,7 @@ begin
     Current := Head.Next;
     if Current.ref <> nil then
     begin
+      HeadUID := Head.UID;
       while HeadUID <> (CurrentUID := Current.UID) do
       begin
         if CurrentUID = ID then
