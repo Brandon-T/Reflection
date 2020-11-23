@@ -245,7 +245,7 @@ CombatInfoHolder_CombatInfo2: THook =             ['cx', 'l', 'Lix;', 1];
 
 {Actor: cs}
 Actor_Animation: THook =                          ['cs', 'bt', 'I', -254649357];
-Actor_AnimationDelay: THook =                     ['cs', 'y', 'I', -370859363];
+Actor_AnimationDelay: THook =                     ['cs', 'by', 'I', 1211840765];
 Actor_AnimationFrame: THook =                     ['cs', 'bw', 'I', 1925242573];
 Actor_MovementSequence: THook =                   ['cs', 'bo', 'I', 1355414019];
 Actor_MovementFrame: THook =                      ['cs', 'be', 'I', 878455421];
