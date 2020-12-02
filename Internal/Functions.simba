@@ -2,8 +2,9 @@
 {$IFNDEF FUNCTIONS}
 {$DEFINE FUNCTIONS}
 
+{$IFDEF TRACK_MEMORY}
 //Used to check for leaks in the include..
-{type
+type
   MemoryPointer = Array of Pointer;
 
 var
@@ -37,12 +38,16 @@ end;
 
 Procedure MemoryPointer.Add(ptr: Pointer);
 begin
-  self += ptr;
+  if ptr <> nil then
+    self += ptr;
 end;
 
 Procedure MemoryPointer.Add(ptr: Array of Pointer); overload;
+var
+  i: Int32;
 begin
-  self += ptr;
+  for i := 0 to high(ptr) do
+    self.add(ptr[i]);
 end;
 
 Procedure MemoryPointer.Remove(ptr: Pointer);
@@ -62,25 +67,49 @@ begin
   begin
     self.Remove(ptrs[I]);
   end;
-end;}
+end;
+
+Function MemoryPointer.MemoryUsage: Int32;
+begin
+  Result := (Length(self) * Sizeof(Pointer));
+end;
+
+Procedure MemoryPointer.Log;
+begin
+  WriteLn('Memory In Use: ', self.MemoryUsage, ' Bytes.');
+end;
+{$ENDIF}
 
 // MARK: - OBJECT
 
 Function RGetObject(eios: Pointer; instance: Pointer; constref hook: THook): Pointer;
 begin
   Result := RIGetObject(eios, instance, PRIField(@hook));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Procedure RFreeObject(eios: Pointer; instance: Pointer);
 begin
   if instance <> nil then
+  begin
     RIReleaseObject(eios, instance);
+    {$IFDEF TRACK_MEMORY}
+    MemoryTracker.Remove(instance);
+    {$ENDIF}
+  end;
 end;
 
 Procedure RFreeObjects(eios: Pointer; constref instances: array of Pointer);
 begin
   if Length(instances) > 0 then
+  begin
     RIReleaseObjects(eios, instances);
+    {$IFDEF TRACK_MEMORY}
+    MemoryTracker.Remove(instances);
+    {$ENDIF}
+  end;
 end;
 
 Function RObjectsEqual(eios: Pointer; first, second: Pointer): Boolean;
@@ -147,11 +176,17 @@ end;
 Function RGetArray(eios: Pointer; instance: Pointer; constref hook: THook): Pointer;
 begin
   result := RIGetArray(eios, instance, PRIField(@hook));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetArray(eios: Pointer; instance: Pointer; var size: SizeUInt; constref hook: THook): Pointer; overload;
 begin
   result := RIGetArray(eios, instance, @size, PRIField(@hook));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetArraySize(eios: Pointer; instance: Pointer): SizeUInt;
@@ -231,6 +266,9 @@ end;
 Function RGetObjectArray(eios: Pointer; instance: Pointer; index: SizeUInt): Pointer;
 begin
   Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, index);
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetBoolArray(eios: Pointer; instance: Pointer; index: SizeUInt; count: SizeUInt): array of Boolean; overload;
@@ -364,6 +402,9 @@ type
   TObjectArray = array of Pointer;
 begin
   Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, index, count));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetObjectArray(eios: Pointer; instance: Pointer; indices: Array of Int32): array of Pointer; overload;
@@ -371,6 +412,9 @@ type
   TObjectArray = array of Pointer;
 begin
   Result := TObjectArray(RIGetArrayElements(eios, instance, ReflectionArrayType.RI_OBJECT, indices));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 
@@ -440,6 +484,9 @@ end;
 Function RGetObjectArray2D(eios: Pointer; instance: Pointer; x, y: Int32): Pointer;
 begin
   Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, x, y);
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetBoolArray2D(eios: Pointer; instance: Pointer; count, x, y: Int32): array of Boolean; overload;
@@ -510,6 +557,9 @@ type
   TObjectArray = array of Pointer;
 begin
   Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 
@@ -579,6 +629,9 @@ end;
 Function RGetObjectArray3D(eios: Pointer; instance: Pointer; x, y, z: Int32): Pointer;
 begin
   Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, x, y, z);
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetBoolArray3D(eios: Pointer; instance: Pointer; count, x, y, z: Int32): array of Boolean; overload;
@@ -649,6 +702,9 @@ type
   TObjectArray = array of Pointer;
 begin
   Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y, z));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 
@@ -718,6 +774,9 @@ end;
 Function RGetObjectArray4D(eios: Pointer; instance: Pointer; x, y, z, w: SizeUInt): Pointer;
 begin
   Result := RIGetArraySingleElement(eios, instance, ReflectionArrayType.RI_OBJECT, x, y, z, w);
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 
 Function RGetBoolArray4D(eios: Pointer; instance: Pointer; count, x, y, z, w: SizeUInt): array of Boolean; overload;
@@ -788,5 +847,8 @@ type
   TObjectArray = array of Pointer;
 begin
   Result := TObjectArray(RIGetArrayElement(eios, instance, ReflectionArrayType.RI_OBJECT, count, x, y, z, w));
+  {$IFDEF TRACK_MEMORY}
+  MemoryTracker.Add(Result);
+  {$ENDIF}
 end;
 {$ENDIF}

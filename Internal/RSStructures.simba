@@ -81,6 +81,7 @@ type
 
     modifierX, modifierY, modifierZ: Int32;
   end;
+  RSAnimatedModelArray = Array of RSAnimatedModel;
 
   RSGroundObject = type RSType;
 
@@ -127,6 +128,17 @@ begin
 end;
 
 Procedure RSObjectArray.Free;
+var
+  I: Int32;
+  Garbage: Array of Pointer;
+begin
+  SetLength(Garbage, Length(self));
+  for I := 0 to high(self) do
+    Garbage[I] := self[I].ref;
+  RFreeObjects(R_EIOS, Garbage);
+end;
+
+Procedure RSAnimatedModelArray.Free;
 var
   I: Int32;
   Garbage: Array of Pointer;

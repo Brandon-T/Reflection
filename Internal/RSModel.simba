@@ -223,8 +223,8 @@ begin
   begin
     //Rotate
     VX := Sar(((Vertices[0][I] * CosAngle) + (Vertices[2][I] * SinAngle)), 16); //X * COSINE[Orientation] + Z * SINE[Orientation] >> 16;
-    VY := Vertices[1][I];
-    VZ := Sar(((Vertices[2][I] * COSINE[Orientation]) - (Vertices[0][I] * SINE[Orientation])), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
+    VZ := Vertices[1][I];
+    VY := Sar(((Vertices[2][I] * COSINE[Orientation]) - (Vertices[0][I] * SINE[Orientation])), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
 
     //Bounds
     xMin := min(xMin, VX);

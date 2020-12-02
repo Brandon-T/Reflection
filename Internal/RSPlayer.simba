@@ -72,6 +72,11 @@ begin
   Result := RGetInt(R_EIOS, ref, PLAYER_COMBATLEVEL);
 end;
 
+Function RSPlayer.Index: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PLAYER_INDEX) + 32768;
+end;
+
 Function RSPlayer.Destination: RSTile;
 var
   X, Y: Int32;
