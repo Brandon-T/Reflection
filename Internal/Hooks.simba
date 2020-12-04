@@ -120,6 +120,7 @@ AnimableNode_Orientation: THook =                 ['ck', 'l', 'I', 89407283];
 AnimableNode_Plane: THook =                       ['ck', 'm', 'I', -1374963731];
 AnimableNode_X: THook =                           ['ck', 'z', 'I', -2010464009];
 AnimableNode_Y: THook =                           ['ck', 'q', 'I', 647351421];
+AnimableNode_Frame: THook =                       ['ck', 'c', 'I', 2125087057];
 
 {BoundaryObject: em}
 BoundaryObject_ID: THook =                        ['em', 'c', 'J', -3078711070799260957];

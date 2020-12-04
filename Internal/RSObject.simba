@@ -292,7 +292,7 @@ begin
 
       if Result.ref <> nil then
       begin
-        AnimationSequence := RSAnimableNode(Entity.ref);
+        AnimationSequence := RSAnimableNode(Entity.ref).AnimationSequence;
         if AnimationSequence.ref <> nil then
         begin
           Garbage += [RSType(Result.ref), AnimationSequence];

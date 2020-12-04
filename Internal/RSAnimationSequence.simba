@@ -16,6 +16,12 @@ begin
   if Frames = nil then
     Exit(-1);
 
+  if Index >= FramesSize then
+  begin
+    Exit(-1);
+    RFreeObject(R_EIOS, Frames);
+  end;
+
   Result := RGetIntArray(R_EIOS, Frames, Index);
   RFreeObject(R_EIOS, Frames);
 end;
