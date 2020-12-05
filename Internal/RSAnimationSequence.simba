@@ -18,8 +18,8 @@ begin
 
   if Index >= FramesSize then
   begin
-    Exit(-1);
     RFreeObject(R_EIOS, Frames);
+    Exit(-1);
   end;
 
   Result := RGetIntArray(R_EIOS, Frames, Index);
