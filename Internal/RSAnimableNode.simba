@@ -15,7 +15,7 @@ end;
 
 Function RSAnimableNode.AnimationFrameID: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, ANIMABLENODE_FRAME);
+  Result := RGetInt(R_EIOS, ref, ANIMABLENODE_ANIMATIONFRAME);
 end;
 
 Function RSAnimableNode.Flags: Int32; constref;
