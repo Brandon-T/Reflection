@@ -256,6 +256,7 @@ begin
   if RObjectInstanceOf(R_EIOS, Entity.ref, MODEL_FITSSINGLETILE.cls) then
   begin
     Result.ref := Entity.ref;
+    Result.vertices := RSModel(Entity.ref).Vertices;
     Exit;
   end;
 

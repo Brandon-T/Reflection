@@ -203,7 +203,7 @@ Model_TexVerticesX: THook =                       ['eh', 'g', '[I', 1];
 Model_TexVerticesY: THook =                       ['eh', 's', '[I', 1];
 Model_TexVerticesZ: THook =                       ['eh', 'o', '[I', 1];
 Model_TexVerticesLength: THook =                  ['eh', 'q', 'I', 1];
-Model_Skins: THook =                              ['eh', 'd', '[[I', 1];
+Model_Skins: THook =                              ['eh', 'k', '[[I', 1];
 Model_ShadowIntensity: THook =                    ['eh', 'ag', 'I', 1];
 Model_FitsSingleTile: THook =                     ['eh', 'an', 'Z', 1];
 
@@ -426,7 +426,7 @@ Client_WidgetRootInterface: THook =               ['client', 'mw', 'I', -1575535
 Client_ViewPortWidth: THook =                     ['client', 'rg', 'I', 165183815];
 Client_ViewPortHeight: THook =                    ['client', 'sd', 'I', -1667977405];
 Client_ViewPortScale: THook =                     ['client', 'sf', 'I', 2093134959];
-Client_MapAngle: THook =                          ['client', 'hr', 'I', 256130781];
+Client_MapAngle: THook =                          ['client', 'ht', 'I', -933249295];
 Client_MapScale: THook =                          ['client', 'N/A', 'N/A', 1];
 Client_MapOffset: THook =                         ['client', 'N/A', 'N/A', 1];
 Client_MenuCount: THook =                         ['client', 'lw', 'I', 1250252403];
