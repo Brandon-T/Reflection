@@ -1,5 +1,34 @@
 {$include_once Static.simba}
 
+const
+{$IFDEF WINDOWS}
+  {$IFDEF CPU32}
+  REMOTE_INPUT_PLUGIN = 'libRemoteInput32.dll';
+  {$ELSE}
+  REMOTE_INPUT_PLUGIN = 'libRemoteInput64.dll';
+  {$ENDIF}
+{$ENDIF}
+
+{$IFDEF DARWIN}
+REMOTE_INPUT_PLUGIN = 'libRemoteInput64.dylib';
+{$ENDIF}
+
+{$IFDEF LINUX}
+  {$IFDEF CPUARM}
+  REMOTE_INPUT_PLUGIN = 'libRemoteInput32.so';
+  {$ENDIF}
+
+  {$IFDEF CPUAARCH64}
+  REMOTE_INPUT_PLUGIN = 'libRemoteInput64.so';
+  {$ENDIF}
+
+  {$IFNDEF CPUARM}
+    {$IFNDEF CPUAARCH64}
+    REMOTE_INPUT_PLUGIN = 'libRemoteInput64.so';
+    {$ENDIF}
+  {$ENDIF}
+{$ENDIF}
+
 Procedure RSetup;
 var
   PID: Int32;
@@ -14,11 +43,7 @@ begin
     PID := EIOS_GetClientPID(I);
     if PID <> -1 then
     begin
-      {$IFDEF WINDOWS}
-      SetEIOSTarget('LibRemoteInput', IntToStr(PID));
-      {$ELSE}
-      SetEIOSTarget('LibRemoteInput', IntToStr(PID));
-      {$ENDIF}
+      SetEIOSTarget(PLUGINPATH + REMOTE_INPUT_PLUGIN, IntToStr(PID));
       break;
     end;
   end;
