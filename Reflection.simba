@@ -24,7 +24,10 @@
 {$include_once Updater.simba}
 
 begin
+  {$IFNDEF DISABLE_UPDATER}
   VerifyReflectionInclude;
   VerifyRemoteInputPlugins;
+  {$ENDIF}
+  
   RSetup;
 end;
