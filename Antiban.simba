@@ -141,8 +141,7 @@ type
     and alterantively how long should the log be (mainly for debugging)
 }
 
-function RAntiban.Init(Skills: Array of TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False): Boolean;
-var i: Int32;
+procedure RAntiban.Init(Skills: Array of TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False);
 begin
   Self.ActiveSkills := Skills;
   Self.HistorySize := LogSize;
@@ -154,7 +153,7 @@ begin
   Self.ReturnToTab := ReturnToTab;
 end;
 
-function RAntiban.Init(Skill: TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False): Boolean; overload;
+procedure RAntiban.Init(Skill: TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False); overload;
 begin
   Self.Init([Skill], ReturnToTab, LogSize, Debug);
 end;
@@ -220,7 +219,7 @@ end;
 }
 function RAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
 var
-  stv, res: TDateTime;
+  res: TDateTime;
 begin
   res := (Date() + StrToTime(TimeOfDay)) - Now();
   if (res < 0) then res += 1;

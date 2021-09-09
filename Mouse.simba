@@ -1,4 +1,5 @@
-{$include_once srl/shared.simba}
+{$include_once srl/utils.simba}
+{$include_once Internal/Functions.simba}
 {$include_once Timing.simba}
 
 {*

@@ -183,8 +183,6 @@ var
   NodeDeque: RSNodeDeque;
   Head, Curr: RSNode;
   Garbage: RSTYpeArray;
-
-  ID: Int32;
 begin
   Player := RSPlayer.Me;
   Tile := Player.Tile;

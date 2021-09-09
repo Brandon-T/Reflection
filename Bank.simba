@@ -300,7 +300,7 @@ Example:
 *}
 Function R_BankSlotToBox(Index: Int32): TBox;
 var
-  ItemContainer, Slot: RSWidget;
+  ItemContainer: RSWidget;
 begin
   if not R_BankScreen then
     Exit(Box(-1, -1, -1, -1));
@@ -384,7 +384,7 @@ begin
         Exit(False);
       end;
 
-      P := Mouse.GetPosition;
+      P := Mouse.Position;
       if Down then
       begin
         Mouse.Move(P.X + RandomRange(-3, 3), P.Y + RandomRange(5, 10));

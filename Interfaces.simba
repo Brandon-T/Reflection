@@ -332,7 +332,7 @@ begin
         Exit(False);
       end;
 
-      P := Mouse.GetPosition;
+      P := Mouse.Position;
       if Direction then
         Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
       else
@@ -1110,7 +1110,7 @@ begin
         Exit(False);
       end;
 
-      P := Mouse.GetPosition;
+      P := Mouse.Position;
       if Direction then
         Mouse.Move(P.X + RandomRange(-1, 1), P.Y - RandomRange(3, 7))
       else

@@ -256,7 +256,6 @@ Example:
 Function R_GetWeaponCategory(): String;
 var
   Widget: RSWidget;
-  Category: String;
 begin
   Widget := RSWidget.Get(R_COMBAT_WEAPON_CATEGORY.Group, R_COMBAT_WEAPON_CATEGORY.Child);
   if (Widget.ref <> nil) then
@@ -290,7 +289,6 @@ Example:
 Function R_GetEquippedWeapon(): String;
 var
   Widget: RSWidget;
-  Category: String;
 begin
   Widget := RSWidget.Get(R_COMBAT_WEAPON.Group, R_COMBAT_WEAPON.Child);
   if (Widget.ref <> nil) then
