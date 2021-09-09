@@ -18,6 +18,7 @@ type
   TRSEquipmentItem = record
     ID: Int32;
     Slot: Int32;
+    Quantity: Int32;
     Name: String;
     Bounds: TBox;
   end;
@@ -179,6 +180,7 @@ var
     Widget := RSWidget.Get(info.Group, info.Child, 1);
     Result.ID := Widget.ItemID;
     Result.Slot := Slot;
+    Result.Quantity := Widget.ItemAmount;
     Garbage += Widget;
   end;
 begin
@@ -265,6 +267,7 @@ var
     Widget := RSWidget.Get(info.Group, info.Child, 1);
     Result.ID := Widget.ItemID;
     Result.Slot := Slot;
+    Result.Quantity := Widget.ItemAmount;
     Garbage += Widget;
   end;
 begin
