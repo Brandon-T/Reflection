@@ -35,4 +35,40 @@ begin
   Result.ref := RGetObject(R_EIOS, nil, ITEMNODE_CACHE);
 end;
 
+Function RSItemNode.ItemIDsEx(ContainerID: Int32): Array of Int32; static;
+var
+  I: Int32;
+  Cache: RSHashTable;
+  ItemContainer: RSItemNode;
+begin
+  Cache := RSClient.ItemNodeCache;
+  if Cache.ref = nil then
+    Exit;
 
+  ItemContainer := Cache.GetObject(ContainerID);
+  Cache.Free;
+
+  if ItemContainer.ref = nil then
+    Exit;
+
+  Result := ItemContainer.ItemIDs;
+end;
+
+Function RSItemNode.ItemQuantitiesEx(ContainerID: Int32): Array of Int32; static;
+var
+  I: Int32;
+  Cache: RSHashTable;
+  ItemContainer: RSItemNode;
+begin
+  Cache := RSClient.ItemNodeCache;
+  if Cache.ref = nil then
+    Exit;
+
+  ItemContainer := Cache.GetObject(ContainerID);
+  Cache.Free;
+
+  if ItemContainer.ref = nil then
+    Exit;
+
+  Result := ItemContainer.ItemQuantities;
+end;

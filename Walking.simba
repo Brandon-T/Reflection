@@ -16,6 +16,19 @@ begin
 end;
 
 {*
+R_TileToMS
+~~~~~~~~~~
+Converts the input tile to a point on the main-screen.
+
+Example:
+  Mouse.Move(R_TileToMS(R_GetMe.Tile));
+*}
+Function R_TileToMS(Tile: RSTile): TPoint;
+begin
+  Result := Tile.ToLocal.TileToMS;
+end;
+
+{*
 R_MMToMS
 ~~~~~~~~~~
 Converts the input point to a mainscreen point.

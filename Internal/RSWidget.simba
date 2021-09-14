@@ -92,13 +92,13 @@ begin
   Result := RGetInt(R_EIOS, ref, WIDGET_ITEMID);
 end;
 
-Function RSWidget.InventoryIDs: Array of Int32; constref;
+Function RSWidget.ItemIDs: Array of Int32; constref;
 var
   IDs: Pointer;
   IDsSize: SizeUInt;
 begin
   IDsSize := 0;
-  IDs := RGetArray(R_EIOS, ref, IDsSize, WIDGET_INVIDS);
+  IDs := RGetArray(R_EIOS, ref, IDsSize, WIDGET_ITEMIDS);
   if IDs = nil then
     Exit;
 

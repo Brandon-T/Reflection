@@ -33,6 +33,70 @@ Example:
 *}
 Function R_GetEquipmentIDs: Array of Int32;
 var
+  I, J: Int32;
+  IDs: Array of Int32;
+begin
+  IDs := RSItemNode.ItemIDsEx(R_EQUIPMENT_ITEM_CONTAINER_ID);
+  SetLength(Result, Max(11, Length(IDs)));
+
+  For I := 0 to High(Result) do
+  begin
+    Result[I] := -1;
+  end;
+
+  For I := 0 to High(IDs) do
+  begin
+    Result[J] := -1;
+    if (I = 6) or (I = 8) or (I = 11) then
+      Continue;
+
+    Result[J] := IDs[I];
+    Inc(J);
+  end;
+end;
+
+{*
+R_GetEquipmentQuantities
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a list of Quantities for all equiped items.
+
+Example:
+    CurrentEquipmentAmounts := R_GetEquipmentQuantities;
+*}
+Function R_GetEquipmentQuantities: Array of Int32;
+var
+  I, J: Int32;
+  Quantities: Array of Int32;
+begin
+  Quantities := RSItemNode.ItemQuantitiesEx(R_EQUIPMENT_ITEM_CONTAINER_ID);
+  SetLength(Result, Max(11, Length(Quantities)));
+
+  For I := 0 to High(Result) do
+  begin
+    Result[I] := -1;
+  end;
+
+  For I := 0 to High(Quantities) do
+  begin
+    Result[J] := -1;
+    if (I = 6) or (I = 8) or (I = 11) then
+      Continue;
+
+    Result[J] := Quantities[I];
+    Inc(J);
+  end;
+end;
+
+{*
+R_GetEquipmentIDs
+~~~~~~~~~~~~~~~~~~~~~~
+Returns a list of IDs for all equiped items.
+
+Example:
+    CurrentEquipment := R_GetEquipmentIDs;
+*}
+(*Function R_GetEquipmentIDs: Array of Int32;
+var
   Equipment: Pointer;
   EquipmentSize: SizeUInt;
   Player: RSLocalPlayer;
@@ -76,7 +140,7 @@ begin
 
   Garbage += RSType(Equipment);
   Garbage.Free;
-end;
+end;*)
 
 {*
 R_IsEquipped

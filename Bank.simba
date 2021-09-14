@@ -242,7 +242,7 @@ begin
   if TabWidget.ref = nil then
     Exit(False);
 
-  Mouse.Click(TabWidget.Bounds, MOUSE_LEFT);
+  Mouse.Click(TabWidget.Bounds, MOUSE_LEFT, True);
   TabWidget.Free;
 
   T.Start;
@@ -461,7 +461,7 @@ begin
   if ItemNodeCache.ref <> nil then
   begin
     Garbage += ItemNodeCache;
-    ItemNode.ref := ItemNodeCache.GetObject(95).ref;
+    ItemNode.ref := ItemNodeCache.GetObject(R_BANK_ITEM_CONTAINER_ID).ref;
 
     if ItemNode.ref <> nil then
     begin
@@ -526,7 +526,7 @@ begin
   if ItemNodeCache.ref <> nil then
   begin
     Garbage += ItemNodeCache;
-    ItemNode.ref := ItemNodeCache.GetObject(95).ref;
+    ItemNode.ref := ItemNodeCache.GetObject(R_BANK_ITEM_CONTAINER_ID).ref;
 
     if ItemNode.ref <> nil then
     begin
@@ -808,6 +808,7 @@ begin
       if Result then
       begin
         Keyboard.PressKey(VK_ENTER);
+        InputFull.Free;
         Exit(True);
       end;
 
