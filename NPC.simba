@@ -191,7 +191,6 @@ var
   NPCTPA : TPointArray;
   EachNPCDef: RSNPCDefinition;
   MyName: String;
-  TimeToWait: Int32;
 begin
   AllNPCs := RSNPC.AllNPCs;
   MyName := RSPlayer.Me.Name;

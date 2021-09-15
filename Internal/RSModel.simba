@@ -166,7 +166,7 @@ begin
   Result := RGetInt(R_EIOS, ref, RENDERABLE_MODELHEIGHT);
 end;
 
-Function RSModel.Bounds(LocalX, LocalY, LocalZ: Int32): Array of TVector;
+Function RSModel.Bounds: Array of TVector;
 var
   I: Int32;
   Orientation: Int32;

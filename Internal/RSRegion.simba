@@ -8,11 +8,13 @@ type
     SceneTiles: Array of Array of Array of RSSceneTile;
   end;
 
+{$IFDEF USE_REGION_CACHING}
 var
   CACHE_SCENE_TERMINATE: Boolean := False;
   CACHED_SCENE_INDEX: Int32 := 0;
   CACHED_SCENE_NODES: Array[0..0] of RSSceneCacheNode := [[]]; //0..3 = 4 Regions..
   CACHED_SCENE_TILES: Array of Array of Array of RSSceneTile;
+{$ENDIF}
 
 {$IFDEF USE_REGION_CACHING}
 Procedure ReleaseSceneTilesCache(Index: Int32);

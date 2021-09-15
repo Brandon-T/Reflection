@@ -358,3 +358,8 @@ Function RSClient.IsMenuOpen: Boolean; static;
 begin
   Result := RGetBool(R_EIOS, nil, CLIENT_ISMENUOPEN);
 end;
+
+Function RSClient.IsItemSelected: Boolean; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_ISITEMSELECTED) = 1;
+end;

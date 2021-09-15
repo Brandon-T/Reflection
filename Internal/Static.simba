@@ -19,8 +19,11 @@ var
   SINE: array[0..2048] of Int32;
   COSINE: array[0..2048] of Int32;
 
+  {$IFDEF USE_REGION_CACHING}
   CACHED_REGION_INDEX: Int32 := 0;
   CACHED_REGION_NODES: Array[0..0] of RSRegionCacheNode := [[]]; //0..3 = 4 Regions..
+  {$ENDIF}
+
   CACHED_TILE_SETTINGS: array of array of array of UInt8;
   CACHED_TILE_HEIGHTS: array of array of array of Int32;
   CACHED_VARP_MASKS: array[0..32] of Int32;

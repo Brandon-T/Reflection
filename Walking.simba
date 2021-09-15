@@ -1,6 +1,10 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
-{$include_once srl/shared.simba}
+{$include_once Timing.simba}
+{$include_once GameTab.simba}
+{$include_once Login.simba}
+{$include_once Menu.simba}
+{$include_once srl/utils.simba}
 
 {*
 R_TileToMM
@@ -55,6 +59,36 @@ begin
 end;
 
 {*
+R_TileOnMM
+~~~~~~~~~~
+Checks if the input tile is on the Mini-Map.
+
+Example:
+  WriteLn(R_TileOnMM(Some_RSObject.Tile));
+*}
+Function R_TileOnMM(Tile: RSTile): Boolean;
+var
+  W, H, MMCX, MMCY: Int32;
+  Temp: TPointArray;
+begin
+  GetClientDimensions(W, H);
+  if RSClient.IsResizeable then
+  begin
+    MMCX := (W - 82);   //From RSTile.
+    MMCY := 84;
+  end else
+    begin
+      MMCX := (W - 122);
+      MMCY := 84;
+    end;
+
+  SetLength(Temp, 1);
+  Temp[0] := Tile.ToLocal.TileToMM;
+  FilterPointsPie(Temp, 0.0, 360.0, 0.0, 73.0 {75.0}, MMCX, MMCY);
+  Result := Length(Temp) > 0;
+end;
+
+{*
 R_TileHeight
 ~~~~~~~~~~~~
 Returns the height of a given tile.
@@ -99,4 +133,371 @@ Example:
 Function R_GetMidTile(Tile1, Tile2: RSTile): RSTile;
 begin
   Result := Point(Round((Tile1.X + Tile2.X)/2), Round((Tile1.Y+Tile2.Y)/2));
+end;
+
+Function R_WaitUntilDistanceFromFlag(Distance: Int32): Boolean;
+var
+  Me: RSPlayer;
+  Dest: RSTile;
+  T: Timer;
+begin
+  Me := RSPlayer.Me;
+  Dest := Me.Destination;
+  if (Dest.X = -1) or (Dest.Y = -1) then
+    Exit(False);
+
+  T.Start;
+  while (Me.Tile.DistanceTo(Dest) > Distance) do
+  begin
+    Wait(250, 500);
+    if T.ElapsedTime > 60000 then
+    begin
+      Me.Free;
+      Exit(False);
+    end;
+  end;
+  Me.Free;
+  Result := True;
+end;
+
+Function R_WalkToTileMM(Tile: RSTile): Boolean;
+begin
+  Result := False;
+  if not R_TileOnMM(Tile) then
+    Exit;
+
+  Mouse.Click(R_TileToMM(Tile), MOUSE_LEFT);
+  Result := True;
+end;
+
+
+Function R_WalkToTileMS(Tile: RSTile): Boolean;
+var
+  P: TPoint;
+  T: Timer;
+begin
+  if not R_IsLoggedIn then
+    Exit;
+
+  P := R_TileToMS(Tile);
+  if (P.X = -1) or (P.Y = -1) then
+    Exit;
+
+  Mouse.Move(P, 2, True);
+  if R_WaitUpText(['Walk here'], True, 50) then
+  begin
+    Mouse.Click(MOUSE_LEFT);
+  end else
+    begin
+      Mouse.Click(MOUSE_RIGHT);
+      Wait(400, 500);
+      if not R_ChooseOptions(['Walk here'], True) then
+      begin
+        R_ChooseOptions(['Cancel'], True)
+      end;
+    end;
+  Wait(120, 180);
+
+  T.Start;
+  R_WaitUntilDistanceFromFlag(5);
+  Result := T.ElapsedTime < 60000;
+end;
+
+(*
+R_WindPath
+~~~~~~~~~~
+
+.. code-block:: pascal
+
+    function R_WindPath(xs, ys, xe, ye, gravity, wind, minWait, maxWait, maxStep, targetArea: extended): TPointArray;
+
+Generates a blind path of points!
+
+.. note::
+
+  by JuKKa
+
+*)
+Function R_WindPath(xs, ys, xe, ye, gravity, wind, maxStep, targetArea: extended): TPointArray;
+var
+  veloX, veloY, windX, windY, veloMag, dist, randomDist, lastDist, step: Extended;
+  lastX, lastY: Int32;
+  sqrt2, sqrt3, sqrt5: Extended;
+begin
+  sqrt2:= sqrt(2);
+  sqrt3:= sqrt(3);
+  sqrt5:= sqrt(5);
+  while hypot(xs - xe, ys - ye) > 1 do
+  begin
+    dist:= hypot(xs - xe, ys - ye);
+    wind:= min(wind, dist);
+    if dist >= targetArea then
+    begin
+      windX:= windX / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+      windY:= windY / sqrt3 + (random(round(wind) * 2 + 1) - wind) / sqrt5;
+    end else
+    begin
+      windX:= windX / sqrt2;
+      windY:= windY / sqrt2;
+      if (maxStep < 3) then
+      begin
+        maxStep:= random(3) + 3.0;
+      end else
+      begin
+        maxStep:= maxStep / sqrt5;
+      end;
+    end;
+    veloX:= veloX + windX;
+    veloY:= veloY + windY;
+    veloX:= veloX + gravity * (xe - xs) / dist;
+    veloY:= veloY + gravity * (ye - ys) / dist;
+    if hypot(veloX, veloY) > maxStep then
+    begin
+      randomDist:= maxStep / 2.0 + random(0, round(maxStep) / 2);
+      veloMag:= sqrt(veloX * veloX + veloY * veloY);
+      veloX:= (veloX / veloMag) * randomDist;
+      veloY:= (veloY / veloMag) * randomDist;
+    end;
+    lastX:= Round(xs);
+    lastY:= Round(ys);
+    xs:= xs + veloX;
+    ys:= ys + veloY;
+    SetLength(Result, Length(Result) + 1);
+    Result[High(Result)] := Point(Round(xs), Round(ys));
+    step:= hypot(xs - lastX, ys - lastY);
+    lastdist:= dist;
+  end;
+end;
+
+Function R_BlindWalkMSEx(Tile: RSTile; Distance: Integer): Boolean;
+var
+  I, Tries: Int32;
+  CurrentTile: RSTile;
+  CTRLPoints: TPointArray;
+  Me: RSPlayer;
+begin
+  Tries := 0;
+  Me := RSPlayer.Me;
+  Repeat
+    CurrentTile := Me.Tile;
+    CtrlPoints := R_WindPath(CurrentTile.X, CurrentTile.Y, Tile.X, Tile.Y, 5.0, 2.5, 1.5, 1.0);
+    Inc(Tries);
+
+    if Length(CtrlPoints) = 0 then
+    begin
+      Me.Free;
+      Exit(True);
+    end;
+
+    if (Tries > 20)then
+    begin
+      Me.Free;
+      Exit;
+    end;
+
+    For I:= High(CtrlPoints) Downto 0 do
+    begin
+      if R_WalkToTileMS(CtrlPoints[I]) then
+      begin
+        Result := Me.Tile.DistanceTo(Tile) <= Distance;
+        Break;
+      end;
+    end;
+  Until(Result);
+end;
+
+Function R_BlindWalkMS(Tile: TPoint): Boolean;
+begin
+  Result := R_BlindWalkMsEx(Tile, 2);
+end;
+
+Function R_WalkPathMMCommon(Path: Array of RSTile; Reverse: Boolean): Boolean;
+type
+  TTileArray = Array of RSTile;
+var
+  I, H, Fails, lP: Int32;
+  P, MM, MMF: TPoint;
+  T, K: Timer;
+  Timeout: Int32;
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+  Timeout := 10000 + Random(2000);
+  T.Start;
+
+  Fails := 0;
+  lP := 0;
+  if Reverse then
+  begin
+    Path := TTileArray(TPointArray(Path).Reversed());
+  end;
+
+  H := High(Path);
+  While (not Result) and (T.ElapsedTime < Timeout) and (Fails < 5) do
+  begin
+    if (not R_IsLoggedIn) then
+    begin
+      Me.Free;
+      Exit;
+    end;
+
+    P := Me.Tile;
+    For I := H Downto 0 do
+    begin
+      if ((I - lP) > 3) then
+        Continue
+      else
+        lP := I;
+
+      MM := R_TileToMM(Path[I]);
+
+      if MM = MMF then
+      begin
+        Inc(Fails);
+      end;
+
+      if R_TileOnMM(Path[I]) then
+      begin
+        R_WalkToTileMM(Path[I]);
+
+        K.Start;
+        Repeat
+          if not Me.IsMoving then
+          begin
+            break;
+          end;
+        Until((K.ElapsedTime > 2000) or R_WaitUntilDistanceFromFlag(30));
+
+        MMF := MM;
+        if (I = H) then
+        begin
+          R_WaitUntilDistanceFromFlag(5);
+        end else
+          begin
+            R_WaitUntilDistanceFromFlag(25);
+          end;
+
+        T.Reset;
+        T.Start;
+        Timeout := 7000 + Random(1000);
+        Break;
+      end;
+    end;
+    Result := (I = H);
+  end;
+
+  Me.Free;
+end;
+
+
+Function R_WalkPathMMEx(Path: Array of RSTile; Reverse: Boolean): Boolean;
+begin
+  if (not R_IsLoggedIn) then
+  begin
+    Exit;
+  end;
+
+  Result := R_WalkPathMMCommon(Path, Reverse);
+  R_WaitUntilDistanceFromFlag(5);
+end;
+
+Function R_WalkPathMM(Path: Array of RSTile): Boolean;
+begin
+  Result := R_WalkPathMMEx(Path, False);
+end;
+
+Function R_WalkPathEx(Path: Array of RSTile; Reverse: Boolean; DistToMsWalk: Int32): Boolean;
+type
+  TTileArray = Array of RSTile;
+begin
+  if (not R_IsLoggedIn) then
+  begin
+    Exit;
+  end;
+
+  Result := R_WalkPathMMCommon(Path, Reverse);
+
+  if DistToMsWalk > 0 then
+  begin
+    if Reverse then
+    begin
+      Result := R_BlindWalkMS(Path[0]);
+    end else
+      begin
+        Result := R_BlindWalkMS(Path[High(Path)]);
+      end;
+  end
+end;
+
+Function R_WalkPath(Path: Array of RSTile): Boolean;
+begin
+  Result := R_WalkPathEx(Path, False, 0);
+end;
+
+Function R_BlindWalkEx(Tile: TPoint; FinishMs: Boolean; DistToMsWalk: integer): Boolean;
+type
+  TTileArray = Array of RSTile;
+var
+  Tries, Fails: Integer;
+  M: TPoint;
+  CtrlPoints: Array of RSTile;
+  Me: RSPlayer;
+begin
+  Me := RSPlayer.Me;
+
+  Repeat
+    Inc(Fails);
+    if Fails > 1 then
+    begin
+      Me.Free;
+      Exit;
+    end;
+
+    if not R_IsLoggedIn then
+    begin
+      Me.Free;
+      Exit;
+    end;
+
+    M := Me.Tile;
+    if M.X = - 1 then
+      Continue;
+
+    if Tile.X = - 1 then
+      Continue;
+
+    if Me.Tile.DistanceTo(Tile) <= 2.0 then
+    begin
+      Me.Free;
+      Exit;
+    end;
+
+    if Length(CtrlPoints) = 0 then
+    begin
+      //CtrlPoints := TPABetweenPoints(M, Tile, 5 + Random(2), 2);
+      CtrlPoints := TTileArray(R_WindPath(M.X, M.Y, Tile.X, Tile.Y, 5.0, 2.5, 1.5, 1.0));
+    end;
+
+    Inc(Tries);
+    if Tries > 20 then
+    begin
+      Me.Free;
+      Exit;
+    end;
+
+    if FinishMs then
+    begin
+      Result := R_WalkPathEx(CtrlPoints, False, DistToMsWalk);
+    end else
+      begin
+        R_WalkPath(CtrlPoints);
+      end;
+  Until(Result);
+
+  Me.Free;
+end;
+
+Function R_BlindWalk(Tile: RSTile): Boolean;
+begin
+  Result := R_BlindWalkEx(Tile, False, 0);
 end;

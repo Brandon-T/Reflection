@@ -167,7 +167,6 @@ Example:
 Function R_GetSkillTabTotalLevel: Int32;
 var
   Widget: RSWidget;
-  SkillTotal: Integer;
 begin
   Widget := RSWidget.Get(R_INTERFACE_SKILLS, Ord(R_SKILL_TAB_INDEX_TOTALLEVEL) + 3);
   Result := StrToInt(copy(Widget.Text, pos(':', Widget.Text) + 1, High(Widget.Text)));

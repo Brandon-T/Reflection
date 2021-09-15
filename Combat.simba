@@ -253,10 +253,9 @@ Get weapon category using the combat interface.
 Example:
     Writeln(R_GetWeaponCategory);
 *}
-Function R_GetWeaponCategory(): String;
+Function R_GetWeaponCategory: String;
 var
   Widget: RSWidget;
-  Category: String;
 begin
   Widget := RSWidget.Get(R_COMBAT_WEAPON_CATEGORY.Group, R_COMBAT_WEAPON_CATEGORY.Child);
   if (Widget.ref <> nil) then
@@ -274,7 +273,7 @@ Get player's combat level.
 Example:
     Writeln(R_GetCombatLevel);
 *}
-Function R_GetCombatLevel(): Int32;
+Function R_GetCombatLevel: Int32;
 begin
   Result := RSPlayer.Me.CombatLevel;
 end;
@@ -287,10 +286,9 @@ Get main weapon name according to the Combat tab.
 Example:
     Writeln(R_GetEquippedWeapon);
 *}
-Function R_GetEquippedWeapon(): String;
+Function R_GetEquippedWeapon: String;
 var
   Widget: RSWidget;
-  Category: String;
 begin
   Widget := RSWidget.Get(R_COMBAT_WEAPON.Group, R_COMBAT_WEAPON.Child);
   if (Widget.ref <> nil) then

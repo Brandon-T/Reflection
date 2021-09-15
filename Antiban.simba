@@ -141,8 +141,7 @@ type
     and alterantively how long should the log be (mainly for debugging)
 }
 
-function RAntiban.Init(Skills: Array of TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False): Boolean;
-var i: Int32;
+procedure RAntiban.Init(Skills: Array of TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False);
 begin
   Self.ActiveSkills := Skills;
   Self.HistorySize := LogSize;
@@ -154,7 +153,7 @@ begin
   Self.ReturnToTab := ReturnToTab;
 end;
 
-function RAntiban.Init(Skill: TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False): Boolean; overload;
+Procedure RAntiban.Init(Skill: TSkillIndex; ReturnToTab: Boolean = True; LogSize:Int32=5; Debug: Boolean = False); overload;
 begin
   Self.Init([Skill], ReturnToTab, LogSize, Debug);
 end;
@@ -220,7 +219,7 @@ end;
 }
 function RAntiban.TimeRunningAtClock(TimeOfDay: String; StVar: String='00:00'): Int64;
 var
-  stv, res: TDateTime;
+  res: TDateTime;
 begin
   res := (Date() + StrToTime(TimeOfDay)) - Now();
   if (res < 0) then res += 1;
@@ -256,7 +255,7 @@ end;
                             The task            How often     Variation (0..1)
   Example: Antiban.AddTask([@Antiban.LoseFocus, FIVE_MINUTES, 0.25]);
 }
-function RAntiban.AddTask(Task: RAntibanTask): Boolean;
+procedure RAntiban.AddTask(Task: RAntibanTask);
 begin
   with Task do
   begin
@@ -276,7 +275,7 @@ end;
     Breaks should always be added in the order most often to least often, but
     where a sleep kind of break is always the last addition.
 }
-function RAntiban.AddBreak(Task: RBreakTask): Boolean;
+procedure RAntiban.AddBreak(Task: RBreakTask);
 begin
   with Task do
   begin
@@ -290,7 +289,7 @@ end;
   Internally used to reset all antiban timers to a random start
   time after a break
 }
-function RAntiban.RestarRAntiban(): Boolean;
+procedure RAntiban.RestarRAntiban;
 var i: Int32;
 begin
   for i:=0 to High(Self.Tasks) do
@@ -530,10 +529,9 @@ begin
   end;
 end;
 
-Procedure RAntiban.HoverSkill();
+Procedure RAntiban.HoverSkill;
 var
   Current: Integer;
-  ReturnToCurrentTab: Boolean;
 begin
   DebugNote('[RND] Hovering Skill');
   Current := R_CurrentGameTab();
@@ -547,10 +545,9 @@ begin
   end;
 end;
 
-Procedure RAntiban.CheckSkill();
+Procedure RAntiban.CheckSkill;
 var
   Current: Integer;
-  ReturnToCurrentTab: Boolean;
 begin
   DebugNote('[RND] Checking Skill');
   Current := R_CurrentGameTab();
@@ -563,10 +560,9 @@ begin
   end;
 end;
 
-Procedure RAntiban.CheckStats();
+Procedure RAntiban.CheckStats;
 var
   Current: Integer;
-  ReturnToCurrentTab: Boolean;
 begin
   DebugNote('[RND] Check Skill Stats');
   Current := R_CurrentGameTab();
@@ -669,7 +665,7 @@ begin
   if (not EIOS_HasFocus(R_EIOS)) then
     EIOS_GainFocus(R_EIOS);
 
-  Player.Login;
+  //Player.Login;
 
   Wait(60,600, wdLeft);
   if Random(10)=0 then Self.CheckSkill();

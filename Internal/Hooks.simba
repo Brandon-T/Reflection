@@ -443,6 +443,7 @@ Client_Experiences: THook =                       ['client', 'lx', '[I', 1];
 Client_CurrentWorld: THook =                      ['client', 'bd', 'I', -161321205];
 Client_Energy: THook =                            ['client', 'na', 'I', -1504668177];
 Client_Weight: THook =                            ['client', 'nn', 'I', 1093671261];
+Client_IsItemSelected: THook =                    ['client', 'mz', 'I', -155667391];
 
 
 {$ENDIF}

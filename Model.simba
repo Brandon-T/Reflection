@@ -1,6 +1,6 @@
 {$include_once Internal/Reflection.simba}
 {$include_once Constants.simba}
-{$include_once srl/shared.simba}
+{$include_once srl/utils.simba}
 
 
 
@@ -139,7 +139,7 @@ begin
   end;
 
   Cull := [Left, Top, Right, Bottom];
-  Filtered := CopyTPA(Cull);
+  Filtered := Copy(Cull);
 
   for I := 0 to High(Points) do
   begin
@@ -186,7 +186,7 @@ var
   its, insideCheck: Boolean;
 begin
   kk := Max(K, 3);
-  pointSet := CopyTPA(points);
+  pointSet := Copy(points);
   ClearDoubleTPA(pointSet);
 
   if Length(pointSet) < 3 then
