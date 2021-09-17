@@ -370,6 +370,11 @@ ItemNode_Cache: THook =                           ['bz', 'n', 'Lnk;', 1];
 Varps_Masks: THook =                              ['ia', 'n', '[I', 1];
 Varps_Main: THook =                               ['ia', 'm', '[I', 1];
 
+{Varcs: cg}
+Varcs_Map: THook =                                ['cg', 'k', 'Ljava/util/Map;', 1];
+Varcs_Strings: THook =                            ['cg', 'o', '[Ljava/lang/String;', 1];
+Varcs_VarcMap: THook =                            ['ko', 'ps', 'Lcg;', 1];
+
 {VarbitDefinition: fl}
 VarbitDefinition_Cache: THook =                   ['fl', 'c', 'Lim;', 1];
 VarbitDefinition_Base: THook =                    ['fl', 'm', 'I', 193213577];

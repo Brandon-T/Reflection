@@ -110,6 +110,8 @@ type
 
   RSVarps = type RSType;
 
+  RSVarcs = type RSType;
+
   RSVarbitDefinition = type RSType;
 
   RSGameShell = type RSType;

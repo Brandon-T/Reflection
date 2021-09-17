@@ -1,0 +1,113 @@
+{$include_once RSStructures.simba}
+
+Function _RemoteVM_Map_Get_Int(Map: Pointer; Key: Int32; var Success: Boolean): Int32;
+var
+  VM: RemoteVM;
+  MapClass: Pointer;
+  MapGetMethodID, IntValueMethodID: jMethodID;
+  IntClass, IntConstructor, JIntValue: Pointer;
+  IntValue, Parameter: JValue;
+begin
+  Success := False;
+  Result := -1;
+
+  // Create a VM connection
+  VM.Init(R_EIOS);
+  if VM = nil then
+  begin
+    Exit;
+  end;
+
+  // Find Map Class
+  MapClass := VM.FindClass('Ljava/util/Map;');
+  if MapClass = nil then
+  begin
+    VM.Free;
+    Exit;
+  end;
+
+  // Map.get Method
+  MapGetMethodID := VM.GetMethodID(MapClass, 'get', '(Ljava/lang/Object;)Ljava/lang/Object;');
+  if MapGetMethodID = nil then
+  begin
+    VM.DeleteGlobalRef(MapClass);
+    VM.Free;
+    Exit;
+  end;
+
+  // Construct an Integer Parameter
+  IntClass := VM.FindClass('Ljava/lang/Integer;');
+  IntConstructor := VM.GetMethodID(IntClass, '<init>', '(I)V');
+  if IntConstructor <> nil then
+  begin
+    IntValue.i := Key;
+
+    // Call new Integer(Key);
+    Parameter.l := VM.NewObject(IntClass, IntConstructor, [IntValue]);
+
+    if Parameter.l = nil then
+    begin
+      VM.DeleteGlobalRef(IntClass);
+      VM.DeleteGlobalRef(MapClass);
+      VM.Free;
+      Exit;
+    end;
+  end;
+
+  // Call Map.get(Key)
+  JIntValue := VM.CallObjectMethod(Map, MapGetMethodID, [Parameter]);
+  VM.DeleteGlobalRef(MapClass);
+
+  if JIntValue = nil then
+  begin
+    VM.DeleteGlobalRef(Parameter.l);
+    VM.DeleteGlobalRef(IntClass);
+    VM.Free;
+    Exit;
+  end;
+
+  // Call Integer.intValue()
+  IntValueMethodID := VM.GetMethodID(IntClass, 'intValue', '()I');
+  if IntValueMethodID = nil then
+  begin
+    VM.DeleteGlobalRef(Parameter.l);
+    VM.DeleteGlobalRef(IntClass);
+    VM.Free;
+    Exit;
+  end;
+
+  Result := VM.CallIntMethod(JIntValue, IntValueMethodID, []);
+  Success := True;
+
+  VM.DeleteGlobalRef(JIntValue);
+  VM.DeleteGlobalRef(Parameter.l);
+  VM.DeleteGlobalRef(IntClass);
+  VM.Free;
+end;
+
+Function RSVarcs.VarcMap: Pointer; static;
+var
+  VarcMap: Pointer;
+begin
+  VarcMap := RGetObject(R_EIOS, nil, VARCS_VARCMAP);
+  if VarcMap = nil then
+    Exit;
+
+  Result := RGetObject(R_EIOS, VarcMap, VARCS_MAP);
+  RFreeObject(R_EIOS, VarcMap);
+end;
+
+Function RSVarcs.GetInt(Key: Int32; var Success: Boolean): Int32; static;
+var
+  Map: Pointer;
+begin
+  Success := False;
+  Result := -1;
+  Map := RSVarcs.VarcMap;
+
+  if Map = nil then
+    Exit;
+
+  Result := _RemoteVM_Map_Get_Int(Map, Key, Success);
+  RFreeObject(R_EIOS, Map);
+end;
