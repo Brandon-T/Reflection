@@ -39,6 +39,8 @@ type
 
   RSQueue = type RSType;
 
+  RSCollisionMap = type RSType;
+
   RSAnimableNode = type RSType;
 
   RSModel = type RSType;

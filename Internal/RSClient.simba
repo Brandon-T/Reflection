@@ -216,6 +216,28 @@ begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_ITEMNODECACHE);
 end;
 
+Function RSClient.CollisionMaps: Array of RSCollisionMap; static;
+var
+  I: Int32;
+  Size: SizeUInt;
+  CollisionMaps: Pointer;
+  SX: Array of Pointer;
+begin
+  Size := 0;
+  CollisionMaps := RGetArray(R_EIOS, nil, Size, CLIENT_COLLISIONMAPS);
+  if CollisionMaps = nil then
+    Exit;
+
+  SetLength(Result, Size);
+  SX := RGetObjectArray(R_EIOS, CollisionMaps, 0, Size);
+  RFreeObject(R_EIOS, CollisionMaps);
+
+  For I := 0 to High(SX) do
+  begin
+    Result[I].ref := SX[I];
+  end;
+end;
+
 Function RSClient.Region: RSRegion; static;
 begin
   Result.ref := RGetObject(R_EIOS, nil, CLIENT_REGION);

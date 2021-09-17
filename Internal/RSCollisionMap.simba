@@ -1,0 +1,36 @@
+{$include_once RSStructures.simba}
+{$include_once Hooks.simba}
+
+Function RSCollisionMap.Width: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, COLLISIONMAP_WIDTH);
+end;
+
+Function RSCollisionMap.Height: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, COLLISIONMAP_HEIGHT);
+end;
+
+Function RSCollisionMap.Adjacency: Array of Array of Int32;
+var
+  Adjacencies: Pointer;
+  I, Size: SizeUInt;
+  SX: Array of Pointer;
+begin
+  Size := 0;
+  Adjacencies := RGetArray(R_EIOS, ref, Size, COLLISIONMAP_ADJACENCY);
+  if Adjacencies = nil then
+    Exit;
+
+  SX := RGetObjectArray(R_EIOS, Adjacencies, 0, Size);
+  RFreeObject(R_EIOS, Adjacencies);
+
+  SetLength(Result, Size);
+
+  For I := 0 to Size - 1 do
+  begin
+    Result[I] := RGetIntArray(R_EIOS, SX[I], 0, RGetArraySize(R_EIOS, SX[I]));
+  end;
+
+  RFreeObjects(R_EIOS, SX);
+end;

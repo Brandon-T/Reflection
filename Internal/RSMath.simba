@@ -362,10 +362,14 @@ begin
 end;
 
 Function RSTile.Project: T2DRectangle; constref;
+begin
+  Result := self.Project(RSClient.Plane);
+end;
+
+Function RSTile.Project(Plane: Int32): T2DRectangle; constref; overload;
 const
   LocalTileSize = (1 shl 7);
 var
-  plane: Int32;
   xSize, ySize: Int32;
   swX, swY, neX, neY: Int32;
   NW, NE, SW, SE: TVector;
@@ -403,7 +407,6 @@ begin
 
   xSize := Sar(self.X, 7);
   ySize := Sar(self.Y, 7);
-  plane := RSClient.Plane;
   swX := self.X - (LocalTileSize div 2);
 	swY := self.Y - (LocalTileSize div 2);
   neX := self.X + (LocalTileSize div 2);
