@@ -73,6 +73,8 @@ Typeface_CharacterPixels: THook =                 ['ll', 'n', '[[B', 1];
 {IndexedRGB: oi}
 IndexedRGB_Pixels: THook =                        ['oi', 'c', '[I', 1];
 IndexedRGB_Palette: THook =                       ['oi', 'n', '[B', 1];
+IndexedRGB_Width: THook =                         ['oi', 'z', 'I', 1];
+IndexedRGB_Height: THook =                        ['oi', 'a', 'I', 1];
 
 {ImageRGB: oc}
 ImageRGB_Pixels: THook =                          ['oc', 'n', '[I', 1];
@@ -365,6 +367,18 @@ Item_StackSizes: THook =                          ['cy', 'c', 'I', -417320715];
 ItemNode_ItemIDs: THook =                         ['bz', 'c', '[I', 1];
 ItemNode_ItemQuantities: THook =                  ['bz', 'm', '[I', 1];
 ItemNode_Cache: THook =                           ['bz', 'n', 'Lnk;', 1];
+
+{Login: bb}
+Login_Index: THook =                              ['bb', 'ah', 'I', -1833095583];
+Login_XPadding: THook =                           ['bb', 'm', 'I', 559672353];
+Login_BoxXOffset: THook =                         ['bb', 't', 'I', 1729619027];
+Login_ButtonSprite: THook =                       ['bb', 'g', 'Loi;', 1];
+Login_LoadingPercent: THook =                     ['bb', 'p', 'I', -1908760531];
+Login_Username: THook =                           ['bb', 'bf', 'Ljava/lang/String;', 1];
+Login_Password: THook =                           ['bb', 'bp', 'Ljava/lang/String;', 1];
+Login_CursorField: THook =                        ['bb', 'bm', 'I', 445492341];
+Login_AccountStatus: THook =                      ['bb', 'aj', 'I', -267030897];
+
 
 {Varps: ia}
 Varps_Masks: THook =                              ['ia', 'n', '[I', 1];

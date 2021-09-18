@@ -7,7 +7,6 @@
 {$include_once Ground.simba}
 {$include_once Interfaces.simba}
 {$include_once Inventory.simba}
-{$include_once Lobby.simba}
 {$include_once Login.simba}
 {$include_once Mainscreen.simba}
 {$include_once Magic.simba}

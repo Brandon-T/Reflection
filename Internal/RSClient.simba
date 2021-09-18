@@ -385,3 +385,67 @@ Function RSClient.IsItemSelected: Boolean; static;
 begin
   Result := RGetInt(R_EIOS, nil, CLIENT_ISITEMSELECTED) = 1;
 end;
+
+Function RSClient.LoginIndex: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, LOGIN_INDEX);
+end;
+
+Function RSClient.LoginXPadding: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, LOGIN_XPADDING);
+end;
+
+Function RSClient.LoginBoxX: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, LOGIN_BOXXOFFSET);
+end;
+
+Function RSClient.LoginScreenButtonWidth: Int32; static;
+var
+  IndexedSprite: Pointer;
+begin
+  IndexedSprite := RGetObject(R_EIOS, nil, LOGIN_BUTTONSPRITE);
+  if IndexedSprite = nil then
+    Exit(0);
+
+  Result := RGetInt(R_EIOS, IndexedSprite, INDEXEDRGB_WIDTH);
+  RFreeObject(R_EIOS, IndexedSprite);
+end;
+
+Function RSClient.LoginScreenButtonHeight: Int32; static;
+var
+  IndexedSprite: Pointer;
+begin
+  IndexedSprite := RGetObject(R_EIOS, nil, LOGIN_BUTTONSPRITE);
+  if IndexedSprite = nil then
+    Exit(0);
+
+  Result := RGetInt(R_EIOS, IndexedSprite, INDEXEDRGB_HEIGHT);
+  RFreeObject(R_EIOS, IndexedSprite);
+end;
+
+Function RSClient.LoginLoadingPercent: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, LOGIN_LOADINGPERCENT);
+end;
+
+Function RSClient.Username: String; static;
+begin
+  Result := RGetString(R_EIOS, nil, LOGIN_USERNAME);
+end;
+
+Function RSClient.Password: String; static;
+begin
+  Result := RGetString(R_EIOS, nil, LOGIN_PASSWORD);
+end;
+
+Function RSClient.ActiveLoginField: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, Login_CursorField);
+end;
+
+Function RSClient.AccountStatus: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, Login_AccountStatus);
+end;

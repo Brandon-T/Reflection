@@ -1,7 +1,24 @@
 {$include_once Internal/RSWidget.simba}
 {$include_once Interfaces.simba}
-{$include_once Lobby.simba}
 {$include_once Worlds.simba}
+
+
+
+{*
+R_IsInLobby
+~~~~~~~~~~~~~
+Checks to see if the Lobby is open.
+*}
+Function R_IsInLobby: Boolean;
+var
+  State: Boolean;
+begin
+  State := (RGetInt(R_EIOS, nil, CLIENT_GAMESTATE) = 30) and (RGetInt(R_EIOS, nil, CLIENT_LOGINSTATE) = 16);
+  if State then
+  begin
+    Result := RSWidget.IsValid(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
+  end;
+end;
 
 {*
 R_IsLoggedIn
@@ -10,9 +27,329 @@ Checks the login state to see if we are logged in.
 
 Example:
   if not R_IsLoggedIn then
-    MyPlayer.Login;
+    R_Login(Username, Pasword);
 *}
 Function R_IsLoggedIn: Boolean;
+var
+  State: Boolean;
 begin
-  Result := (not R_IsLobbyOpen) and (RGetInt(R_EIOS, nil, Client_GameState) = 30) and (RGetInt(R_EIOS, nil, Client_LoginState) = 16 {2});
+  State := (RGetInt(R_EIOS, nil, CLIENT_GAMESTATE) = 30) and (RGetInt(R_EIOS, nil, CLIENT_LOGINSTATE) = 16);
+  if State then
+  begin
+    Result := Not R_IsInLobby;
+  end;
 end;
+
+{*
+R_LoginFromLobby
+~~~~~~~~~~~~~~~~
+If the Player is in the Lobby, Log into the Game.
+*}
+Function R_LoginFromLobby: Boolean;
+var
+  Tries: Int32;
+  Bounds: TBox;
+  ClickHereToPlay: RSWidget;
+begin
+  While(Tries < 3) do
+  begin
+    if R_IsLoggedIn then
+    begin
+      Exit(True);
+    end;
+
+    ClickHereToPlay := RSWidget.Get(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
+    if ClickHereToPlay.ref = nil then
+    begin
+      Exit(False);
+    end;
+
+    Bounds := ClickHereToPlay.Bounds;
+    ClickHereToPlay.Free;
+
+    Mouse.Click(Bounds, MOUSE_LEFT);
+    Result := WaitUntil(R_IsLoggedIn, 500, 2000);
+    if Result then
+    begin
+      Exit(True);
+    end;
+
+    Inc(Tries);
+  end;
+end;
+
+{*
+R_LoginToLobby
+~~~~~~~~~~~~~~~~
+If the Player is on the Login-Screen, Log them into the Lobby.
+*}
+Function R_LoginToLobby(Username: String; Password: String): Boolean;
+var
+  X: Int32;
+  W, H: Int32;
+  Tries: Int32;
+  GameState, LoginIndex: Int32;
+  ExistingUser, LoginBox: TBox;
+  PasswordBox, LoginButton: TBox;
+  CancelButton, TryAgainButton: TBox;
+  BackButton, OkayButton: TBox;
+begin
+  while(Tries < 3) do
+  begin
+    if (R_IsLoggedIn) then
+    begin
+      Exit(False);
+    end;
+
+    if (R_IsInLobby) then
+    begin
+      Exit(True);
+    end;
+
+    // Do Login
+    GameState := RSClient.GameState;
+
+    if (GameState = 0) or (GameState = 5) then
+    begin
+      //RuneScape is loading - please wait...
+      Writeln('Loading - please wait...');
+      WaitUntil(RSClient.GameState <> GameState, 500, 1000);
+      Continue;
+    end;
+
+    if (GameState = 20) then
+    begin
+      // Player is Logging In / Authenticating
+      WaitUntil(RSClient.GameState <> GameState, 500, 2000);
+      Continue;
+    end;
+
+    if (GameState = 25) then
+    begin
+      // Game is Loading
+      WaitUntil(RSClient.GameState <> GameState, 500, 2000);
+      Continue;
+    end;
+
+    GameState := RSClient.GameState;
+    LoginIndex := RSClient.LoginIndex;
+
+    if (GameState = 10) or (GameState = 11) then
+    begin
+      X := RSClient.LoginBoxX;
+      W := RSClient.LoginScreenButtonWidth;
+      H := RSClient.LoginScreenButtonHeight;
+
+      case LoginIndex of
+        // Welcome to RuneScape
+        0: begin
+             //TitleBoxSprite := [X, 171, X + 360, 370];
+             //NewUser := [X + 27, 271, X + 27 + W, 271 + H];
+             ExistingUser := [X + 187, 271, X + 187 + W, 271 + H];
+             Mouse.Click(ExistingUser, MOUSE_LEFT);
+             if not WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 1000) then
+             begin
+              Inc(Tries);
+             end;
+
+             Continue;
+           end;
+
+        // Continue
+        1: Exit(False);
+
+        // Login Password
+        2: begin
+             LoginBox := [X + 70, 238, X + 310, 258];
+             PasswordBox := [X + 70, 258, X + 310, 278];
+             LoginButton := [X + 27, 301, X + 27 + W, 301 + H];
+             CancelButton := [X + 187, 301, X + 187 + W, 301 + H];
+
+             if (RSClient.Username = Username) and (RSClient.Password = Password) then
+             begin
+               Mouse.Click(LoginButton, MOUSE_LEFT);
+               if not WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000) then
+               begin
+                 Inc(Tries);
+               end;
+
+               Continue;
+             end;
+
+             // Enter Username Field
+             while RSClient.Username <> UserName do
+             begin
+               if RSClient.ActiveLoginField <> 0 then
+               begin
+                Mouse.Click(LoginBox, MOUSE_LEFT);
+               end;
+
+               // Erase Username
+               while (Length(RSClient.Username) > 0) and (RSClient.ActiveLoginField = 0) do
+               begin
+                Keyboard.PressKey(VK_BACK);
+               end;
+
+               // Enter Username
+               if WaitUntil(RSClient.ActiveLoginField = 0, 500, 2000) then
+               begin
+                 Keyboard.Send(Username);
+                 if RSClient.Username = Username then
+                 begin
+                  Keyboard.PressKey(VK_TAB);
+                 end else
+                   begin
+                     Continue;
+                   end;
+
+                 if not WaitUntil(RSClient.ActiveLoginField = 1, 500, 2000) then
+                 begin
+                   Inc(Tries);
+                 end;
+
+                 break;
+               end;
+             end;
+
+             // Enter Password Field
+             while RSClient.Password <> Password do
+             begin
+               if RSClient.ActiveLoginField <> 1 then
+               begin
+                Mouse.Click(PasswordBox, MOUSE_LEFT);
+               end;
+
+               // Erase Password
+               while (Length(RSClient.Password) > 0) and (RSClient.ActiveLoginField = 1) do
+               begin
+                Keyboard.PressKey(VK_BACK);
+               end;
+
+               // Enter Password
+               if WaitUntil(RSClient.ActiveLoginField = 1, 500, 2000) then
+               begin
+                 Keyboard.Send(Password);
+                 if RSClient.Password = Password then
+                 begin
+                  Keyboard.PressKey(VK_ENTER);
+                 end else
+                   begin
+                     Continue;
+                   end;
+
+                 if not WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000) then
+                 begin
+                   Inc(Tries);
+                 end;
+
+                 break;
+               end;
+             end;
+           end;
+
+        // Invalid Credentials.
+        3: begin
+             //ForgotPasswordButton := [X + 107, 291, X + 107 + W, 291 + H];
+             TryAgainButton := [X + 107, 256, X + 107 + W, 256 + H];
+             Mouse.Click(TryAgainButton, MOUSE_LEFT);
+             WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000);
+             Inc(Tries);
+           end;
+
+        // Authenticator
+        4: Exit(False); // Ain't nobody got time for that
+
+        // Forgot Password / Recover Account
+        5: begin
+             // RecoverButton := [X + 27, 301, X + 27 + W, 301 + H];
+             BackButton := [X + 187, 301, X + 187 + W, 301 + H];
+             Mouse.Click(BackButton, MOUSE_LEFT);
+             WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000);
+             Inc(Tries);
+           end;
+
+        // Back
+        6: begin
+             BackButton := [X + 107, 301, X + 107 + W, 301 + H];
+             Mouse.Click(BackButton, MOUSE_LEFT);
+             WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000);
+             Inc(Tries);
+           end;
+
+        // Invalid Date of Birth. Please verify your account status
+        7: Exit(False); // There are buttons here, user should fix their account
+
+        // Sorry, but your account is not eligible to play.
+        8: Exit(False); // There is a Back Button here, user should fix their account
+
+        // Try again ???
+        9: begin
+             TryAgainButton := [X + 107, 256, X + 107 + W, 256 + H];
+             Mouse.Click(TryAgainButton, MOUSE_LEFT);
+             WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000);
+             Inc(Tries);
+           end;
+
+        // Welcome to RuneScape ???
+        10: Exit(False); // There are No Buttons.
+
+        // Terms of Agreement
+        12: Exit(False); // - User should accept this manually
+
+        // Privacy Policy
+        13: Exit(False); // - User should accept this manually
+
+        // Account Disable
+        14: begin
+              if RSClient.AccountStatus = 0 then
+              begin
+                TerminateScript('Account Disabled');
+              end;
+
+              // Account locked as suspected stolen
+              if RSClient.AccountStatus = 1 then
+              begin
+                TerminateScript('Account Locked/Suspended - Suspected Stolen');
+              end;
+
+              // Else visit support page..
+              BackButton := [X + 107, 306, X + 107 + W, 306 + H];
+              Mouse.Click(BackButton, MOUSE_LEFT);
+              WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000);
+              Inc(Tries);
+            end;
+
+        // You were disconnected from the server
+        24: begin
+              OkayButton := [X + 107, 281, X + 107 + W, 281 + H];
+              Mouse.Click(OkayButton, MOUSE_LEFT);
+              WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000);
+            end;
+      end;
+    end;
+  end;
+end;
+
+{*
+R_Login
+~~~~~~~~~~~~~~~~
+If the Player is on the Login-Screen, Log them into the Game.
+*}
+Function R_Login(Username: String; Password: String): Boolean;
+begin
+  if (R_IsLoggedIn) then
+  begin
+    Exit(True);
+  end;
+
+  if (R_IsInLobby) then
+  begin
+    Exit(R_LoginFromLobby);
+  end;
+
+  if R_LoginToLobby(Username, Password) then
+  begin
+    Exit(R_LoginFromLobby);
+  end;
+end;
+

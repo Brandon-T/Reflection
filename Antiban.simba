@@ -1,6 +1,5 @@
 {$include_once GameTab.simba}
 {$include_once Login.simba}
-{$include_once Lobby.simba}
 {$include_once Mainscreen.simba}
 {$include_once Mouse.simba}
 {$include_once Player.simba}
