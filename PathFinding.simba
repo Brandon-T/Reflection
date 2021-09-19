@@ -12,7 +12,7 @@ type
 
   RSCameFromElement = record
     Key: Int64;
-    Value: RSTileExtended;
+    Value: ^RSTileExtended;
   end;
 
   RSCostSoFarElement = record
@@ -25,7 +25,7 @@ type
 
   RSPriorityQueuePair = record
     Key: Double;
-    Value: RSTileExtended;
+    Value: ^RSTileExtended;
   end;
 
   RSPriorityQueue = record
@@ -37,12 +37,12 @@ type
     Result := 7 * (X * Y) + (P.X * P.Y);
   end;
 
-  Procedure RSCameFromSet.Put(constref Key: RSTileExtended; constref Value: RSTileExtended);
+  Procedure RSCameFromSet.Put(Key: ^RSTileExtended; Value: ^RSTileExtended);
   var
     I: Int32;
     Hash: Int32;
   begin
-    Hash := Key.Hash;
+    Hash := Key^.Hash;
     For I := 0 To High(Self) do
     begin
       If Self[I].Key = Hash then
@@ -55,12 +55,12 @@ type
     Self += [Hash, Value];
   end;
 
-  Function RSCameFromSet.Get(constref Key: RSTileExtended): RSTileExtended; constref;
+  Function RSCameFromSet.Get(Key: ^RSTileExtended): ^RSTileExtended; constref;
   var
     I: Int32;
     Hash: Int32;
   begin
-    Hash := Key.Hash;
+    Hash := Key^.Hash;
     For I := 0 To High(Self) do
     begin
       If Self[I].Key = Hash then
@@ -70,12 +70,12 @@ type
     end;
   end;
 
-  Function RSCameFromSet.Contains(constref Key: RSTileExtended): Boolean; constref;
+  Function RSCameFromSet.Contains(Key: ^RSTileExtended): Boolean; constref;
   var
     I: Int32;
     Hash: Int32;
   begin
-    Hash := Key.Hash;
+    Hash := Key^.Hash;
     For I := 0 To High(Self) do
     begin
       If Self[I].Key = Hash then
@@ -85,12 +85,12 @@ type
     end;
   end;
 
-  Procedure RSCostSoFarSet.Put(constref Key: RSTileExtended; Value: Double);
+  Procedure RSCostSoFarSet.Put(Key: ^RSTileExtended; Value: Double);
   var
     I: Int32;
     Hash: Int32;
   begin
-    Hash := Key.Hash;
+    Hash := Key^.Hash;
     For I := 0 To High(Self) do
     begin
       If Self[I].Key = Hash then
@@ -103,12 +103,12 @@ type
     Self += [Hash, Value];
   end;
 
-  Function RSCostSoFarSet.Get(constref Key: RSTileExtended): Double; constref;
+  Function RSCostSoFarSet.Get(Key: ^RSTileExtended): Double; constref;
   var
     I: Int32;
     Hash: Int32;
   begin
-    Hash := Key.Hash;
+    Hash := Key^.Hash;
     For I := 0 To High(Self) do
     begin
       If Self[I].Key = Hash then
@@ -120,12 +120,12 @@ type
     Result := 0.0;
   end;
 
-  Function RSCostSoFarSet.Contains(constref Key: RSTileExtended): Boolean; constref;
+  Function RSCostSoFarSet.Contains(Key: ^RSTileExtended): Boolean; constref;
   var
     I: Int32;
     Hash: Int32;
   begin
-    Hash := Key.Hash;
+    Hash := Key^.Hash;
     For I := 0 To High(Self) do
     begin
       If Self[I].Key = Hash then
@@ -151,25 +151,25 @@ type
     Result := Length(Bucket) = 0;
   end;
 
-  Procedure RSPriorityQueue.Put(Key: Double; constref Value: RSTileExtended);
+  Procedure RSPriorityQueue.Put(Key: Double; Value: ^RSTileExtended);
   begin
     Bucket += [Key, Value];
     Sort(Bucket, @RSPriorityQueue.Compare);
   end;
 
-  Function RSPriorityQueue.Pop: RSTileExtended;
+  Function RSPriorityQueue.Pop: ^RSTileExtended;
   begin
     Result := Bucket[0].Value;
     Delete(Bucket, 0, 1);
   end;
 
-  Function GetNeighbours(constref Node: RSTileExtended; var Map: Array of RSTileExtended; W, H: Int32): Array of ^RSTileExtended;
+  Function GetNeighbours(Node: ^RSTileExtended; var Map: Array of RSTileExtended; W, H: Int32): Array of ^RSTileExtended;
   var
     C, X, Y: Int32;
   begin
     C := 0;
-    X := Node.P.X;
-    Y := Node.P.Y;
+    X := Node^.P.X;
+    Y := Node^.P.Y;
     SetLength(Result,  8);
 
     // N
@@ -231,7 +231,7 @@ type
     SetLength(Result, C);
   end;
 
-  Function IsValid(constref Current, Next: RSTileExtended; W, H: Int32): Boolean;
+  Function IsValid(Current, Next: ^RSTileExtended; W, H: Int32): Boolean;
   const
     BLOCKED_NORTH = 19136800;
     BLOCKED_EAST = 19136896;
@@ -246,17 +246,17 @@ type
     DX, DY, Flags: Int32;
   begin
     // Valid Position / Bounds Check
-    Result := (Current.P.X >= 0) and
-              (Current.P.Y >= 0) and
-              (Current.P.X < W) and
-              (Current.P.Y < H);
+    Result := (Current^.P.X >= 0) and
+              (Current^.P.Y >= 0) and
+              (Current^.P.X < W) and
+              (Current^.P.Y < H);
 
     // Direction Check
     if Result then
     begin
       Flags := 0;
-      DX := (Next.P.X - Current.P.X);
-      DY := (Next.P.Y - Current.P.Y);
+      DX := (Next^.P.X - Current^.P.X);
+      DY := (Next^.P.Y - Current^.P.Y);
 
       if (DX = 0) and (DY > 0) then // Moving North
       begin
@@ -298,18 +298,18 @@ type
         Flags := Flags OR BLOCKED_WEST OR BLOCKED_NORTH OR BLOCKED_NORTHWEST;
       end;
 
-      Result := Result and ((Next.Flags and Flags) = 0);
+      Result := Result and ((Next^.Flags and Flags) = 0);
     end;
   end;
 
-  Function Cost(constref A, B: RSTileExtended): Double;
+  Function Cost(A, B: ^RSTileExtended): Double;
   begin
-    Result := Distance(A.X, A.Y, B.X, B.Y);
+    Result := Distance(A^.X, A^.Y, B^.X, B^.Y);
   end;
 
-  Function Heuristic(constref A, B: RSTileExtended): Double;
+  Function Heuristic(A, B: ^RSTileExtended): Double;
   begin
-    Result := Abs(a.X - b.X) + Abs(a.Y - b.Y);
+    Result := Abs(a^.X - b^.X) + Abs(a^.Y - b^.Y);
   end;
 
   Procedure Reverse(var Self: RSTileArray);
@@ -344,7 +344,8 @@ var
   Frontier: RSPriorityQueue;
   CameFrom: RSCameFromSet;
   CostSoFar: RSCostSoFarSet;
-  S, D, Current: RSTileExtended;
+  S, D: RSTileExtended;
+  Current: ^RSTileExtended;
   P: RSTile;
   Neighbours: Array of ^RSTileExtended;
   NewCost: Double;
@@ -409,14 +410,14 @@ begin
   if D.P = [-1, -1] then
     Exit;
 
-  Frontier.Put(0.0, S);
-  CameFrom.Put(S, S);
-  CostSoFar.Put(S, 0.0);
+  Frontier.Put(0.0, @S);
+  CameFrom.Put(@S, @S);
+  CostSoFar.Put(@S, 0.0);
 
   While (Not Frontier.Empty) do
   begin
     Current := Frontier.Pop;
-    if Current = D then
+    if Current^.Hash = D.Hash then
       break;
 
     Neighbours := GetNeighbours(Current, TileMap, SceneWidth, SceneHeight);
@@ -424,25 +425,25 @@ begin
     begin
       // Path is Out of Bounds
       // Next Node (Neighbour) is a Barrier
-      if (Not IsValid(Current, Neighbours[Index]^, SceneWidth, SceneHeight)) then
+      if (Not IsValid(Current, Neighbours[Index], SceneWidth, SceneHeight)) then
         Continue;
 
-      NewCost := CostSoFar.Get(Current) + Cost(Current, Neighbours[Index]^);
-      if (Not CostSoFar.Contains(Neighbours[Index]^)) or (NewCost < CostSoFar.Get(Neighbours[Index]^)) then
+      NewCost := CostSoFar.Get(Current) + Cost(Current, Neighbours[Index]);
+      if (Not CostSoFar.Contains(Neighbours[Index])) or (NewCost < CostSoFar.Get(Neighbours[Index])) then
       begin
-        CostSoFar.Put(Neighbours[Index]^, NewCost);
-        CameFrom.Put(Neighbours[Index]^, Current);
-        Frontier.Put(NewCost + Heuristic(Neighbours[Index]^, D), Neighbours[Index]^);
+        CostSoFar.Put(Neighbours[Index], NewCost);
+        CameFrom.Put(Neighbours[Index], Current);
+        Frontier.Put(NewCost + Heuristic(Neighbours[Index], @D), Neighbours[Index]);
       end;
     end;
   end;
 
-  if CameFrom.Contains(D) then
+  if CameFrom.Contains(@D) then
   begin
-    Current := D;
-    While Current.Hash <> S.Hash do
+    Current := @D;
+    While Current^.Hash <> S.Hash do
     begin
-      P := [Current.X, Current.Y];
+      P := [Current^.X, Current^.Y];
       Result += P.LocalToWorldTile;
       Current := CameFrom.Get(Current);
     end;
