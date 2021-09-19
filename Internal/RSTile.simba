@@ -35,6 +35,32 @@ begin
   Result.Y := RSClient.BaseY + self.Y div 128;
 end;
 
+Function RSTile.LocalToScene: RSTile; constref;
+begin
+  Result.X := Sar(self.X, 7);
+  Result.Y := Sar(self.Y, 7);
+end;
+
+Function RSTile.GlobalToScene: RSTile; constref;
+begin
+  Result := self.ToLocal.LocalToScene;
+end;
+
+Function RSTile.SceneToLocal: RSTile; constref;
+  Function sal(base: Int32; shift: byte): Int32;
+  begin
+    result := base * (1 shl shift);
+  end;
+begin
+  Result.X := Sal(self.X, 7) + Sal(1, 6);
+  Result.Y := Sal(self.Y, 7) + Sal(1, 6);
+end;
+
+Function RSTile.SceneToGlobal: RSTile; constref;
+begin
+  Result := self.SceneToLocal.ToGlobal;
+end;
+
 {*
   Converts a LOCAL Tile to a Global Tile within Instances.
   If the tile is not currently in an instance, returns the result of `ToGlobal`.

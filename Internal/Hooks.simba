@@ -176,8 +176,8 @@ SceneTile_SceneTileObject: THook =                ['hs', 'r', 'Lhs;', 1];
 SceneTile_GameObject: THook =                     ['hs', 'y', '[Lhj;', 1];
 SceneTile_WallDecoration: THook =                 ['hs', 'a', 'Lhh;', 1];
 SceneTile_GroundDecoration: THook =               ['hs', 'u', 'Lgx;', 1];
-SceneTile_LocalX: THook =                         ['hs', 'c', 'I', -737784569];
-SceneTile_LocalY: THook =                         ['hs', 'm', 'I', -330707151];
+SceneTile_SceneX: THook =                         ['hs', 'c', 'I', -737784569];
+SceneTile_SceneY: THook =                         ['hs', 'm', 'I', -330707151];
 SceneTile_Plane: THook =                          ['hs', 'k', 'I', 1574233783];
 
 {GrandExchange: kq}

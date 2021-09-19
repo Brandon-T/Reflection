@@ -99,6 +99,7 @@ type
 
   RSObject = record(RSType)
     ObjectType: RSObjectType;
+    Plane: Int32;
   end;
   RSObjectArray = array of RSObject;
 
