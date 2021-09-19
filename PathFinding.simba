@@ -1,0 +1,454 @@
+{$include_once Reflection/Internal/RSCollisionMap.simba}
+{$include_once Reflection/Internal/RSClient.simba}
+
+Function R_AStart(Start: RSTile; Destination: RSTile): Array of RSTile;
+type
+  RSTileArray = Array of RSTile;
+
+  RSTileExtended = record(RSTile)
+    Flags: Int32;
+    P: TPoint;
+  end;
+
+  RSCameFromElement = record
+    Key: Int64;
+    Value: RSTileExtended;
+  end;
+
+  RSCostSoFarElement = record
+    Key: Int64;
+    Value: Double;
+  end;
+
+  RSCameFromSet = Array of RSCameFromElement;
+  RSCostSoFarSet = Array of RSCostSoFarElement;
+
+  RSPriorityQueuePair = record
+    Key: Double;
+    Value: RSTileExtended;
+  end;
+
+  RSPriorityQueue = record
+    Bucket: Array of RSPriorityQueuePair;
+  end;
+
+  Function RSTileExtended.Hash: Int32; constref;
+  begin
+    Result := 7 * (X * Y) + (P.X * P.Y);
+  end;
+
+  Procedure RSCameFromSet.Put(constref Key: RSTileExtended; constref Value: RSTileExtended);
+  var
+    I: Int32;
+    Hash: Int32;
+  begin
+    Hash := Key.Hash;
+    For I := 0 To High(Self) do
+    begin
+      If Self[I].Key = Hash then
+      begin
+        Self[I].Value := Value;
+        Exit;
+      end;
+    end;
+
+    Self += [Hash, Value];
+  end;
+
+  Function RSCameFromSet.Get(constref Key: RSTileExtended): RSTileExtended; constref;
+  var
+    I: Int32;
+    Hash: Int32;
+  begin
+    Hash := Key.Hash;
+    For I := 0 To High(Self) do
+    begin
+      If Self[I].Key = Hash then
+      begin
+        Exit(Self[I].Value);
+      end;
+    end;
+  end;
+
+  Function RSCameFromSet.Contains(constref Key: RSTileExtended): Boolean; constref;
+  var
+    I: Int32;
+    Hash: Int32;
+  begin
+    Hash := Key.Hash;
+    For I := 0 To High(Self) do
+    begin
+      If Self[I].Key = Hash then
+      begin
+        Exit(True);
+      end;
+    end;
+  end;
+
+  Procedure RSCostSoFarSet.Put(constref Key: RSTileExtended; Value: Double);
+  var
+    I: Int32;
+    Hash: Int32;
+  begin
+    Hash := Key.Hash;
+    For I := 0 To High(Self) do
+    begin
+      If Self[I].Key = Hash then
+      begin
+        Self[I].Value := Value;
+        Exit;
+      end;
+    end;
+
+    Self += [Hash, Value];
+  end;
+
+  Function RSCostSoFarSet.Get(constref Key: RSTileExtended): Double; constref;
+  var
+    I: Int32;
+    Hash: Int32;
+  begin
+    Hash := Key.Hash;
+    For I := 0 To High(Self) do
+    begin
+      If Self[I].Key = Hash then
+      begin
+        Exit(Self[I].Value);
+      end;
+    end;
+
+    Result := 0.0;
+  end;
+
+  Function RSCostSoFarSet.Contains(constref Key: RSTileExtended): Boolean; constref;
+  var
+    I: Int32;
+    Hash: Int32;
+  begin
+    Hash := Key.Hash;
+    For I := 0 To High(Self) do
+    begin
+      If Self[I].Key = Hash then
+      begin
+        Exit(True);
+      end;
+    end;
+  end;
+
+  Function RSPriorityQueue.Compare(constref A, B: RSPriorityQueuePair): Int32; static;
+  begin
+    if A.Key < B.Key then
+      Exit(-1);
+
+    if A.Key = B.Key then
+      Exit(0);
+
+    Exit(1);
+  end;
+
+  Function RSPriorityQueue.Empty: Boolean; constref;
+  begin
+    Result := Length(Bucket) = 0;
+  end;
+
+  Procedure RSPriorityQueue.Put(Key: Double; constref Value: RSTileExtended);
+  begin
+    Bucket += [Key, Value];
+    Sort(Bucket, @RSPriorityQueue.Compare);
+  end;
+
+  Function RSPriorityQueue.Pop: RSTileExtended;
+  begin
+    Result := Bucket[0].Value;
+    Delete(Bucket, 0, 1);
+  end;
+
+  Function GetNeighbours(constref Node: RSTileExtended; var Map: Array of RSTileExtended; W, H: Int32): Array of ^RSTileExtended;
+  var
+    C, X, Y: Int32;
+  begin
+    C := 0;
+    X := Node.P.X;
+    Y := Node.P.Y;
+    SetLength(Result,  8);
+
+    // N
+    if (Y > 0) then
+    begin
+      Result[C] := @Map[(Y - 1) * W + X];
+      Inc(C);
+    end;
+
+    // E
+    if (X + 1 < W) then
+    begin
+      Result[C] := @Map[Y * W + (X + 1)];
+      Inc(C);
+    end;
+
+    // S
+    if (Y + 1 < H) then
+    begin
+      Result[C] := @Map[(Y + 1) * W + X];
+      Inc(C);
+    end;
+
+    // W
+    if (X > 0) then
+    begin
+      Result[C] := @Map[Y * W + (X - 1)];
+      Inc(C);
+    end;
+
+    // Diagonal NE
+    if (X + 1 < W) and (Y > 0) then
+    begin
+      Result[C] := @Map[(Y - 1) * W + (X + 1)];
+      Inc(C);
+    end;
+
+    // Diagonal SE
+    if (X + 1 < W) and (Y + 1 < H) then
+    begin
+      Result[C] := @Map[(Y + 1) * W + (X + 1)];
+      Inc(C);
+    end;
+
+    // Diagonal SW
+    if (X > 0) and (Y + 1 < H) then
+    begin
+      Result[C] := @Map[(Y + 1) * W + (X - 1)];
+      Inc(C);
+    end;
+
+    // Diagonal NW
+    if (X > 0) and (Y > 0) then
+    begin
+      Result[C] := @Map[(Y - 1) * W + (X - 1)];
+      Inc(C);
+    end;
+
+    SetLength(Result, C);
+  end;
+
+  Function IsValid(constref Current, Next: RSTileExtended; W, H: Int32): Boolean;
+  const
+    BLOCKED_NORTH = 19136800;
+    BLOCKED_EAST = 19136896;
+    BLOCKED_SOUTH = 19136770;
+    BLOCKED_WEST = 19136776;
+
+    BLOCKED_NORTHEAST = 19136992;
+    BLOCKED_SOUTHEAST = 19136824;
+    BLOCKED_SOUTHWEST = 19136782;
+    BLOCKED_NORTHWEST = 19136899;
+  var
+    DX, DY, Flags: Int32;
+  begin
+    // Valid Position / Bounds Check
+    Result := (Current.P.X >= 0) and
+              (Current.P.Y >= 0) and
+              (Current.P.X < W) and
+              (Current.P.Y < H);
+
+    // Direction Check
+    if Result then
+    begin
+      Flags := 0;
+      DX := (Next.P.X - Current.P.X);
+      DY := (Next.P.Y - Current.P.Y);
+
+      if (DX = 0) and (DY > 0) then // Moving North
+      begin
+        Flags := Flags OR BLOCKED_NORTH;
+      end;
+
+      if (DX > 0) and (DY = 0) then //Moving East
+      begin
+        Flags := BLOCKED_EAST;
+      end;
+
+      if (DX = 0) and (DY < 0) then // Moving South
+      begin
+        Flags := Flags OR BLOCKED_SOUTH;
+      end;
+
+      if (DX < 0) and (DY = 0) then // Moving West
+      begin
+        Flags := Flags OR BLOCKED_WEST;
+      end;
+
+      if (DX > 0) and (DY > 0) then //Moving North East
+      begin
+        Flags := Flags OR BLOCKED_EAST OR BLOCKED_NORTH OR BLOCKED_NORTHEAST;
+      end;
+
+      if (DX > 0) and (DY < 0) then //Moving South East
+      begin
+        Flags := Flags OR BLOCKED_EAST OR BLOCKED_SOUTH OR BLOCKED_SOUTHEAST;
+      end;
+
+      if (DX < 0) and (DY < 0) then //Moving South West
+      begin
+        Flags := Flags OR BLOCKED_WEST OR BLOCKED_SOUTH OR BLOCKED_SOUTHWEST;
+      end;
+
+      if (DX < 0) and (DY > 0) then //Moving North West
+      begin
+        Flags := Flags OR BLOCKED_WEST OR BLOCKED_NORTH OR BLOCKED_NORTHWEST;
+      end;
+
+      Result := Result and ((Next.Flags and Flags) = 0);
+    end;
+  end;
+
+  Function Cost(constref A, B: RSTileExtended): Double;
+  begin
+    Result := Distance(A.X, A.Y, B.X, B.Y);
+  end;
+
+  Function Heuristic(constref A, B: RSTileExtended): Double;
+  begin
+    Result := Abs(a.X - b.X) + Abs(a.Y - b.Y);
+  end;
+
+  Procedure Reverse(var Self: RSTileArray);
+  var
+    T: RSTile;
+    L, H: ^RSTile;
+  begin
+    if (Length(Self) = 0) then
+      Exit;
+
+    L := @Self[0];
+    H := @Self[High(self)];
+
+    while (PtrUInt(L) < PtrUInt(H)) do
+    begin
+      T := H^;
+      H^ := L^;
+      L^ := T;
+      Dec(H);
+      Inc(L);
+    end;
+  end;
+const
+  SceneWidth = 104;
+  SceneHeight = 104;
+var
+  Index: Int32;
+  X, Y, Plane: Int32;
+  TileMap: Array of RSTileExtended;
+  CollisionMaps: Array of RSCollisionMap;
+  Flags: Array of Array of Int32;
+  Frontier: RSPriorityQueue;
+  CameFrom: RSCameFromSet;
+  CostSoFar: RSCostSoFarSet;
+  S, D, Current: RSTileExtended;
+  P: RSTile;
+  Neighbours: Array of ^RSTileExtended;
+  NewCost: Double;
+begin
+  Plane := RSClient.Plane;
+  CollisionMaps := RSClient.CollisionMaps;
+  if Length(CollisionMaps) = 0 then
+  begin
+    Exit;
+  end;
+
+  if CollisionMaps[Plane].ref = nil then
+  begin
+    RSTypeArray(CollisionMaps).Free;
+    Exit;
+  end;
+
+  Flags := CollisionMaps[Plane].Adjacency;
+  RSTypeArray(CollisionMaps).Free;
+
+  SetLength(CollisionMaps, 0);
+  SetLength(TileMap, SceneWidth * SceneHeight);
+
+  For Y := 0 to SceneHeight - 1 do
+  begin
+    For X := 0 to SceneWidth - 1 do
+    begin
+      // Convert from Scene To Local
+      Index := Y * SceneWidth + X;
+      TileMap[Index].X := (X * (1 shl 7)) + (1 shl 6); //(X + BaseX).ToLocal;
+      TileMap[Index].Y := (Y * (1 shl 7)) + (1 shl 6); //(Y + BaseY).ToLocal;
+      TileMap[Index].Flags := Flags[X][Y]; // Store Tile Flags
+      TileMap[Index].P := [X, Y];
+    end;
+  end;
+
+  SetLength(Flags, 0);
+
+  P := Start.ToLocal;
+  S := [P.X, P.Y, 0, [-1, -1]];
+
+  P := Destination.ToLocal;
+  D := [P.X, P.Y, 0, [-1, -1]];
+
+  For Index := 0 to High(TileMap) do
+  begin
+    If (TileMap[Index].X = S.X) and (TileMap[Index].Y = S.Y) then
+    begin
+      S.Flags := TileMap[Index].Flags;
+      S.P := TileMap[Index].P;
+    end else
+      If (TileMap[Index].X = D.X) and (TileMap[Index].Y = D.Y) then
+      begin
+        D.Flags := TileMap[Index].Flags;
+        D.P := TileMap[Index].P;
+      end;
+  end;
+
+  if S.P = [-1, -1] then
+    Exit;
+
+  if D.P = [-1, -1] then
+    Exit;
+
+  Frontier.Put(0.0, S);
+  CameFrom.Put(S, S);
+  CostSoFar.Put(S, 0.0);
+
+  While (Not Frontier.Empty) do
+  begin
+    Current := Frontier.Pop;
+    if Current = D then
+      break;
+
+    Neighbours := GetNeighbours(Current, TileMap, SceneWidth, SceneHeight);
+    For Index := 0 To High(Neighbours) do
+    begin
+      // Path is Out of Bounds
+      // Next Node (Neighbour) is a Barrier
+      if (Not IsValid(Current, Neighbours[Index]^, SceneWidth, SceneHeight)) then
+        Continue;
+
+      NewCost := CostSoFar.Get(Current) + Cost(Current, Neighbours[Index]^);
+      if (Not CostSoFar.Contains(Neighbours[Index]^)) or (NewCost < CostSoFar.Get(Neighbours[Index]^)) then
+      begin
+        CostSoFar.Put(Neighbours[Index]^, NewCost);
+        CameFrom.Put(Neighbours[Index]^, Current);
+        Frontier.Put(NewCost + Heuristic(Neighbours[Index]^, D), Neighbours[Index]^);
+      end;
+    end;
+  end;
+
+  if CameFrom.Contains(D) then
+  begin
+    Current := D;
+    While Current.Hash <> S.Hash do
+    begin
+      P := [Current.X, Current.Y];
+      Result += P.LocalToWorldTile;
+      Current := CameFrom.Get(Current);
+    end;
+
+    P := [S.X, S.Y];
+    Result += P.LocalToWorldTile;
+    Reverse(Result);
+  end;
+end;

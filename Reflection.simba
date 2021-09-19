@@ -20,6 +20,7 @@
 {$include_once Timing.simba}
 {$include_once Walking.simba}
 {$include_once Worlds.simba}
+{$include_once PathFinding.simba}
 {$include_once Updater.simba}
 
 begin
