@@ -1,7 +1,7 @@
 {$include_once Reflection/Internal/RSCollisionMap.simba}
 {$include_once Reflection/Internal/RSClient.simba}
 
-Function R_AStart(Start: RSTile; Destination: RSTile): Array of RSTile;
+Function R_AStar(Start: RSTile; Destination: RSTile): Array of RSTile;
 type
   RSTileArray = Array of RSTile;
 
