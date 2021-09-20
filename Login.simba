@@ -139,6 +139,7 @@ begin
       X := RSClient.LoginBoxX;
       W := RSClient.LoginScreenButtonWidth;
       H := RSClient.LoginScreenButtonHeight;
+      
       case LoginIndex of
         // Welcome to RuneScape
         0: begin
