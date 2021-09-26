@@ -213,7 +213,6 @@ begin
 
              // Enter Password Field
              while RSClient.Password <> Password do
-             //WriteLn(RSClient.Password);
              begin
                if RSClient.ActiveLoginField <> 1 then
                begin
