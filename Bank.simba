@@ -912,7 +912,8 @@ begin
 
   if Widget.ref <> nil then
   begin
-    Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+    Mouse.Move(Widget.Bounds, True);
+    Mouse.Click(MOUSE_LEFT);
     Widget.Free;
     Wait(50 + RandomRange(0, 50));
     Result := not R_BankScreen;
