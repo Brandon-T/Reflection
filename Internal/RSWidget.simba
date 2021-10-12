@@ -327,7 +327,7 @@ begin
     Current.ref := Parent.ref;
   end;
 
-  if Current.BoundsIndex <> -1 then
+  {if Current.BoundsIndex <> -1 then
   begin
     Result.X += Current.BoundsX;
     Result.Y += Current.BoundsY;
@@ -337,7 +337,7 @@ begin
       Result.X += Current.RelativeX;
       Result.Y += Current.RelativeY;
     end;
-  end else
+  end else}
     begin
       Result.X += Current.RelativeX;
       Result.Y += Current.RelativeY;
