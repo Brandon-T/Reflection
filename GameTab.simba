@@ -165,7 +165,7 @@ begin
   Widget := RSWidget.Get(ID.Group, ID.Child);
   if Widget.ref <> nil then
   begin
-    Result := Widget.TextureID <> -1;
+    Result := Widget.SpriteID <> -1;
     Widget.Free;
   end;
 end;

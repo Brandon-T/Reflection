@@ -124,6 +124,11 @@ Function RSWidget.ItemAmount: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, WIDGET_ITEMAMOUNT);
 end;
+ 
+Function RSWidget.SpriteID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_SPRITEID);
+end;
 
 Function RSWidget.TextureID: Int32; constref;
 begin
