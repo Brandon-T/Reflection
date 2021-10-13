@@ -116,7 +116,7 @@ Utility function that returns the IDs of the booths.
 Function R__GetBankIDs(Location: TBankLocation): TIntegerArray;
 begin
   case Location of
-    TBankLocation.lUMBRIDGE:
+    TBankLocation.LUMBRIDGE:
       Result := [18491, 27291];
 
     TBankLocation.VARROCK_WEST,
@@ -242,7 +242,7 @@ Example:
 *}
 Function R_WaitBankScreen(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_BankScreen);
+  Result := WaitUntil(R_Bankscreen, 50, timeout);
 end;
 
  
@@ -338,7 +338,7 @@ Example:
 *}
 Function R_WaitPinScreen(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_PinScreen);
+  Result := WaitUntil(R_PinScreen, 50, timeout);
 end;
 
 {*
@@ -366,7 +366,7 @@ Example:
 *}
 Function R_WaitDepositBox(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_DepositBox);
+  Result := WaitUntil(R_DepositBox, 50, timeout);
 end;
 
 {*
