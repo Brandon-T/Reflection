@@ -1,5 +1,6 @@
 {$include_once Internal/Reflection.simba}
-{$include_once Constants.simba}
+{$include_once Constants.simba} 
+{$include_once Mainscreen.simba}
 {$include_once Menu.simba}
 {$include_once Inventory.simba}
 {$include_once Mouse.simba}
@@ -29,14 +30,196 @@ type
     Bounds: TBox;
   end;
 
+  TBankLocation = (
+    LUMBRIDGE,
+    VARROCK_WEST,
+    VARROCK_EAST,
+    GRAND_EXCHANGE,
+    FALADOR_WEST,
+    FALADOR_EAST,
+    EDGEVILLE,
+    CAMELOT,
+    ARDOUGNE_NORTH,
+    ARDOUGNE_SOUTH,
+    AL_KHARID,
+    DUEL_ARENA,
+    CASTLE_WARS,
+    YANILLE,
+    PORT_KHAZARD
+  );
+
 {$scopedenums on}
 type
   TRSBankQuantity = (ONE, FIVE, TEN, X, ALL);
 {$scopedenums off}
 
 {*
+R__GetBankTiles
+~~~~~~~~~~~~~~~
+Utility function that returns the tiles of the booths.
+*}
+Function R__GetBankTiles(Location: TBankLocation): TPointArray;
+begin
+  case Location of
+    TBankLocation.LUMBRIDGE:
+      Result := [[3208, 3221], [3209, 3221]];
+
+    TBankLocation.VARROCK_WEST:
+      Result := [[3186, 3444], [3186, 3442], [3186, 3440], [3186, 3438], [3186, 3436]];
+
+    TBankLocation.VARROCK_EAST:
+      Result := [[3251, 3419], [3252, 3419], [3253, 3419], [3254, 3419], [3255, 3419], [3256, 3419]];
+
+    TBankLocation.GRAND_EXCHANGE:
+      Result := [[3162, 3490], [3162, 3489], [3167, 3489], [3167, 3490]];
+
+    TBankLocation.FALADOR_WEST:
+      Result := [[2945, 3367], [2946, 3367], [2947, 3367], [2948, 3367], [2949, 3367]];
+
+    TBankLocation.FALADOR_EAST:
+      Result := [[3015, 3354], [3014, 3354], [3013, 3354], [3012, 3354], [3011, 3354], [3010, 3354]];
+
+    TBankLocation.EDGEVILLE:
+      Result := [[3098, 3493], [3096, 3493], [3095, 3491], [3095, 3489]];
+
+    TBankLocation.CAMELOT:
+      Result := [[2721, 3494], [2722, 3494], [2724, 3494], [2727, 3494], [2728, 3494], [2729, 3494]];
+
+    TBankLocation.ARDOUGNE_NORTH:
+      Result := [[2619, 3331], [2618, 3331], [2615, 3331]];
+
+    TBankLocation.ARDOUGNE_SOUTH:
+      Result := [[2656, 3286], [2656, 3283], [2656, 3280]];
+
+    TBankLocation.AL_KHARID:
+      Result := [[3268, 3169], [3268, 3168], [3268, 3166], [3268, 3164]];
+
+    TBankLocation.DUEL_ARENA:
+      Result := [[3382, 3270], [3381, 3269]];
+                                    
+    TBankLocation.CASTLE_WARS:
+      Result := [[2444, 3083]]; 
+
+    TBankLocation.YANILLE:
+      Result := [[2614, 3094], [2614, 3092], [2614, 3091]];  
+
+    TBankLocation.PORT_KHAZARD:
+      Result := [[2661, 3163]];
+  end;
+end;
+
+{*
+R__GetBankIDs
+~~~~~~~~~~~~~
+Utility function that returns the IDs of the booths.
+*}
+Function R__GetBankIDs(Location: TBankLocation): TIntegerArray;
+begin
+  case Location of
+    TBankLocation.LUMBRIDGE:
+      Result := [18491, 27291];
+
+    TBankLocation.VARROCK_WEST,
+    TBankLocation.VARROCK_EAST:
+      Result := [10583, 34810];
+
+    TBankLocation.GRAND_EXCHANGE:
+      Result := [10060, 30389];
+
+    TBankLocation.FALADOR_WEST,
+    TBankLocation.FALADOR_EAST:
+      Result := [24101, 27253];
+
+    TBankLocation.EDGEVILLE,
+    TBankLocation.AL_KHARID:
+      Result := [10355];
+
+    TBankLocation.CAMELOT:
+      Result := [25808, 27264];
+
+    TBankLocation.ARDOUGNE_NORTH,
+    TBankLocation.ARDOUGNE_SOUTH:
+      Result := [10355, 10356];
+
+    TBankLocation.DUEL_ARENA:
+      Result := [3194];   
+
+    TBankLocation.CASTLE_WARS:
+      Result := [4483];
+
+    TBankLocation.YANILLE:
+      Result := [10356, 10355];
+
+    TBankLocation.PORT_KHAZARD:
+      Result := [26707];
+  end;
+end;
+  
+{*
+R__GetBankType
+~~~~~~~~~~~~~~
+Utility function that returns the RSObjectType of the booth.
+*}
+Function R__GetBankType(Location: TBankLocation): RSObjectType;
+begin
+  case Location of
+    TBankLocation.GRAND_EXCHANGE:
+      Result := BOUNDARY_OBJECT;
+
+    TBankLocation.LUMBRIDGE,
+    TBankLocation.CAMELOT,
+    TBankLocation.EDGEVILLE,
+    TBankLocation.AL_KHARID,
+    TBankLocation.DUEL_ARENA,
+    TBankLocation.CASTLE_WARS,
+    TBankLocation.PORT_KHAZARD,
+    TBankLocation.YANILLE,
+    TBankLocation.FALADOR_WEST,
+    TBankLocation.FALADOR_EAST,
+    TBankLocation.VARROCK_WEST,
+    TBankLocation.VARROCK_EAST,
+    TBankLocation.ARDOUGNE_NORTH,
+    TBankLocation.ARDOUGNE_SOUTH:
+      Result := GAME_OBJECT;
+  end;
+end;
+ 
+{*
+R__GetBankUptext
+~~~~~~~~~~~~~~~~
+Utility function that returns the strings included in the name of the booth.
+*}
+Function R__GetBankUptext(Location: TBankLocation): Array of String;
+begin
+  case Location of
+    TBankLocation.GRAND_EXCHANGE:
+      Result := ["Bank Grand Exchange booth"];
+
+    TBankLocation.LUMBRIDGE,
+    TBankLocation.CAMELOT,
+    TBankLocation.EDGEVILLE,
+    TBankLocation.AL_KHARID, 
+    TBankLocation.YANILLE,
+    TBankLocation.FALADOR_WEST,
+    TBankLocation.FALADOR_EAST,
+    TBankLocation.VARROCK_WEST,
+    TBankLocation.VARROCK_EAST,
+    TBankLocation.ARDOUGNE_NORTH,
+    TBankLocation.ARDOUGNE_SOUTH:
+      Result := ["Bank Bank booth"];
+       
+    TBankLocation.DUEL_ARENA:
+      Result := ["Bank Open chest"];
+
+    TBankLocation.CASTLE_WARS,
+    TBankLocation.PORT_KHAZARD:
+      Result := ["Use Bank chest"];
+  end;
+end;
+
+{*
 R_BankScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 Returns true if Bank Screen is open.
 
 Example:
@@ -50,7 +233,7 @@ end;
 
 {*
 R_WaitBankScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 Returns once Bank Screen is open, otherwise it waits for the timeout.
 
 Example:
@@ -59,12 +242,80 @@ Example:
 *}
 Function R_WaitBankScreen(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_BankScreen);
+  Result := WaitUntil(R_Bankscreen, 50, timeout);
+end;
+
+ 
+{*
+R_OpenBank
+~~~~~~~~~~
+Opens the specified bank by interacting with the booths. Returns true if Bank
+Screen is open.
+
+Example:
+    if R_OpenBank(EDGEVILLE) then
+      ...
+*}
+Function R_OpenBank(Location: TBankLocation):boolean;
+var
+  Me: RSPlayer;
+  I: Integer;
+  T: Timer;
+  Pnt: TPoint;
+  Box: TBox;
+  Booths, Bounds: TPointArray;
+  IDs: TIntegerArray;
+  BoothType: RSObjectType;
+  BoothUptext: Array of String;
+  Obj: RSObject;
+begin
+  if (R_BankScreen) then
+    Exit(True);
+
+  Me := RSPlayer.Me;
+
+  Booths := R__GetBankTiles(Location);
+  IDs := R__GetBankIDs(Location);
+  BoothType := R__GetBankType(Location);
+  BoothUptext := R__GetBankUptext(Location);
+
+  Booths.Sort([Me.Tile.X, Me.Tile.Y]);
+
+  for I := 0 to High(Booths) do
+  begin
+    Obj := RSObject.Get(BoothType, Booths[I].X, Booths[I].Y);
+    if (IDs.Find(Obj.ID) <> -1) then
+    begin
+      Bounds := Obj.ToTPA();
+      Box :=  Bounds.MinAreaRect.Bounds;
+
+      while not SRL.PointInPoly(Pnt, Bounds) do
+        Pnt := TSRL.RandomPoint(Box);
+
+      if not R_MainscreenBounds.Contains(Pnt) then
+        Continue;
+
+      Mouse.Move(Pnt, 20, False);
+
+      if (R_WaitUpText(BoothUptext, False, randomRange(80, 214))) then
+      begin
+        Mouse.Click(MOUSE_LEFT);
+        if R_DidRedClick then
+        begin
+          T.Start;
+          While (Not R_Bankscreen) and (Not R_ClickToContinueIsOpen) and (T.ElapsedTime < 25000) do
+            wait(RandomRange(80, 176));
+        end;
+      end;
+      Obj.Free;
+      Exit(R_BankScreen);
+    end;
+  end;
 end;
 
 {*
 R_PinScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 Returns true if Pin Screen is open.
 
 Example:
@@ -78,7 +329,7 @@ end;
 
 {*
 R_WaitPinScreen
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 Returns once Pin Screen is open, otherwise it waits for the timeout.
 
 Example:
@@ -87,12 +338,12 @@ Example:
 *}
 Function R_WaitPinScreen(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_PinScreen);
+  Result := WaitUntil(R_PinScreen, 50, timeout);
 end;
 
 {*
 R_DepositBox
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 Returns true if Deposit Screen is open.
 
 Example:
@@ -106,7 +357,7 @@ end;
 
 {*
 R_WaitDepositBox
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 Returns once Deposit Screen is open, otherwise it waits for the timeout.
 
 Example:
@@ -115,12 +366,12 @@ Example:
 *}
 Function R_WaitDepositBox(timeout: UInt32): Boolean;
 begin
-  Result := R_WaitFunction(timeout, 50, @R_DepositBox);
+  Result := WaitUntil(R_DepositBox, 50, timeout);
 end;
 
 {*
 R_CurrentBankTab
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 Returns the current open bank tab.
 
 Example:
@@ -134,7 +385,7 @@ end;
 
 {*
 R_BankTabCount
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Counts the number of items in a bank tab.
 
 Example:
@@ -159,7 +410,7 @@ end;
 
 {*
 R_BankSlotToTab
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 Returns the tab containing your global bank slot.
 
 Example:
@@ -187,7 +438,7 @@ end;
 
 {*
 R_BankSlotToTabSlot
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 Returns the tab slot containing your global bank slot.
 
 Example:
@@ -218,7 +469,7 @@ end;
 
 {*
 R_SelectBankTab
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 Opens the specified bank tab.
 
 Example:
@@ -257,7 +508,7 @@ end;
 
 {*
 R_BankSlotVisible
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 Returns true if the bank slot is visible on the screen.
 
 Example:
@@ -292,7 +543,7 @@ end;
 
 {*
 R_BankSlotToBox
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
 Returns the mainscreen bounds of the bank slot.
 
 Example:
@@ -315,7 +566,7 @@ end;
 
 {*
 R_ScrollToBankSlot
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 Scrolls to the specified bank slot if it is not on screen.
 Possible scroll methods:
   - RSScroll.SCROLLWHEEL: Emulates the mouse scroll wheel.
@@ -434,7 +685,7 @@ end;
 
 {*
 R_GetAllBankItems
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 Returns an array of all the items in your bank.
 
 Example:
@@ -494,7 +745,7 @@ end;
 
 {*
 R_FindBankItem
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Locates and returns information about the specified item in the bank.
 
 Example:
@@ -560,7 +811,7 @@ end;
 
 {*
 R_DepositAllItems
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 Returns true if successfully deposited all inventory items.
 
 Example:
@@ -586,7 +837,7 @@ end;
 
 {*
 R_DepositAllEquipment
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 Returns true if successfully deposited all equipment items.
 
 Example:
@@ -612,7 +863,7 @@ end;
 
 {*
 R_DepositSlot
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Returns true if deposited specified inventory slot. Accepts any amount to
   deposit. Amount = 0: Deposit all items.
 
@@ -686,12 +937,12 @@ begin
       Inc(Retries);
     end;
   end;
-end;    
+end;
 
 
 {*
 R_DepositItem
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 Returns true if deposited specified inventory item into bank.
   Amount = 0: Deposit all items.
 
@@ -714,10 +965,10 @@ begin
     R_DepositSlot(Items[Random(0, High(Items))].Slot, Amount)
   else R_DepositSlot(Items[0].Slot, Amount);
 end;
- 
+
 {*
 R_WithdrawItem
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 Returns true if withdrawed specified bank item into inventory.
 
 Example:
@@ -819,7 +1070,7 @@ end;
 
 {*
 R_SetBankWithdrawMode
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 Set withdraw mode as noted or items.
 
 Example:
@@ -848,12 +1099,12 @@ begin
 
   Mouse.Click(Button.Bounds, MOUSE_LEFT);
   Button.Free;
-  Result := RSWidget.Get(Group, Child, 4).TextureID = R_BUTTON_CENTER_HIGHLIGHT_RED;
+  Result := RSWidget.Get(Group, Child, 4).SpriteID = R_BUTTON_CENTER_HIGHLIGHT_RED;
 end;
 
 {*
 R_SetBankQuantityMode
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 Set withdraw quantity. Acceptable Inputs:
   - TRSBankQuantity.ONE
   - TRSBankQuantity.FIVE
@@ -882,20 +1133,20 @@ begin
 
   if (Widget.ref <> nil) and (CheckWidget.ref <> nil) then
   begin
-    if (CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
+    if (CheckWidget.SpriteID = R_BUTTON_CENTER_HIGHLIGHT_GREY) then
     begin
       Mouse.Click(Widget.Bounds, MOUSE_LEFT);
       Wait(250, RandomRange(612, 1330));
     end;
-    Result := CheckWidget.TextureID = R_BUTTON_CENTER_HIGHLIGHT_RED;
+    Result := CheckWidget.SpriteID = R_BUTTON_CENTER_HIGHLIGHT_RED;
     Widget.Free;
     CheckWidget.Free;
   end;
-end;  
+end;
 
 {*
 R_BankScreen_Close
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 Returns true if bankscreen either is closed or was closed by the function.
 
 Example:
@@ -918,4 +1169,4 @@ begin
     Wait(50 + RandomRange(0, 50));
     Result := not R_BankScreen;
   end;
-end;    
+end;
