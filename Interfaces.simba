@@ -665,7 +665,7 @@ begin
     Widgets += WidgetKey;
     if (WidgetKey.Text = '') or (Lowercase(WidgetKey.Text) = 'space') then
     begin
-      Keyboard.Send(" ");
+      Keyboard.PressKey(VK_SPACE);
       RSTypeArray(Widgets).Free;
       Exit(True);
     end else
