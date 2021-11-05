@@ -19,7 +19,7 @@ end;
 
 Function RSVarbitDefinition.DefinitionCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, VARBITDEFINITION_CACHE);
+  Result.ref := RGetStaticObject(R_EIOS, VARBITDEFINITION_CACHE);
 end;
 
 Function RSVarbitDefinition.Definition(ID: Int64): RSVarbitDefinition; static;

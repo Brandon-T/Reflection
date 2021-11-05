@@ -5,17 +5,17 @@
 
 Function RSClient.LoopCycle: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_LOOPCYCLE);
+  Result := RGetStaticInt(R_EIOS, CLIENT_LOOPCYCLE);
 end;
 
 Function RSClient.LoginState: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_LOGINSTATE);
+  Result := RGetStaticInt(R_EIOS, CLIENT_LOGINSTATE);
 end;
 
 Function RSClient.GameState: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_GAMESTATE);
+  Result := RGetStaticInt(R_EIOS, CLIENT_GAMESTATE);
 end;
 
 Function RSClient.IsLoading: Boolean; static;
@@ -41,47 +41,47 @@ end;
 
 Function RSClient.Plane: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_PLANE);
+  Result := RGetStaticInt(R_EIOS, CLIENT_PLANE);
 end;
 
 Function RSClient.BaseX: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_BASEX);
+  Result := RGetStaticInt(R_EIOS, CLIENT_BASEX);
 end;
 
 Function RSClient.BaseY: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_BASEY);
+  Result := RGetStaticInt(R_EIOS, CLIENT_BASEY);
 end;
 
 Function RSClient.DestinationX: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_DESTINATIONX);
+  Result := RGetStaticInt(R_EIOS, CLIENT_DESTINATIONX);
 end;
 
 Function RSClient.DestinationY: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_DESTINATIONY);
+  Result := RGetStaticInt(R_EIOS, CLIENT_DESTINATIONY);
 end;
 
 Function RSClient.ViewPortWidth: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTWIDTH);
+  Result := RGetStaticInt(R_EIOS, CLIENT_VIEWPORTWIDTH);
 end;
 
 Function RSClient.ViewPortHeight: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTHEIGHT);
+  Result := RGetStaticInt(R_EIOS, CLIENT_VIEWPORTHEIGHT);
 end;
 
 Function RSClient.ViewPortScale: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_VIEWPORTSCALE);
+  Result := RGetStaticInt(R_EIOS, CLIENT_VIEWPORTSCALE);
 end;
 
 Function RSClient.MapAngle: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_MAPANGLE);
+  Result := RGetStaticInt(R_EIOS, CLIENT_MAPANGLE);
 end;
 
 Function RSClient.NPCIndices(NPCCount: Int32): Array of Int32; static;
@@ -90,7 +90,7 @@ var
   IndicesSize: SizeUInt;
 begin
   IndicesSize := 0;
-  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_NPCINDICES);
+  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_NPCINDICES);
   if Indices = nil then
     Exit;
 
@@ -104,7 +104,7 @@ var
   IndicesSize: SizeUInt;
 begin
   IndicesSize := 0;
-  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_NPCINDICES);
+  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_NPCINDICES);
   if Indices = nil then
     Exit;
 
@@ -114,7 +114,7 @@ end;
 
 Function RSClient.NPCCount: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_NPCCOUNT);
+  Result := RGetStaticInt(R_EIOS, CLIENT_NPCCOUNT);
 end;
 
 Function RSClient.PlayerIndices(PlayerCount: Int32): Array of Int32; static;
@@ -123,7 +123,7 @@ var
   IndicesSize: SizeUInt;
 begin
   IndicesSize := 0;
-  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_PLAYERINDICES);
+  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_PLAYERINDICES);
   if Indices = nil then
     Exit;
 
@@ -137,7 +137,7 @@ var
   IndicesSize: SizeUInt;
 begin
   IndicesSize := 0;
-  Indices := RGetArray(R_EIOS, nil, IndicesSize, CLIENT_PLAYERINDICES);
+  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_PLAYERINDICES);
   if Indices = nil then
     Exit;
 
@@ -147,7 +147,7 @@ end;
 
 Function RSClient.PlayerCount: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_PLAYERCOUNT);
+  Result := RGetStaticInt(R_EIOS, CLIENT_PLAYERCOUNT);
 end;
 
 Function RSClient.AllNPCs: Array of RSNPC; static;
@@ -157,7 +157,7 @@ var
   I, J, NPCsSize: SizeUInt;
 begin
   NPCsSize := 0;
-  NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCs);
+  NPCs := RGetStaticArray(R_EIOS, NPCsSize, CLIENT_LOCALNPCs);
   if NPCs = nil then
     Exit;
 
@@ -185,7 +185,7 @@ var
   I, J, PlayersSize: SizeUInt;
 begin
   PlayersSize := 0;
-  Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  Players := RGetStaticArray(R_EIOS, PlayersSize, CLIENT_LOCALPLAYERS);
   if Players = nil then
     Exit;
 
@@ -208,12 +208,12 @@ end;
 
 Function RSClient.AnimationFrameCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, CLIENT_ANIMATIONFRAMECACHE);
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_ANIMATIONFRAMECACHE);
 end;
 
 Function RSClient.ItemNodeCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, CLIENT_ITEMNODECACHE);
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_ITEMNODECACHE);
 end;
 
 Function RSClient.CollisionMaps: Array of RSCollisionMap; static;
@@ -224,7 +224,7 @@ var
   SX: Array of Pointer;
 begin
   Size := 0;
-  CollisionMaps := RGetArray(R_EIOS, nil, Size, CLIENT_COLLISIONMAPS);
+  CollisionMaps := RGetStaticArray(R_EIOS, Size, CLIENT_COLLISIONMAPS);
   if CollisionMaps = nil then
     Exit;
 
@@ -240,19 +240,19 @@ end;
 
 Function RSClient.Region: RSRegion; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, CLIENT_REGION);
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_REGION);
 end;
 
 Function RSClient.IsRegionInstanced: Boolean; static;
 begin
-  Result := RGetBool(R_EIOS, nil, CLIENT_ISREGIONINSTANCED);
+  Result := RGetStaticBool(R_EIOS, CLIENT_ISREGIONINSTANCED);
 end;
 
 Function RSClient.RegionInstanceChunk(Plane, ChunkX, ChunkY: Int32): Int32; static;
 var
   Chunks: Pointer;
 begin
-  Chunks := RGetArray(R_EIOS, nil, CLIENT_REGIONINSTANCES);
+  Chunks := RGetStaticArray(R_EIOS, CLIENT_REGIONINSTANCES);
   if Chunks = nil then
     Exit(-1);
 
@@ -269,7 +269,7 @@ var
 type
   RSSceneTileArray = Array of RSSceneTile;
 begin
-  Chunks := RGetArray(R_EIOS, nil, CLIENT_REGIONINSTANCES);
+  Chunks := RGetStaticArray(R_EIOS, CLIENT_REGIONINSTANCES);
   SX := RGetObjectArray(R_EIOS, Chunks, Plane);
   RFreeObject(R_EIOS, Chunks);
 
@@ -320,7 +320,7 @@ var
   Actions: Pointer;
   Size: SizeUInt;
 begin
-  Actions := RGetArray(R_EIOS, nil, Size, CLIENT_MENUACTIONS);
+  Actions := RGetStaticArray(R_EIOS, Size, CLIENT_MENUACTIONS);
   if Actions = nil then
     Exit;
 
@@ -336,7 +336,7 @@ var
   Options: Pointer;
   Size: SizeUInt;
 begin
-  Options := RGetArray(R_EIOS, nil, Size, CLIENT_MENUOPTIONS);
+  Options := RGetStaticArray(R_EIOS, Size, CLIENT_MENUOPTIONS);
   if Options = nil then
     Exit;
 
@@ -349,63 +349,63 @@ end;
 
 Function RSClient.MenuCount: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_MENUCOUNT);
+  Result := RGetStaticInt(R_EIOS, CLIENT_MENUCOUNT);
 end;
 
 Function RSClient.MenuLocation: TPoint; static;
 begin
-  Result.X := RGetInt(R_EIOS, nil, CLIENT_MENUX);
-  Result.Y := RGetInt(R_EIOS, nil, CLIENT_MENUY);
+  Result.X := RGetStaticInt(R_EIOS, CLIENT_MENUX);
+  Result.Y := RGetStaticInt(R_EIOS, CLIENT_MENUY);
 end;
 
 Function RSClient.MenuWidth: SizeUInt; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_MENUWIDTH);
+  Result := RGetStaticInt(R_EIOS, CLIENT_MENUWIDTH);
 end;
 
 Function RSClient.MenuHeight: SizeUInt; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_MENUHEIGHT);
+  Result := RGetStaticInt(R_EIOS, CLIENT_MENUHEIGHT);
 end;
 
 Function RSClient.MenuBounds: TBox; static;
 begin
-  Result.X1 := RGetInt(R_EIOS, nil, CLIENT_MENUX);
-  Result.Y1 := RGetInt(R_EIOS, nil, CLIENT_MENUY);
+  Result.X1 := RGetStaticInt(R_EIOS, CLIENT_MENUX);
+  Result.Y1 := RGetStaticInt(R_EIOS, CLIENT_MENUY);
   Result.X2 := Result.X1 + RSClient.MenuWidth;
   Result.Y2 := Result.Y1 + RSClient.MenuHeight;
 end;
 
 Function RSClient.IsMenuOpen: Boolean; static;
 begin
-  Result := RGetBool(R_EIOS, nil, CLIENT_ISMENUOPEN);
+  Result := RGetStaticBool(R_EIOS, CLIENT_ISMENUOPEN);
 end;
 
 Function RSClient.IsItemSelected: Boolean; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_ISITEMSELECTED) = 1;
+  Result := RGetStaticInt(R_EIOS, CLIENT_ISITEMSELECTED) = 1;
 end;
 
 Function RSClient.LoginIndex: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, LOGIN_INDEX);
+  Result := RGetStaticInt(R_EIOS, LOGIN_INDEX);
 end;
 
 Function RSClient.LoginXPadding: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, LOGIN_XPADDING);
+  Result := RGetStaticInt(R_EIOS, LOGIN_XPADDING);
 end;
 
 Function RSClient.LoginBoxX: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, LOGIN_BOXXOFFSET);
+  Result := RGetStaticInt(R_EIOS, LOGIN_BOXXOFFSET);
 end;
 
 Function RSClient.LoginScreenButtonWidth: Int32; static;
 var
   IndexedSprite: Pointer;
 begin
-  IndexedSprite := RGetObject(R_EIOS, nil, LOGIN_BUTTONSPRITE);
+  IndexedSprite := RGetStaticObject(R_EIOS, LOGIN_BUTTONSPRITE);
   if IndexedSprite = nil then
     Exit(0);
 
@@ -417,7 +417,7 @@ Function RSClient.LoginScreenButtonHeight: Int32; static;
 var
   IndexedSprite: Pointer;
 begin
-  IndexedSprite := RGetObject(R_EIOS, nil, LOGIN_BUTTONSPRITE);
+  IndexedSprite := RGetStaticObject(R_EIOS, LOGIN_BUTTONSPRITE);
   if IndexedSprite = nil then
     Exit(0);
 
@@ -427,25 +427,25 @@ end;
 
 Function RSClient.LoginLoadingPercent: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, LOGIN_LOADINGPERCENT);
+  Result := RGetStaticInt(R_EIOS, LOGIN_LOADINGPERCENT);
 end;
 
 Function RSClient.Username: String; static;
 begin
-  Result := RGetString(R_EIOS, nil, LOGIN_USERNAME);
+  Result := RGetStaticString(R_EIOS, LOGIN_USERNAME);
 end;
 
 Function RSClient.Password: String; static;
 begin
-  Result := RGetString(R_EIOS, nil, LOGIN_PASSWORD);
+  Result := RGetStaticString(R_EIOS, LOGIN_PASSWORD);
 end;
 
 Function RSClient.ActiveLoginField: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, Login_CursorField);
+  Result := RGetStaticInt(R_EIOS, Login_CursorField);
 end;
 
 Function RSClient.AccountStatus: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, Login_AccountStatus);
+  Result := RGetStaticInt(R_EIOS, Login_AccountStatus);
 end;

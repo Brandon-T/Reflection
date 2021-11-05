@@ -42,12 +42,12 @@ end;
 
 Function RSAnimationSequence.AnimationSequenceCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, ANIMATIONSEQUENCE_SEQUENCECACHE);
+  Result.ref := RGetStaticObject(R_EIOS, ANIMATIONSEQUENCE_SEQUENCECACHE);
 end;
 
 Function RSAnimationSequence.FrameCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, ANIMATIONSEQUENCE_FRAMECACHE);
+  Result.ref := RGetStaticObject(R_EIOS, ANIMATIONSEQUENCE_FRAMECACHE);
 end;
 
 Function RSAnimationSequence.TransformActorModel(constref Model: RSModel; FrameID: Int32): RSAnimatedModel; constref;

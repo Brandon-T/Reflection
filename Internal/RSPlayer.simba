@@ -10,7 +10,7 @@
 
 Function RSPlayer.Me: RSLocalPlayer; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYER);
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_LOCALPLAYER);
 end;
 
 Function RSPlayer.AllPlayers: Array of RSPlayer; static;
@@ -25,7 +25,7 @@ begin
     Exit;
 
   PlayersSize := 0;
-  Players := RGetArray(R_EIOS, nil, PlayersSize, CLIENT_LOCALPLAYERS);
+  Players := RGetStaticArray(R_EIOS, PlayersSize, CLIENT_LOCALPLAYERS);
   if Players = nil then
     Exit;
 

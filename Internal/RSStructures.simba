@@ -1,5 +1,6 @@
 {$include_once Static.simba}
 {$include_once Functions.simba}
+{$include_once StaticFunctions.simba}
 {$include_once Structures.simba}
 
 type

@@ -1,6 +1,7 @@
 {$include_once Hooks.simba}
 {$include_once RSStructures.simba}
 {$include_once Functions.simba}
+{$include_once StaticFunctions.simba}
 {$include_once Static.simba}
 {$include_once Setup.simba}
 

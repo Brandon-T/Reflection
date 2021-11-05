@@ -4,25 +4,25 @@
 
 Function RSCamera.X: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAX);
+  Result := RGetStaticInt(R_EIOS, CLIENT_CAMERAX);
 end;
 
 Function RSCamera.Y: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAY);
+  Result := RGetStaticInt(R_EIOS, CLIENT_CAMERAY);
 end;
 
 Function RSCamera.Z: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAZ);
+  Result := RGetStaticInt(R_EIOS, CLIENT_CAMERAZ);
 end;
 
 Function RSCamera.Pitch: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAPITCH);
+  Result := RGetStaticInt(R_EIOS, CLIENT_CAMERAPITCH);
 end;
 
 Function RSCamera.Yaw: Int32; static;
 begin
-  Result := RGetInt(R_EIOS, nil, CLIENT_CAMERAYAW);
+  Result := RGetStaticInt(R_EIOS, CLIENT_CAMERAYAW);
 end;

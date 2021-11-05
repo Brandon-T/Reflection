@@ -13,7 +13,7 @@ Function R_IsInLobby: Boolean;
 var
   State: Boolean;
 begin
-  State := (RGetInt(R_EIOS, nil, CLIENT_GAMESTATE) = 30) and (RGetInt(R_EIOS, nil, CLIENT_LOGINSTATE) = 16);
+  State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30) and (RGetStaticInt(R_EIOS, CLIENT_LOGINSTATE) = 16);
   if State then
   begin
     Result := RSWidget.IsValid(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
@@ -33,7 +33,7 @@ Function R_IsLoggedIn: Boolean;
 var
   State: Boolean;
 begin
-  State := (RGetInt(R_EIOS, nil, CLIENT_GAMESTATE) = 30) and (RGetInt(R_EIOS, nil, CLIENT_LOGINSTATE) = 16);
+  State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30) and (RGetStaticInt(R_EIOS, CLIENT_LOGINSTATE) = 16);
   if State then
   begin
     Result := Not R_IsInLobby;

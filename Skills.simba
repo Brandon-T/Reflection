@@ -66,7 +66,7 @@ Function R_GetSkillLevel(Skill: TSkill): Int32;
 var
   Skills: Pointer;
 begin
-  Skills := RGetArray(R_EIOS, nil, CLIENT_CURRENTLEVELS);
+  Skills := RGetStaticArray(R_EIOS, CLIENT_CURRENTLEVELS);
   Result := RGetIntArray(R_EIOS, Skills, Ord(Skill));
   RFreeObject(R_EIOS, Skills);
 end;
@@ -83,7 +83,7 @@ Function R_GetSkillMaxLevel(Skill: TSkill): Int32;
 var
   Skills: Pointer;
 begin
-  Skills := RGetArray(R_EIOS, nil, CLIENT_REALLEVELS);
+  Skills := RGetStaticArray(R_EIOS, CLIENT_REALLEVELS);
   Result := RGetIntArray(R_EIOS, Skills, Ord(Skill));
   RFreeObject(R_EIOS, Skills);
 end;
@@ -100,7 +100,7 @@ Function R_GetSkillExperience(Skill: TSkill): Int32;
 var
   Experiences: Pointer;
 begin
-  Experiences := RGetArray(R_EIOS, nil, CLIENT_EXPERIENCES);
+  Experiences := RGetStaticArray(R_EIOS, CLIENT_EXPERIENCES);
   Result := RGetIntArray(R_EIOS, Experiences, Ord(Skill));
   RFreeObject(R_EIOS, Experiences);
 end;

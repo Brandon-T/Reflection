@@ -32,7 +32,7 @@ end;
 
 Function RSItemNode.HashTable: RSHashTable; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, ITEMNODE_CACHE);
+  Result.ref := RGetStaticObject(R_EIOS, ITEMNODE_CACHE);
 end;
 
 Function RSItemNode.ItemIDsEx(ContainerID: Int32): Array of Int32; static;

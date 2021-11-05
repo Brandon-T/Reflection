@@ -89,7 +89,7 @@ Function RSVarcs.VarcMap: Pointer; static;
 var
   VarcMap: Pointer;
 begin
-  VarcMap := RGetObject(R_EIOS, nil, VARCS_VARCMAP);
+  VarcMap := RGetStaticObject(R_EIOS, VARCS_VARCMAP);
   if VarcMap = nil then
     Exit;
 

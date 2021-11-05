@@ -92,12 +92,12 @@ end;
 
 Function RSObjectDefinition.DefinitionCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, OBJECTDEFINITION_DEFINITIONCACHE);
+  Result.ref := RGetStaticObject(R_EIOS, OBJECTDEFINITION_DEFINITIONCACHE);
 end;
 
 Function RSObjectDefinition.ModelCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, OBJECTDEFINITION_MODELCACHE);
+  Result.ref := RGetStaticObject(R_EIOS, OBJECTDEFINITION_MODELCACHE);
 end;
 
 Function RSObjectDefinition.Definition(ID: Int64): RSObjectDefinition; static;

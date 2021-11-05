@@ -47,7 +47,7 @@ end;
 
 Function RSItemDefinition.DefinitionCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, ITEMDEFINITION_CACHE);
+  Result.ref := RGetStaticObject(R_EIOS, ITEMDEFINITION_CACHE);
 end;
 
 Function RSItemDefinition.Get(ID: Int32): RSItemDefinition; static;

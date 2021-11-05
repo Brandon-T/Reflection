@@ -21,7 +21,7 @@ begin
     Exit;
 
   NPCsSize := 0;
-  NPCs := RGetArray(R_EIOS, nil, NPCsSize, CLIENT_LOCALNPCS);
+  NPCs := RGetStaticArray(R_EIOS, NPCsSize, CLIENT_LOCALNPCS);
   if NPCs = nil then
     Exit;
 

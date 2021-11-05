@@ -39,7 +39,7 @@ end;
 
 Function RSPlayerDefinition.ModelCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, PLAYERDEFINITION_MODELCACHE);
+  Result.ref := RGetStaticObject(R_EIOS, PLAYERDEFINITION_MODELCACHE);
 end;
 
 Function RSPlayerDefinition.CachedModel: RSModel; constref;

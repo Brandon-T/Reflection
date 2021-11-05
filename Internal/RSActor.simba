@@ -232,7 +232,7 @@ begin
 
   if Index < 32768 then
   begin
-    Actors := RGetObject(R_EIOS, nil, CLIENT_LOCALNPCS);
+    Actors := RGetStaticObject(R_EIOS, CLIENT_LOCALNPCS);
     if Actors <> nil then
     begin
       Result.ref := RGetObjectArray(R_EIOS, Actors, Index);
@@ -241,7 +241,7 @@ begin
     end;
   end else
     begin
-      Actors := RGetObject(R_EIOS, nil, CLIENT_LOCALPLAYERS);
+      Actors := RGetStaticObject(R_EIOS, CLIENT_LOCALPLAYERS);
       if Actors <> nil then
       begin
         Result.ref := RGetObjectArray(R_EIOS, Actors, Index - 32768);

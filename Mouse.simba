@@ -13,7 +13,7 @@ Example:
 *} 
 Function R_DidRedClick(): Boolean;
 begin
-  Result := WaitUntil((RGetInt(R_EIOS, nil, Client_CrossHairColor) = 2), 50, 200);
+  Result := WaitUntil((RGetStaticInt(R_EIOS, Client_CrossHairColor) = 2), 50, 200);
 end;
 
 {*
@@ -28,5 +28,5 @@ Example:
 *} 
 Function R_DidYellowClick(): Boolean;
 begin
-  Result := WaitUntil((RGetInt(R_EIOS, nil, Client_CrossHairColor) = 1), 50, 200);
+  Result := WaitUntil((RGetStaticInt(R_EIOS, Client_CrossHairColor) = 1), 50, 200);
 end;

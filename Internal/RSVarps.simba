@@ -12,7 +12,7 @@ Function RSVarps.VarpMask(Index: Int32): Int32; static;
 var
   Masks: Pointer;
 begin
-  Masks := RGetArray(R_EIOS, nil, VARPS_MASKS);
+  Masks := RGetStaticArray(R_EIOS, VARPS_MASKS);
   Result := RGetIntArray(R_EIOS, Masks, Index);
   RFreeObject(R_EIOS, Masks);
 end;
@@ -22,7 +22,7 @@ Function RSVarps.VarpMain(Index: Int32): Int32; static;
 var
   Masks: Pointer;
 begin
-  Masks := RGetArray(R_EIOS, nil, VARPS_MAIN);
+  Masks := RGetStaticArray(R_EIOS, VARPS_MAIN);
   Result := RGetIntArray(R_EIOS, Masks, Index);
   RFreeObject(R_EIOS, Masks);
 end;

@@ -1,4 +1,5 @@
 {$include_once Functions.simba}
+{$include_once StaticFunctions.simba}
 {$include_once Hooks.simba}
 
 type
@@ -46,7 +47,7 @@ var
   SX, SY: Array of Pointer;
 begin
   SettingsSize := 0;
-  Settings := RGetArray(R_EIOS, nil, SettingsSize, CLIENT_TILESETTINGS);
+  Settings := RGetStaticArray(R_EIOS, SettingsSize, CLIENT_TILESETTINGS);
   SX := RGetObjectArray(R_EIOS, Settings, 0, SettingsSize);
   RFreeObject(R_EIOS, Settings);
 
@@ -74,7 +75,7 @@ var
   SX, SY: Array of Pointer;
 begin
   HeightsSize := 0;
-  Heights := RGetArray(R_EIOS, nil, HeightsSize, CLIENT_TILEHEIGHTS);
+  Heights := RGetStaticArray(R_EIOS, HeightsSize, CLIENT_TILEHEIGHTS);
   SX := RGetObjectArray(R_EIOS, Heights, 0, HeightsSize);
   RFreeObject(R_EIOS, Heights);
 
@@ -103,7 +104,7 @@ var
   MasksSize: SizeUInt;
 begin
   MasksSize := 0;
-  Masks := RGetArray(R_EIOS, nil, VARP_MASKS);
+  Masks := RGetStaticArray(R_EIOS, VARP_MASKS);
   if Masks = nil then
     Exit;
 
@@ -129,8 +130,8 @@ Function IsClientLoading: Boolean;
 var
   GameState: Int32;
 begin
-  GameState := RGetInt(R_EIOS, nil, CLIENT_GAMESTATE);
-  Result := (Gamestate = 25) or (GameState = 40) or (GameState = 45) or RGetBool(R_EIOS, nil, CLIENT_ISLOADING);
+  GameState := RGetStaticInt(R_EIOS, CLIENT_GAMESTATE);
+  Result := (Gamestate = 25) or (GameState = 40) or (GameState = 45) or RGetStaticBool(R_EIOS, CLIENT_ISLOADING);
 end;
 
 {$IFDEF USE_REGION_CACHING}

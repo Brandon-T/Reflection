@@ -81,7 +81,7 @@ end;
 
 Function RSNPCDefinition.ModelCache: RSCache; static;
 begin
-  Result.ref := RGetObject(R_EIOS, nil, NPCDEFINITION_MODELCACHE);
+  Result.ref := RGetStaticObject(R_EIOS, NPCDEFINITION_MODELCACHE);
 end;
 
 Function RSNPCDefinition.CachedModel: RSModel; constref;
