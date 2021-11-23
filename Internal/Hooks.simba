@@ -457,6 +457,7 @@ Client_MenuX: THook =                             ['by', 'ma', 'I', -276676703];
 Client_MenuY: THook =                             ['ho', 'mx', 'I', -1716567897];
 Client_MenuWidth: THook =                         ['fe', 'mm', 'I', 1556110033];
 Client_MenuHeight: THook =                        ['jd', 'mt', 'I', 1344605477];
+Client_Resizable: THook =                         ['client', 'qe', 'Z', 1];
 Client_CurrentLevels: THook =                     ['client', 'lz', '[I', 1];
 Client_RealLevels: THook =                        ['client', 'lv', '[I', 1];
 Client_Experiences: THook =                       ['client', 'lw', '[I', 1];
