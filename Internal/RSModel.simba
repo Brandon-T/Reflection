@@ -6,7 +6,7 @@
 {$include_once RSAnimation.simba}
 
 
-Function RSModel.RawVertices: Array[0..3] of Array of Int32; constref;
+Function RSModel.RawVertices: Array[0..2] of Array of Int32; constref;
 var
   VerticesSize: SizeUInt;
   VerticesX, VerticesY, VerticesZ: Pointer;
@@ -26,7 +26,7 @@ begin
   RFreeObjects(R_EIOS, [VerticesX, VerticesY, VerticesZ]);
 end;
 
-Function RSModel.RawIndices: Array[0..3] of Array of Int32; constref;
+Function RSModel.RawIndices: Array[0..2] of Array of Int32; constref;
 var
   IndicesSize: SizeUInt;
   IndicesX, IndicesY, IndicesZ: Pointer;
@@ -49,7 +49,7 @@ end;
 Function RSModel.Vertices: Array of TVector; constref;
 var
   I, VerticesSize: SizeUInt;
-  Vertices: Array[0..3] of Array of Int32;
+  Vertices: Array[0..2] of Array of Int32;
 begin
   Vertices := self.RawVertices;
   VerticesSize := Length(Vertices[0]);
@@ -66,7 +66,7 @@ end;
 Function RSModel.Indices: Array of TVector; constref;
 var
   I, IndicesSize: SizeUInt;
-  Indices: Array[0..3] of Array of Int32;
+  Indices: Array[0..2] of Array of Int32;
 begin
   Indices := self.RawIndices;
   IndicesSize := Length(Indices[0]);
@@ -83,8 +83,8 @@ end;
 Function RSModel.TriangleFaces: Array of TTriangle; constref;
 var
   I, IndicesSize: SizeUInt;
-  Indices: Array[0..3] of Array of Int32;
-  Vertices: Array[0..3] of Array of Int32;
+  Indices: Array[0..2] of Array of Int32;
+  Vertices: Array[0..2] of Array of Int32;
 begin
   Indices := self.RawIndices;
   Vertices := self.RawVertices;
@@ -156,6 +156,22 @@ begin
   RSTypeArray(SkinsArray).Free;
 end;
 
+Function RSModel.FaceColors3: Array of Int32;
+var
+  Arr: Pointer;
+  Size: SizeUInt;
+begin
+  Arr := RGetArray(R_EIOS, ref, Size, MODEL_FACECOLORS3);
+  if Arr = nil then
+    Exit;
+
+  if Size = 0 then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Arr, 0, Size);
+  RFreeObject(R_EIOS, Arr);
+end;
+
 Function RSModel.FitsSingleTile: Boolean;
 begin
   Result := RGetBool(R_EIOS, ref, MODEL_FITSSINGLETILE);
@@ -166,116 +182,189 @@ begin
   Result := RGetInt(R_EIOS, ref, RENDERABLE_MODELHEIGHT);
 end;
 
-Function RSModel.Bounds: Array of TVector;
-var
-  I: Int32;
-  Orientation: Int32;
-  xMin, xMax: Int32;
-  yMin, yMax: Int32;
-  zMin, zMax: Int32;
-  SinAngle, CosAngle: Int32;
-  Vertices: Array[0..3] of Array of Int32;
-  VX, VY, VZ: Int32;
-  xMid, yMid, zMid: Int32;
-  xMidOffset, yMidOffset, zMidOffset: Int32;
+//Function RSModel.AABB(LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
+//var
+//  I: Int32;
+//  xMin, xMax: Int32;
+//  yMin, yMax: Int32;
+//  zMin, zMax: Int32;
+//  SinAngle, CosAngle: Int32;
+//  Vertices: Array[0..2] of Array of Int32;
+//  VX, VY, VZ: Int32;
+//  xMid, yMid, zMid: Int32;
+//  xMidOffset, yMidOffset, zMidOffset: Int32;
+//
+//  Height, BottomY, xzRadius: Int32;
+//  MagXZSq, Radius, Diameter: Int32;
+//
+//  EX, EY, EZ: Int32;
+//  X1, Y1, Z1, X2, Y2, Z2: Int32;
+//  Bounds: Array of TVector;
+//begin
+//  Vertices := self.RawVertices;
+//
+//  //Calculate Cylindrical Bounds
+//	Height := 0;
+//	BottomY := 0;
+//	xzRadius := 0;
+//
+//  For I := 0 to High(Vertices[0]) do
+//  begin
+//    VX := Vertices[0][I];
+//    VY := Vertices[1][I];
+//    VZ := Vertices[2][I];
+//
+//    Height := max(Height, -VY);
+//    BottomY := max(BottomY, VY);
+//
+//    MagXZSq := (VX * VX) + (VZ * VZ);
+//    xzRadius := max(MagXZSq, xzRadius);
+//  end;
+//
+//  xzRadius := Floor(Sqrt(xzRadius) + 0.99);
+//  Radius := Floor(Sqrt((xzRadius * xzRadius) + (Height * Height)) + 0.99);
+//  Diameter := Radius + Floor(Sqrt((xzRadius * xzRadius) + (BottomY * BottomY)) + 0.99);
+//
+//
+//  //Calculate Bounding Box..
+//  //Orientation := 0;
+//  xMin := 0; xMax := 0;
+//  yMin := 0; yMax := 0;
+//  zMin := 0; zMax := 0;
+//
+//  SinAngle := SINE[Orientation];
+//  CosAngle := COSINE[Orientation];
+//
+//  For I := 0 to High(Vertices[0]) do
+//  begin
+//    //Rotate
+//    VX := Sar(((Vertices[0][I] * CosAngle) + (Vertices[2][I] * SinAngle)), 16); //X * COSINE[Orientation] + Z * SINE[Orientation] >> 16;
+//    VZ := Vertices[1][I];
+//    VY := Sar(((Vertices[2][I] * CosAngle) - (Vertices[0][I] * SinAngle)), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
+//
+//    //Bounds
+//    xMin := min(xMin, VX);
+//    xMax := max(xMax, VX);
+//
+//    yMin := min(yMin, VY);
+//    yMax := max(yMax, VY);
+//
+//    zMin := min(zMin, VZ);
+//    zMax := max(zMax, VZ);
+//  end;
+//
+//  xMid := (xMax + xMin) div 2;
+//  yMid := (yMax + yMin) div 2;
+//  zMid := (zMax + zMin) div 2;
+//  xMidOffset := (xMax - xMin + 1) div 2;
+//  yMidOffset := (yMax - yMin + 1) div 2;
+//  zMidOffset := (zMax - zMin + 1) div 2;
+//
+//  xMidOffset := max(xMidOffset, 32);
+//  zMidOffset := max(zMidOffset, 32);
+//
+//  if (self.FitsSingleTile) then
+//  begin
+//    xMidOffset += 8;
+//    zMidOffset += 8;
+//  end;
+//
+//  //Calculate Projection
+//  X1 := xMid;
+//  Y1 := zMid;
+//  Z1 := yMid;
+//  EX := xMidOffset;
+//  EY := zMidOffset;
+//  EZ := yMidOffset;
+//
+//  X2 := X1 + EX;
+//  Y2 := Y1 + EY;
+//  Z2 := Z1 + EZ;
+//
+//  X1 -= EX;
+//  Y1 -= EY;
+//  Z1 -= EZ;
+//
+//  Bounds := [
+//      [X1, Y1, Z1], [X2, Y1, Z1], [X1, Y2, Z1], [X2, Y2, Z1],
+//      [X1, Y1, Z2], [X2, Y1, Z2], [X1, Y2, Z2], [X2, Y2, Z2]
+//  ];
+//
+//  Result := Project(Bounds, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+//end;
+//
+//Function RSModel.BoundingEdges(LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
+//var
+//  TPA: TPointArray;
+//  I, J, K, MinX, MaxX, MinY, MaxY, XS, YS: Int32;
+//  Indices: Array[0..2] of Array of Int32;
+//  FaceColours: Array of Int32;
+//  Nope: Boolean;
+//begin
+//  if self.FitsSingleTile then
+//  begin
+//    Result := self.AABB(LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+//    Exit;
+//  end;
+//
+//  TPA := Project(self.Vertices, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+//  Indices := self.RawIndices;
+//  FaceColours := self.FaceColors3;
+//
+//  For I := 0 To High(Indices[0]) do
+//  begin
+//    if FaceColours[I] = -2 then
+//      continue;
+//
+//    MinX := High(Int32);
+//    MinY := High(Int32);
+//    MaxX := Low(Int32);
+//    MaxY := Low(Int32);
+//    Nope := False;
+//
+//    For J := 0 to High(Indices) do
+//    begin
+//      K := Indices[J][I];
+//      if K >= Length(TPA) then
+//      begin
+//        Nope := True;
+//        break;
+//      end;
+//
+//      XS := TPA[K].X;
+//      YS := TPA[K].Y;
+//      if (XS = -1) or (YS = -1) then
+//      begin
+//        Nope := True;
+//        break;
+//      end;
+//
+//      MinX := Min(MinX, XS);
+//      MaxX := Max(MaxX, XS);
+//      MinY := Min(MinY, YS);
+//      MaxY := Max(MaxY, YS);
+//    end;
+//
+//    if Nope then
+//      continue;
+//
+//    MinX -= 5;
+//    MinY -= 5;
+//    MaxX += 5;
+//    MaxY += 5;
+//
+//    if (0 > maxX) or (RSClient.ViewPortWidth < minX) or (0 > maxY) or (RSClient.ViewPortHeight < minY) then
+//    begin
+//      continue;
+//    end;
+//
+//    Result += EdgeFromBox([minX, minY, maxX, maxY]);
+//  end;
+//
+//  Result := TPABorder(Result);
+//end;
 
-  Height, BottomY, xzRadius: Int32;
-  MagXZSq, Radius, Diameter: Int32;
-
-  EX, EY, EZ: Int32;
-  X1, Y1, Z1, X2, Y2, Z2: Int32;
-begin
-  Vertices := self.RawVertices;
-
-  //Calculate Cylindrical Bounds
-	Height := 0;
-	BottomY := 0;
-	xzRadius := 0;
-
-  For I := 0 to Length(Vertices) - 1 do
-  begin
-    VX := Vertices[0][I];
-    VY := Vertices[1][I];
-    VZ := Vertices[2][I];
-
-    Height := max(Height, -VY);
-    BottomY := max(BottomY, VY);
-
-    MagXZSq := (VX * VX) + (VZ * VZ);
-    xzRadius := max(MagXZSq, xzRadius);
-  end;
-
-  xzRadius := Floor(Sqrt(xzRadius + 0.99));
-  Radius := Floor(Sqrt(((xzRadius * xzRadius) + (Height * Height)) + 0.99));
-  Diameter := Radius + Floor(Sqrt(((xzRadius * xzRadius) + (BottomY * BottomY)) + 0.99));
-
-
-  //Calculate Bounding Box..
-  Orientation := 0;
-  xMin := 0; xMax := 0;
-  yMin := 0; yMax := 0;
-  zMin := 0; zMax := 0;
-
-  SinAngle := SINE[Orientation];
-  CosAngle := COSINE[Orientation];
-
-  For I := 0 to Length(Vertices) - 1 do
-  begin
-    //Rotate
-    VX := Sar(((Vertices[0][I] * CosAngle) + (Vertices[2][I] * SinAngle)), 16); //X * COSINE[Orientation] + Z * SINE[Orientation] >> 16;
-    VZ := Vertices[1][I];
-    VY := Sar(((Vertices[2][I] * COSINE[Orientation]) - (Vertices[0][I] * SINE[Orientation])), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
-
-    //Bounds
-    xMin := min(xMin, VX);
-    xMax := max(xMax, VX);
-
-    yMin := min(yMin, VY);
-    yMax := max(yMax, VY);
-
-    zMin := min(zMin, VZ);
-    zMax := max(zMax, VZ);
-  end;
-
-  xMid := (xMax + xMin) div 2;
-  yMid := (yMax + yMin) div 2;
-  zMid := (zMax + zMin) div 2;
-  xMidOffset := (xMax - xMin + 1) div 2;
-  yMidOffset := (yMax - yMin + 1) div 2;
-  zMidOffset := (zMax - zMin + 1) div 2;
-
-  xMidOffset := max(xMidOffset, 32);
-  zMidOffset := max(zMidOffset, 32);
-
-  if (self.FitsSingleTile) then
-  begin
-    xMidOffset += 8;
-    zMidOffset += 8;
-  end;
-
-  //Calculate Projection
-  X1 := xMid;
-  Y1 := zMid;
-  Z1 := yMid;
-  EX := xMidOffset;
-  EY := zMidOffset;
-  EZ := yMidOffset;
-
-  X2 := X1 + EX;
-  Y2 := Y1 + EY;
-  Z2 := Z1 + EZ;
-
-  X1 -= EX;
-  Y1 -= EY;
-  Z1 -= EZ;
-
-  Result := [
-      [X1, Y1, Z1], [X2, Y1, Z1], [X1, Y2, Z1], [X2, Y2, Z1],
-      [X1, Y1, Z2], [X2, Y1, Z2], [X1, Y2, Z2], [X2, Y2, Z2]
-  ];
-end;
-
-Procedure RSModel.Scale(var Vertices: Array[0..3] of Array of Int32; Scales: TVector); static;
+Procedure RSModel.Scale(var Vertices: Array[0..2] of Array of Int32; Scales: TVector); static;
 var
   I: Int32;
 begin

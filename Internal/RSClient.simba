@@ -284,12 +284,27 @@ begin
   RFreeObjects(R_EIOS, SY);
 end;
 
-Function RSClient.IsResizeable: Boolean; static;
+Function RSClient.IsResizable: Boolean; static;
 var
   W, H: Int32;
 begin
+  if RGetStaticBool(R_EIOS, CLIENT_RESIZABLE) then
+  begin
+    {
+
+    if RSClient.GetVarbit(4067) = 0 then
+    begin
+      // RESIZABLE_CLASSIC
+    end else
+      begin
+        //RESIZABLE_MODERN
+      end;
+    }
+    Exit(True);
+  end;
+
   GetClientDimensions(W, H);
-  Result := (W <> 765) or (H <> 503);
+  Result := False; //(W <> 765) or (H <> 503);
 end;
 
 Function RSClient.GetVarBit(ID: Int32): Int32; static;

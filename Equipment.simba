@@ -196,7 +196,7 @@ begin
   { Game Tab }
   if RSWidget.IsValid(R_INTERFACE_EQUIPMENT_CONTAINER.Group, R_INTERFACE_EQUIPMENT_CONTAINER.Child) then
   begin
-    if RSClient.IsResizeable then
+    if RSClient.IsResizable then
     begin
       Widget := RSWidget.Get(R_GAMETAB_FIXED_EQUIPMENT.Group, R_GAMETAB_FIXED_EQUIPMENT.Child);
       if Widget.ref <> nil then
@@ -207,7 +207,7 @@ begin
       end;
     end else
       begin
-        Widget := RSWidget.Get(R_GAMETAB_RESIZEABLE_EQUIPMENT.Group, R_GAMETAB_RESIZEABLE_EQUIPMENT.Child);
+        Widget := RSWidget.Get(R_GAMETAB_RESIZABLE_EQUIPMENT.Group, R_GAMETAB_RESIZABLE_EQUIPMENT.Child);
         if Widget.ref <> nil then
         begin
           Result := Widget.TextureID <> -1; // = 1030

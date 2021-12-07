@@ -208,6 +208,7 @@ Model_TexVerticesY: THook =                       ['hl', 'c', '[I', 1];
 Model_TexVerticesZ: THook =                       ['hl', 'f', '[I', 1];
 Model_TexVerticesLength: THook =                  ['hl', 'r', 'I', 1];
 Model_Skins: THook =                              ['hl', 'h', '[[I', 1];
+Model_FaceColors3: THook =                        ['hl', 'l', '[I', 1];
 Model_ShadowIntensity: THook =                    ['hl', 'al', 'I', 1];
 Model_FitsSingleTile: THook =                     ['hl', 'ag', 'Z', 1];
 

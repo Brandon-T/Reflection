@@ -227,7 +227,7 @@ begin
     Result.X := Sar((X * CosA) + (Y * SinA), 16);  // + (mm_location.x + mm_width / 2)
     Result.Y := Sar((X * SinA) - (Y * CosA), 16);  // + (mm_location.y + mm_height / 2)
 
-    if RSClient.IsResizeable then
+    if RSClient.IsResizable then
     begin
       GetClientDimensions(W, H);
       Result.X += (W - 82);   //MM.Center.X = 82 from the right.
