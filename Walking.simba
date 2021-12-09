@@ -72,7 +72,7 @@ var
   Temp: TPointArray;
 begin
   GetClientDimensions(W, H);
-  if RSClient.IsResizeable then
+  if RSClient.IsResizable then
   begin
     MMCX := (W - 82);   //From RSTile.
     MMCY := 84;
