@@ -288,7 +288,7 @@ Function RSClient.IsResizable: Boolean; static;
 var
   W, H: Int32;
 begin
-  if RGetStaticBool(R_EIOS, CLIENT_RESIZABLE) then
+  if RGetStaticBool(R_EIOS, CLIENT_ISRESIZABLE) then
   begin
     {
 
