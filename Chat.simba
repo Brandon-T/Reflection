@@ -124,8 +124,15 @@ Example:
       ...
 *}
 Function R_ChatChooseOptionIsOpen: Boolean;
+var
+  Widget: RSWidget;
 begin
-  Result := RSWidget.Get(R_CHATBOX_NPC_DIALOG_OPTION.Group, R_CHATBOX_NPC_DIALOG_OPTION.Child).ref <> nil;
+  Widget := RSWidget.Get(R_CHATBOX_NPC_DIALOG_OPTION.Group, R_CHATBOX_NPC_DIALOG_OPTION.Child);
+  Result := Widget.ref <> nil;
+  if Result then
+  begin
+    Widget.Free;
+  end;
 end;  
 
 {*

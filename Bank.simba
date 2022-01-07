@@ -537,7 +537,7 @@ begin
   BankBounds := TabContainer.Bounds;
   TabContainer.Free;
 
-  Result := BankBounds.Contains(TabContainer.Bounds);
+  Result := BankBounds.Contains(TabWidget.Bounds);
   TabWidget.Free;
 end;
 
@@ -600,7 +600,7 @@ begin
   //Scroll the interface using the mouse-wheel
   if ScrollType = RSScroll.SCROLLWHEEL then
   begin
-    Mouse.Move(ItemContainerBounds);
+    Mouse.Move(ItemContainerBounds, True);
 
     T.Start;
     while not ItemContainerBounds.Contains(R_BankSlotToBox(Index)) do
@@ -621,7 +621,7 @@ begin
     if ScrollBar.ref = nil then
       Exit(False);
 
-    Mouse.Move(ScrollBar.Bounds);
+    Mouse.Move(ScrollBar.Bounds, True);
     Mouse.Click(MOUSE_LEFT);
     Mouse.Hold(MOUSE_LEFT);
     ScrollBar.Free;
@@ -660,7 +660,7 @@ begin
     if ScrollArrow.ref = nil then
       Exit(False);
 
-    Mouse.Move(ScrollArrow.Bounds);
+    Mouse.Move(ScrollArrow.Bounds, True);
     Mouse.Click(MOUSE_LEFT);
     Mouse.Hold(MOUSE_LEFT);
     ScrollArrow.Free;
@@ -987,18 +987,21 @@ begin
   if Item.ID = -1 then
     Exit(False);
 
-  if Item.Slot = 0 then
+  if R_CurrentBankTab <> Item.Tab then
+  begin
+    if not R_SelectBankTab(Item.Tab) then
+      Exit(False);
+  end;
+
+  Item := R_FindBankItem(ID);
+  if Item.ID = -1 then
+    Exit(False);
+
+  if not R_BankSlotVisible(Item.Slot) then
   begin
     if not R_ScrollToBankSlot(Item.Slot, RSScroll.SCROLLWHEEL) then
       Exit(False);
-  end else
-    begin
-      if R_CurrentBankTab <> Item.Tab then
-      begin
-        if not R_SelectBankTab(Item.Tab) then
-          Exit(False);
-      end;
-    end;
+  end;
 
   Item := R_FindBankItem(ID);
   if Item.ID = -1 then
@@ -1006,7 +1009,7 @@ begin
 
   if Amount = 0 then
   begin
-    Mouse.Move(Item.Bounds);
+    Mouse.Move(Item.Bounds, True);
     if R_WaitUptext(['Withdraw-All'], True, RandomRange(500, 800)) then
     begin
       Mouse.Click(Item.Bounds, MOUSE_LEFT);
@@ -1020,12 +1023,12 @@ begin
 
   if Amount = -1 then
   begin
-    Mouse.Click(Item.Bounds, MOUSE_RIGHT);
+    Mouse.Click(Item.Bounds, MOUSE_RIGHT, True);
     Wait(50 + RandomRange(50, 100));
     Exit(R_ChooseOptions(['Withdraw-All-but-1']));
   end;
 
-  Mouse.Move(Item.Bounds);
+  Mouse.Move(Item.Bounds, True);
   Wait(50 + RandomRange(50, 100));
   if R_WaitUptext(['Withdraw-' + IntToStr(Amount)], True, RandomRange(200, 300)) then
   begin

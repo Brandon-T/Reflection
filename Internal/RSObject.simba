@@ -120,6 +120,16 @@ begin
   Result := (self.Hash shr 17) and $FFFFFFFF;
 end;
 
+Function RSObject.Flags: Int32; constref;
+begin
+  case self.ObjectType of
+      GAME_OBJECT: Result := RGetInt(R_EIOS, ref, GAMEOBJECT_FLAGS);
+      WALL_DECORATION: Result := RGetInt(R_EIOS, ref, WALLDECORATION_FLAGS);
+      BOUNDARY_OBJECT: Result := RGetInt(R_EIOS, ref, BOUNDARYOBJECT_FLAGS);
+      FLOOR_DECORATION: Result := RGetInt(R_EIOS, ref, FLOORDECORATION_FLAGS);
+    end;
+end;
+
 Function RSObject.LocalTile: RSTile; constref;
 begin
   case self.ObjectType of
@@ -151,6 +161,36 @@ begin
   Result := self.LocalTile;
   Result.X := RSClient.BaseX + Result.X div 128;
   Result.Y := RSClient.BaseY + Result.Y div 128;
+end;
+
+Function RSObject.Orientation: Int32; constref;
+var
+  Orientation, Rotation: Int32;
+begin
+  case self.ObjectType of
+    GAME_OBJECT:
+      begin
+        Orientation := RGetInt(R_EIOS, ref, GAMEOBJECT_ORIENTATION);
+		    Rotation := Sar(self.Flags, 6) and 3;
+		    Result := Rotation * 512 + Orientation;
+      end;
+    WALL_DECORATION:
+      begin
+        Orientation := RGetInt(R_EIOS, ref, WALLDECORATION_ORIENTATION);
+        Rotation := Sar(self.Flags, 6) and 3;
+		    Result := Rotation * 512 + Orientation;
+      end;
+    BOUNDARY_OBJECT:
+      begin
+        Orientation := RGetInt(R_EIOS, ref, BOUNDARYOBJECT_ORIENTATION);
+        Rotation := Sar(self.Flags, 6) and 3;
+		    Result := Rotation * 512 + Orientation;
+      end;
+    FLOOR_DECORATION:
+      begin
+        Result := -1;
+      end;
+  end;
 end;
 
 Function RSObject.Definition: RSObjectDefinition; constref;

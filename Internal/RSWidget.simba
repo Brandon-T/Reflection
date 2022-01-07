@@ -253,6 +253,40 @@ begin
   RFreeObject(R_EIOS, Children);
 end;
 
+Function RSWidget.StaticChildren: Array of RSWidget; constref;
+begin
+  if self.ParentID = self.ID then
+  begin
+    // Dynamic Widget
+    Exit;
+  end;
+
+  Result := RSWidget.Widgets(self.GroupID);
+end;
+
+Function RSWidget.NestedChildren: Array of RSWidget; constref;
+var
+  I: Int32;
+  HashTable: RSHashTable;
+  WidgetNode: RSWidgetNode;
+  Garbage: RSTypeArray;
+begin
+  HashTable.ref := RGetStaticObject(R_EIOS, CLIENT_WIDGETNODECACHE);
+  if HashTable.ref = nil then
+  begin
+    Exit;
+  end;
+
+  WidgetNode.ref := HashTable.GetObject(Self.ID).ref;
+  if WidgetNode.ref <> nil then
+  begin
+    Result := RSWidget.Widgets(WidgetNode.ID);
+    WidgetNode.Free;
+  end;
+
+  HashTable.Free;
+end;
+
 Function RSWidget.Children: Array of RSWidget; constref;
 var
   Children: Pointer;
