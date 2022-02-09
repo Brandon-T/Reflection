@@ -32,6 +32,7 @@ type
 
   TBankLocation = (
     LUMBRIDGE,
+    DRAYNOR,
     VARROCK_WEST,
     VARROCK_EAST,
     GRAND_EXCHANGE,
@@ -45,7 +46,9 @@ type
     DUEL_ARENA,
     CASTLE_WARS,
     YANILLE,
-    PORT_KHAZARD
+    PORT_KHAZARD,
+    BLAST_FURNACE,
+    WOODCUTTING_GUILD
   );
 
 {$scopedenums on}
@@ -63,6 +66,9 @@ begin
   case Location of
     TBankLocation.LUMBRIDGE:
       Result := [[3208, 3221], [3209, 3221]];
+
+    TBankLocation.DRAYNOR:
+      Result := [[3091, 3245], [3091, 3243], [3091, 3242]];
 
     TBankLocation.VARROCK_WEST:
       Result := [[3186, 3444], [3186, 3442], [3186, 3440], [3186, 3438], [3186, 3436]];
@@ -105,6 +111,12 @@ begin
 
     TBankLocation.PORT_KHAZARD:
       Result := [[2661, 3163]];
+
+    TBankLocation.BLAST_FURNACE:
+      Result := [[1948, 4956]];
+
+    TBankLocation.WOODCUTTING_GUILD:
+      Result := [[1592, 3475]];
   end;
 end;
 
@@ -130,6 +142,7 @@ begin
     TBankLocation.FALADOR_EAST:
       Result := [24101, 27253];
 
+    TBankLocation.DRAYNOR,
     TBankLocation.EDGEVILLE,
     TBankLocation.AL_KHARID:
       Result := [10355];
@@ -150,8 +163,12 @@ begin
     TBankLocation.YANILLE:
       Result := [10356, 10355];
 
-    TBankLocation.PORT_KHAZARD:
+    TBankLocation.PORT_KHAZARD,
+    TBankLocation.BLAST_FURNACE:
       Result := [26707];
+
+    TBankLocation.WOODCUTTING_GUILD:
+      Result := [28861];
   end;
 end;
   
@@ -167,6 +184,7 @@ begin
       Result := BOUNDARY_OBJECT;
 
     TBankLocation.LUMBRIDGE,
+    TBankLocation.DRAYNOR,
     TBankLocation.CAMELOT,
     TBankLocation.EDGEVILLE,
     TBankLocation.AL_KHARID,
@@ -179,7 +197,9 @@ begin
     TBankLocation.VARROCK_WEST,
     TBankLocation.VARROCK_EAST,
     TBankLocation.ARDOUGNE_NORTH,
-    TBankLocation.ARDOUGNE_SOUTH:
+    TBankLocation.ARDOUGNE_SOUTH,
+    TBankLocation.BLAST_FURNACE,
+    TBankLocation.WOODCUTTING_GUILD:
       Result := GAME_OBJECT;
   end;
 end;
@@ -195,7 +215,8 @@ begin
     TBankLocation.GRAND_EXCHANGE:
       Result := ["Bank Grand Exchange booth"];
 
-    TBankLocation.LUMBRIDGE,
+    TBankLocation.LUMBRIDGE, 
+    TBankLocation.DRAYNOR,
     TBankLocation.CAMELOT,
     TBankLocation.EDGEVILLE,
     TBankLocation.AL_KHARID, 
@@ -212,7 +233,9 @@ begin
       Result := ["Bank Open chest"];
 
     TBankLocation.CASTLE_WARS,
-    TBankLocation.PORT_KHAZARD:
+    TBankLocation.PORT_KHAZARD,
+    TBankLocation.BLAST_FURNACE,
+    TBankLocation.WOODCUTTING_GUILD:
       Result := ["Use Bank chest"];
   end;
 end;
