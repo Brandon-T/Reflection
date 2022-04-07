@@ -266,10 +266,8 @@ end;
 
 Function RSWidget.NestedChildren: Array of RSWidget; constref;
 var
-  I: Int32;
   HashTable: RSHashTable;
   WidgetNode: RSWidgetNode;
-  Garbage: RSTypeArray;
 begin
   HashTable.ref := RGetStaticObject(R_EIOS, CLIENT_WIDGETNODECACHE);
   if HashTable.ref = nil then
