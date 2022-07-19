@@ -206,7 +206,7 @@ Procedure VerifyRemoteInputPlugins;
 begin
   If Not DownloadOrCheckRequiredPlugins then
   begin
-    RaiseException('Could not verify or install RemoteInput plugins.\nPlease Visit: https://github.com/' + REFLECTION_REPO_USERNAME + 'Reflection/releases');
+    RaiseException('Could not verify or install RemoteInput plugins.'#13#10'Please Visit: https://github.com/' + REFLECTION_REPO_USERNAME + '/Reflection/releases');
   end;
 end;
 
@@ -215,7 +215,7 @@ Procedure VerifyReflectionInclude;
 begin
   If Not IsReflectionUpToDate then
   begin
-    RaiseException('Could not verify or install Reflection Include.\nPlease Visit: https://github.com/' + REFLECTION_REPO_USERNAME + 'Reflection');
+    RaiseException('Could not verify or install Reflection Include.'#13#10'Please Visit: https://github.com/' + REFLECTION_REPO_USERNAME + '/Reflection');
   end;
 end;
 {$ENDIF}

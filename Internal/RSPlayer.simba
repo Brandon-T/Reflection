@@ -59,7 +59,7 @@ end;
 
 Function RSPlayer.IsVisible: Boolean; constref;
 begin
-  Result := RGetBool(R_EIOS, ref, PLAYER_VISIBLE);
+  Result := not RGetBool(R_EIOS, ref, PLAYER_ISHIDDEN);
 end;
 
 Function RSPlayer.Definition: RSPlayerDefinition; constref;
