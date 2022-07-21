@@ -174,7 +174,7 @@ begin
       begin
         if ItemIDs[I] = ID then
         begin
-          if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+          if false {InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER} then
           begin
             Columns := Widget.Width;
             Row := I div Columns;
@@ -259,7 +259,7 @@ begin
 
       if Index < Length(ItemIDs) then
       begin
-        if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+        if false {InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER} then
         begin
           Columns := Widget.Width;
           Row := Index div Columns;
@@ -338,7 +338,7 @@ begin
       begin
         if ItemIDs[I] <> -1 then
         begin
-          if InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER then
+          if false {InventoryID = R_BACKPACK_INVENTORY_ITEM_CONTAINER} then
           begin
             Columns := Widget.Width;
             Row := I div Columns;
