@@ -273,7 +273,6 @@ Actor_CombatCycle: THook =                        ['cs', 'N/A', 'N/A', 1];
 Actor_InteractingIndex: THook =                   ['cs', 'br', 'I', -766757299];
 Actor_Orientation: THook =                        ['cs', 'cv', 'I', 877961797];
 Actor_IsWalking: THook =                          ['cs', 'al', 'Z', 1];
-Actor_TargetIndex: THook =                        ['cs', 'br', 'I', -766757299];
 Actor_CombatInfoList: THook =                     ['cs', 'bp', 'Lln;', 1];
 Actor_SpotAnimation: THook =                      ['cs', 'ch', 'I', -1452307989];
 Actor_SpotAnimationFrame: THook =                 ['cs', 'cd', 'I', 2035761433];
