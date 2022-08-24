@@ -659,7 +659,7 @@ begin
   if (not R_SkillMenu) or (R_WidgetIsHidden(OptionButton)) then
     Exit(False);
 
-  WidgetKey := RSWidget.Get(OptionKey.Group, OptionKey.Child, OptionKey.Index);
+  WidgetKey := RSWidget.Get(OptionKey.Group, OptionKey.Child, -1);
   if WidgetKey.ref <> nil then
   begin
     Widgets += WidgetKey;

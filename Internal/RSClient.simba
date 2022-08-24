@@ -292,7 +292,7 @@ begin
   begin
     {
 
-    if RSClient.GetVarbit(4067) = 0 then
+    if RSClient.GetVarbit(4607) = 0 then
     begin
       // RESIZABLE_CLASSIC
     end else

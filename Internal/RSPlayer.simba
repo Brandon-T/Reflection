@@ -93,7 +93,7 @@ begin
   Result.Y := Y + RSClient.BaseY;
 end;
 
-Function RSPlayer.IsMoving: Boolean;
+Function RSPlayer.IsMoving: Boolean; constref
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_QUEUESIZE) > 0;
 end;

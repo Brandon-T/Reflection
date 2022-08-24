@@ -151,12 +151,12 @@ begin
   RFreeObjects(R_EIOS, SY);
 end;
 
-Function RSRegion.SceneTile(X, Y, Z: Int32): RSSceneTile; constref;
+Function RSRegion.SceneTile(Plane, X, Y: Int32): RSSceneTile; constref;
 var
   Tiles: Pointer;
 begin
   Tiles := RGetArray(R_EIOS, ref, REGION_SCENETILES);
-  Result.ref := RGetObjectArray3D(R_EIOS, Tiles, X, Y, Z);
+  Result.ref := RGetObjectArray3D(R_EIOS, Tiles, Plane, X, Y);
   RFreeObject(R_EIOS, Tiles);
 end;
 
