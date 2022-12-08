@@ -33,7 +33,7 @@ var
   ObjectsSize: SizeUInt;
 begin
   ObjectsSize := 0;
-  Objects := RGetArray(R_EIOS, ref, ObjectsSize, SCENETILE_GAMEOBJECT);
+  Objects := RGetArray(R_EIOS, ref, ObjectsSize, SCENETILE_GAMEOBJECTS);
   if (Objects = nil) or (ObjectsSize = 0) then
     Exit;
 
@@ -51,7 +51,7 @@ var
   TilePlane: Int32;
 begin
   ObjectsSize := 0;
-  Objects := RGetArray(R_EIOS, ref, ObjectsSize, SCENETILE_GAMEOBJECT);
+  Objects := RGetArray(R_EIOS, ref, ObjectsSize, SCENETILE_GAMEOBJECTS);
   if Objects = nil then
     Exit;
 
