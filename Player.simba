@@ -251,6 +251,13 @@ begin
     Result := -1;
 end;
 
+Function R_CameraAngle: Int32;
+begin
+  //UNIT := (PI / 1024.0); //Number of RS Units in a Circle.
+  //Result := Round(RSCamera.Yaw * (PI / 1024.0) * (180.0 / PI));
+  Result := Round(RSCamera.Yaw * (45.0 / 256.0));
+end;
+
 
 {*
 R_SetCameraAngle

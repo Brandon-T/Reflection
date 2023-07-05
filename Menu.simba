@@ -23,15 +23,21 @@ begin
     Actions := RSClient.MenuActions;
     Options := RSClient.MenuOptions;
 
-    for I := Count - 1 downto 0 do
+    Count := Min(Count, Length(Actions));
+    Count := Min(Count, Length(Options));
+
+    if Count > 0 then
     begin
-      Action := StripHTML(Actions[I]);
-      Option := StripHTML(Options[I]);
+      for I := Count - 1 downto 0 do
+      begin
+        Action := StripHTML(Actions[I]);
+        Option := StripHTML(Options[I]);
 
-      if (Length(Action) = 0) and (Length(Option) = 0) then
-        break;
+        if (Length(Action) = 0) and (Length(Option) = 0) then
+          break;
 
-      Result += Trim(Action + ' ' + Option);
+        Result += Trim(Action + ' ' + Option);
+      end;
     end;
   end;
 end;

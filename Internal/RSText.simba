@@ -31,6 +31,7 @@ Function StripHTML(Str: String): String;
 var
   It, Jt: Int32;
 begin
+  Str := Str.Replace('<br>', ' ', [rfReplaceAll]);
   It := Pos( '<', Str);
 
   while (It <> 0) do

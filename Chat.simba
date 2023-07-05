@@ -92,6 +92,44 @@ begin
 end;
 
 {*
+R_ChatDialogText
+~~~~~~~~~~~~~~~~~~~~~~
+Returns the chat dialog text.
+
+Example:
+    writeln(R_ChatDialogText);
+      ...
+*}
+Function R_ChatDialogText: String;
+var
+  Dialog: RSWidget;
+begin
+  Dialog := RSWidget.Get(R_INTERFACE_CHAT_DIALOG_TEXT.Group, R_INTERFACE_CHAT_DIALOG_TEXT.Child);
+  if Dialog.ref <> nil then
+  begin
+    Result := Dialog.Text;
+    Dialog.Free;
+    Exit;
+  end;
+
+  Dialog := RSWidget.Get(R_CHATBOX_NPC_TEXT.Group, R_CHATBOX_NPC_TEXT.Child);
+  if Dialog.ref <> nil then
+  begin
+    Result := Dialog.Text;
+    Dialog.Free;
+    Exit;
+  end;
+
+  Dialog := RSWidget.Get(R_CHATBOX_PLAYER_TEXT.Group, R_CHATBOX_PLAYER_TEXT.Child);
+  if Dialog.ref <> nil then
+  begin
+    Result := Dialog.Text;
+    Dialog.Free;
+    Exit;
+  end;
+end;
+
+{*
 R_ChatInput
 ~~~~~~~~~~~~~~~~~~~~~~
 Returns true if the chat input option is open (Chat screen with '*').
@@ -144,7 +182,7 @@ Example:
     if R_ChatChooseOption(['Yes']) then
       ...
 *}
-Function R_ChatChooseOption(options: Array of String; caseSensitive: Boolean = True): Boolean;
+Function R_ChatChooseOption(options: Array of String; caseSensitive: Boolean = True; useMouse: Boolean = True): Boolean;
 var
   I, J: Int32;
   Dialog: RSWidget;
@@ -167,7 +205,13 @@ begin
       begin
         if (caseSensitive and (Pos(Options[J], Title) > 0)) or (not caseSensitive and (Pos(Lowercase(Options[J]), Lowercase(Title)) > 0)) then
         begin
-          Mouse.Click(Items[I].Bounds, MOUSE_LEFT);
+          if useMouse then
+          begin
+            Mouse.Click(Items[I].Bounds, MOUSE_LEFT);
+          end else
+            begin
+              Keyboard.Send(ToStr(I));
+            end;
           RSTypeArray(Items).Free;
           Exit(True);
         end;
@@ -202,7 +246,7 @@ Example:
     if R_ClickToContinue then
       ...
 *}
-Function R_ClickToContinue: Boolean;
+Function R_ClickToContinue(useMouse: Boolean = True): Boolean;
 var
   FoundWidget: RSWidget;
   EachWidget : RWidget;
@@ -217,13 +261,23 @@ begin
     R_INTERFACE_NEW_ACTIONS_CONTINUE
   ];
 
-  for EachWidget in WidgetsToCheck do begin
+  for EachWidget in WidgetsToCheck do
+  begin
     FoundWidget := RSWidget.Get(EachWidget.Group, EachWidget.Child);
-    if FoundWidget.ref <> nil then begin
-      if Result then begin
+    if FoundWidget.ref <> nil then
+    begin
+      if Result then
+      begin
         Wait(216, Random(300, 626));
       end;
-      Mouse.Click(FoundWidget.Bounds, MOUSE_LEFT);
+
+      if useMouse then
+      begin
+        Mouse.Click(FoundWidget.Bounds, MOUSE_LEFT);
+      end else
+        begin
+          Keyboard.PressKey(VK_SPACE);
+        end;
       FoundWidget.Free;
       Result := True;
     end;
