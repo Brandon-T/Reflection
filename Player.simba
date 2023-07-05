@@ -2,7 +2,6 @@
 {$include_once Constants.simba}
 {$include_once Mainscreen.simba}
 {$include_once Worlds.simba}
-{$include_once srl/utils.simba}
 
 (*
 PLAYER

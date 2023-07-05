@@ -1,3 +1,7 @@
+{$IFNDEF SRL_UTILS}
+{$include_once srl/utils.simba}
+{$ENDIF}
+
 type
   RWidget = record
     Group: Int16;

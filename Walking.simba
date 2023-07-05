@@ -4,7 +4,6 @@
 {$include_once GameTab.simba}
 {$include_once Login.simba}
 {$include_once Menu.simba}
-{$include_once srl/utils.simba}
 
 {*
 R_TileToMM
