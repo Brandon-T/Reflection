@@ -86,11 +86,6 @@ begin
   result := RIGetArraySize(eios, instance);
 end;
 
-Function RGetStaticArraySize(eios: Pointer; index: SizeUInt): SizeUInt; overload;
-begin
-  result := RIGetArraySize(eios, nil, index);
-end;
-
 
 // MARK: - Array of 1-Dimension
 
@@ -98,66 +93,66 @@ Function RGetStaticBoolArray(eios: Pointer; index: SizeUInt): Boolean;
 type
   PBool = ^Boolean;
 begin
-  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, index))^;
+  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BOOLEAN, index))^;
 end;
 
 Function RGetStaticCharArray(eios: Pointer; index: SizeUInt): Char;
 begin
-  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_CHAR, index))^;
+  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionType.RI_CHAR, index))^;
 end;
 
 Function RGetStaticByteArray(eios: Pointer; index: SizeUInt): Byte;
 type
   PByte = ^Byte;
 begin
-  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BYTE, index))^;
+  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BYTE, index))^;
 end;
 
 Function RGetStaticShortArray(eios: Pointer; index: SizeUInt): Int16;
 type
   PShort = ^Int16;
 begin
-  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_SHORT, index))^;
+  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionType.RI_SHORT, index))^;
 end;
 
 Function RGetStaticIntArray(eios: Pointer; index: SizeUInt): Int32;
 type
   PInt = ^Int32;
 begin
-  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_INT, index))^;
+  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionType.RI_INT, index))^;
 end;
 
 Function RGetStaticLongArray(eios: Pointer; index: SizeUInt): Int64;
 type
   PLong = ^Int64;
 begin
-  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_LONG, index))^;
+  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionType.RI_LONG, index))^;
 end;
 
 Function RGetStaticFloatArray(eios: Pointer; index: SizeUInt): Single;
 type
   PFloat = ^Single;
 begin
-  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_FLOAT, index))^;
+  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionType.RI_FLOAT, index))^;
 end;
 
 Function RGetStaticDoubleArray(eios: Pointer; index: SizeUInt): Double;
 type
   PDouble = ^Double;
 begin
-  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_DOUBLE, index))^;
+  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionType.RI_DOUBLE, index))^;
 end;
 
 Function RGetStaticStringArray(eios: Pointer; index: SizeUInt): String;
 type
   PString = ^String;
 begin
-  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_STRING, index))^;
+  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionType.RI_STRING, index))^;
 end;
 
 Function RGetStaticObjectArray(eios: Pointer; index: SizeUInt): Pointer;
 begin
-  Result := RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_OBJECT, index);
+  Result := RIGetArraySingleElement(eios, nil, ReflectionType.RI_OBJECT, index);
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -167,133 +162,133 @@ Function RGetStaticBoolArray(eios: Pointer; index: SizeUInt; count: SizeUInt): a
 type
   TBooleanArray = array of Boolean;
 begin
-  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, index, count));
+  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BOOLEAN, index, count));
 end;
 
 Function RGetStaticBoolArray(eios: Pointer; indices: Array of Int32): array of Boolean; overload;
 type
   TBooleanArray = array of Boolean;
 begin
-  Result := TBooleanArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_BOOLEAN, indices));
+  Result := TBooleanArray(RIGetArrayElements(eios, nil, ReflectionType.RI_BOOLEAN, indices));
 end;
 
 Function RGetStaticCharArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Char; overload;
 type
   TCharArray = array of Char;
 begin
-  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_CHAR, index, count));
+  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionType.RI_CHAR, index, count));
 end;
 
 Function RGetStaticCharArray(eios: Pointer; indices: Array of Int32): array of Char; overload;
 type
   TCharArray = array of Char;
 begin
-  Result := TCharArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_CHAR, indices));
+  Result := TCharArray(RIGetArrayElements(eios, nil, ReflectionType.RI_CHAR, indices));
 end;
 
 Function RGetStaticByteArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Byte; overload;
 type
   TByteArray = array of Byte;
 begin
-  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BYTE, index, count));
+  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BYTE, index, count));
 end;
 
 Function RGetStaticByteArray(eios: Pointer; indices: Array of Int32): array of Byte; overload;
 type
   TByteArray = array of Byte;
 begin
-  Result := TByteArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_BYTE, indices));
+  Result := TByteArray(RIGetArrayElements(eios, nil, ReflectionType.RI_BYTE, indices));
 end;
 
 Function RGetStaticShortArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Int16; overload;
 type
   TShortArray = array of Int16;
 begin
-  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_SHORT, index, count));
+  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionType.RI_SHORT, index, count));
 end;
 
 Function RGetStaticShortArray(eios: Pointer; indices: Array of Int32): array of Int16; overload;
 type
   TShortArray = array of Int16;
 begin
-  Result := TShortArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_SHORT, indices));
+  Result := TShortArray(RIGetArrayElements(eios, nil, ReflectionType.RI_SHORT, indices));
 end;
 
 Function RGetStaticIntArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Int32; overload;
 type
   TIntArray = array of Int32;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_INT, index, count));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_INT, index, count));
 end;
 
 Function RGetStaticIntArray(eios: Pointer; indices: Array of Int32): array of Int32; overload;
 type
   TIntArray = array of Int32;
 begin
-  Result := TIntArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_INT, indices));
+  Result := TIntArray(RIGetArrayElements(eios, nil, ReflectionType.RI_INT, indices));
 end;
 
 Function RGetStaticLongArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Int64; overload;
 type
   TIntArray = array of Int64;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_LONG, index, count));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_LONG, index, count));
 end;
 
 Function RGetStaticLongArray(eios: Pointer; indices: Array of Int32): array of Int64; overload;
 type
   TIntArray = array of Int64;
 begin
-  Result := TIntArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_LONG, indices));
+  Result := TIntArray(RIGetArrayElements(eios, nil, ReflectionType.RI_LONG, indices));
 end;
 
 Function RGetStaticFloatArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Single; overload;
 type
   TFloatArray = array of Single;
 begin
-  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_FLOAT, index, count));
+  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionType.RI_FLOAT, index, count));
 end;
 
 Function RGetStaticFloatArray(eios: Pointer; indices: Array of Int32): array of Single; overload;
 type
   TFloatArray = array of Single;
 begin
-  Result := TFloatArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_FLOAT, indices));
+  Result := TFloatArray(RIGetArrayElements(eios, nil, ReflectionType.RI_FLOAT, indices));
 end;
 
 Function RGetStaticDoubleArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Double; overload;
 type
   TDoubleArray = array of Double;
 begin
-  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_DOUBLE, index, count));
+  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionType.RI_DOUBLE, index, count));
 end;
 
 Function RGetStaticDoubleArray(eios: Pointer; indices: Array of Int32): array of Double; overload;
 type
   TDoubleArray = array of Double;
 begin
-  Result := TDoubleArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_DOUBLE, indices));
+  Result := TDoubleArray(RIGetArrayElements(eios, nil, ReflectionType.RI_DOUBLE, indices));
 end;
 
 Function RGetStaticStringArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of String; overload;
 type
   TStringArray = array of String;
 begin
-  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_STRING, index, count));
+  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionType.RI_STRING, index, count));
 end;
 
 Function RGetStaticStringArray(eios: Pointer; indices: Array of Int32): array of String; overload;
 type
   TStringArray = array of String;
 begin
-  Result := TStringArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_STRING, indices));
+  Result := TStringArray(RIGetArrayElements(eios, nil, ReflectionType.RI_STRING, indices));
 end;
 
 Function RGetStaticObjectArray(eios: Pointer; index: SizeUInt; count: SizeUInt): array of Pointer; overload;
 type
   TObjectArray = array of Pointer;
 begin
-  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_OBJECT, index, count));
+  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionType.RI_OBJECT, index, count));
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -303,7 +298,7 @@ Function RGetStaticObjectArray(eios: Pointer; indices: Array of Int32): array of
 type
   TObjectArray = array of Pointer;
 begin
-  Result := TObjectArray(RIGetArrayElements(eios, nil, ReflectionArrayType.RI_OBJECT, indices));
+  Result := TObjectArray(RIGetArrayElements(eios, nil, ReflectionType.RI_OBJECT, indices));
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -316,66 +311,66 @@ Function RGetStaticBoolArray2D(eios: Pointer; x, y: Int32): Boolean;
 type
   PBool = ^Boolean;
 begin
-  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, x, y))^;
+  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BOOLEAN, x, y))^;
 end;
 
 Function RGetStaticCharArray2D(eios: Pointer; x, y: Int32): Char;
 begin
-  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_CHAR, x, y))^;
+  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionType.RI_CHAR, x, y))^;
 end;
 
 Function RGetStaticByteArray2D(eios: Pointer; x, y: Int32): Byte;
 type
   PByte = ^Byte;
 begin
-  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BYTE, x, y))^;
+  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BYTE, x, y))^;
 end;
 
 Function RGetStaticShortArray2D(eios: Pointer; x, y: Int32): Int16;
 type
   PShort = ^Int16;
 begin
-  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_SHORT, x, y))^;
+  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionType.RI_SHORT, x, y))^;
 end;
 
 Function RGetStaticIntArray2D(eios: Pointer; x, y: Int32): Int32;
 type
   PInt = ^Int32;
 begin
-  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_INT, x, y))^;
+  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionType.RI_INT, x, y))^;
 end;
 
 Function RGetStaticLongArray2D(eios: Pointer; x, y: Int32): Int64;
 type
   PLong = ^Int64;
 begin
-  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_LONG, x, y))^;
+  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionType.RI_LONG, x, y))^;
 end;
 
 Function RGetStaticFloatArray2D(eios: Pointer; x, y: Int32): Single;
 type
   PFloat = ^Single;
 begin
-  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_FLOAT, x, y))^;
+  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionType.RI_FLOAT, x, y))^;
 end;
 
 Function RGetStaticDoubleArray2D(eios: Pointer; x, y: Int32): Double;
 type
   PDouble = ^Double;
 begin
-  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_DOUBLE, x, y))^;
+  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionType.RI_DOUBLE, x, y))^;
 end;
 
 Function RGetStaticStringArray2D(eios: Pointer; x, y: Int32): String;
 type
   PString = ^String;
 begin
-  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_STRING, x, y))^;
+  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionType.RI_STRING, x, y))^;
 end;
 
 Function RGetStaticObjectArray2D(eios: Pointer; x, y: Int32): Pointer;
 begin
-  Result := RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_OBJECT, x, y);
+  Result := RIGetArraySingleElement(eios, nil, ReflectionType.RI_OBJECT, x, y);
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -385,70 +380,70 @@ Function RGetStaticBoolArray2D(eios: Pointer; count, x, y: Int32): array of Bool
 type
   TBooleanArray = array of Boolean;
 begin
-  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, count, x, y));
+  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BOOLEAN, count, x, y));
 end;
 
 Function RGetStaticCharArray2D(eios: Pointer; count, x, y: Int32): array of Char; overload;
 type
   TCharArray = array of Char;
 begin
-  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_CHAR, count, x, y));
+  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionType.RI_CHAR, count, x, y));
 end;
 
 Function RGetStaticByteArray2D(eios: Pointer; count, x, y: Int32): array of Byte; overload;
 type
   TByteArray = array of Byte;
 begin
-  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BYTE, count, x, y));
+  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BYTE, count, x, y));
 end;
 
 Function RGetStaticShortArray2D(eios: Pointer; count, x, y: Int32): array of Int16; overload;
 type
   TShortArray = array of Int16;
 begin
-  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_SHORT, count, x, y));
+  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionType.RI_SHORT, count, x, y));
 end;
 
 Function RGetStaticIntArray2D(eios: Pointer; count, x, y: Int32): array of Int32; overload;
 type
   TIntArray = array of Int32;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_INT, count, x, y));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_INT, count, x, y));
 end;
 
 Function RGetStaticLongArray2D(eios: Pointer; count, x, y: Int32): array of Int64; overload;
 type
   TIntArray = array of Int64;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_LONG, count, x, y));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_LONG, count, x, y));
 end;
 
 Function RGetStaticFloatArray2D(eios: Pointer; count, x, y: Int32): array of Single; overload;
 type
   TFloatArray = array of Single;
 begin
-  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_FLOAT, count, x, y));
+  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionType.RI_FLOAT, count, x, y));
 end;
 
 Function RGetStaticDoubleArray2D(eios: Pointer; count, x, y: Int32): array of Double; overload;
 type
   TDoubleArray = array of Double;
 begin
-  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_DOUBLE, count, x, y));
+  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionType.RI_DOUBLE, count, x, y));
 end;
 
 Function RGetStaticStringArray2D(eios: Pointer; count, x, y: Int32): array of String; overload;
 type
   TStringArray = array of String;
 begin
-  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_STRING, count, x, y));
+  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionType.RI_STRING, count, x, y));
 end;
 
 Function RGetStaticObjectArray2D(eios: Pointer; count, x, y: Int32): array of Pointer; overload;
 type
   TObjectArray = array of Pointer;
 begin
-  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_OBJECT, count, x, y));
+  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionType.RI_OBJECT, count, x, y));
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -461,66 +456,66 @@ Function RGetStaticBoolArray3D(eios: Pointer; x, y, z: Int32): Boolean;
 type
   PBool = ^Boolean;
 begin
-  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, x, y, z))^;
+  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BOOLEAN, x, y, z))^;
 end;
 
 Function RGetStaticCharArray3D(eios: Pointer; x, y, z: Int32): Char;
 begin
-  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_CHAR, x, y, z))^;
+  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionType.RI_CHAR, x, y, z))^;
 end;
 
 Function RGetStaticByteArray3D(eios: Pointer; x, y, z: Int32): Byte;
 type
   PByte = ^Byte;
 begin
-  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BYTE, x, y, z))^;
+  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BYTE, x, y, z))^;
 end;
 
 Function RGetStaticShortArray3D(eios: Pointer; x, y, z: Int32): Int16;
 type
   PShort = ^Int16;
 begin
-  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_SHORT, x, y, z))^;
+  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionType.RI_SHORT, x, y, z))^;
 end;
 
 Function RGetStaticIntArray3D(eios: Pointer; x, y, z: Int32): Int32;
 type
   PInt = ^Int32;
 begin
-  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_INT, x, y, z))^;
+  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionType.RI_INT, x, y, z))^;
 end;
 
 Function RGetStaticLongArray3D(eios: Pointer; x, y, z: Int32): Int64;
 type
   PLong = ^Int64;
 begin
-  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_LONG, x, y, z))^;
+  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionType.RI_LONG, x, y, z))^;
 end;
 
 Function RGetStaticFloatArray3D(eios: Pointer; x, y, z: Int32): Single;
 type
   PFloat = ^Single;
 begin
-  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_FLOAT, x, y, z))^;
+  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionType.RI_FLOAT, x, y, z))^;
 end;
 
 Function RGetStaticDoubleArray3D(eios: Pointer; x, y, z: Int32): Double;
 type
   PDouble = ^Double;
 begin
-  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_DOUBLE, x, y, z))^;
+  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionType.RI_DOUBLE, x, y, z))^;
 end;
 
 Function RGetStaticStringArray3D(eios: Pointer; x, y, z: Int32): String;
 type
   PString = ^String;
 begin
-  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_STRING, x, y, z))^;
+  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionType.RI_STRING, x, y, z))^;
 end;
 
 Function RGetStaticObjectArray3D(eios: Pointer; x, y, z: Int32): Pointer;
 begin
-  Result := RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_OBJECT, x, y, z);
+  Result := RIGetArraySingleElement(eios, nil, ReflectionType.RI_OBJECT, x, y, z);
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -530,70 +525,70 @@ Function RGetStaticBoolArray3D(eios: Pointer; count, x, y, z: Int32): array of B
 type
   TBooleanArray = array of Boolean;
 begin
-  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, count, x, y, z));
+  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BOOLEAN, count, x, y, z));
 end;
 
 Function RGetStaticCharArray3D(eios: Pointer; count, x, y, z: Int32): array of Char; overload;
 type
   TCharArray = array of Char;
 begin
-  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_CHAR, count, x, y, z));
+  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionType.RI_CHAR, count, x, y, z));
 end;
 
 Function RGetStaticByteArray3D(eios: Pointer; count, x, y, z: Int32): array of Byte; overload;
 type
   TByteArray = array of Byte;
 begin
-  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BYTE, count, x, y, z));
+  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BYTE, count, x, y, z));
 end;
 
 Function RGetStaticShortArray3D(eios: Pointer; count, x, y, z: Int32): array of Int16; overload;
 type
   TShortArray = array of Int16;
 begin
-  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_SHORT, count, x, y, z));
+  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionType.RI_SHORT, count, x, y, z));
 end;
 
 Function RGetStaticIntArray3D(eios: Pointer; count, x, y, z: Int32): array of Int32; overload;
 type
   TIntArray = array of Int32;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_INT, count, x, y, z));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_INT, count, x, y, z));
 end;
 
 Function RGetStaticLongArray3D(eios: Pointer; count, x, y, z: Int32): array of Int64; overload;
 type
   TIntArray = array of Int64;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_LONG, count, x, y, z));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_LONG, count, x, y, z));
 end;
 
 Function RGetStaticFloatArray3D(eios: Pointer; count, x, y, z: Int32): array of Single; overload;
 type
   TFloatArray = array of Single;
 begin
-  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_FLOAT, count, x, y, z));
+  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionType.RI_FLOAT, count, x, y, z));
 end;
 
 Function RGetStaticDoubleArray3D(eios: Pointer; count, x, y, z: Int32): array of Double; overload;
 type
   TDoubleArray = array of Double;
 begin
-  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_DOUBLE, count, x, y, z));
+  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionType.RI_DOUBLE, count, x, y, z));
 end;
 
 Function RGetStaticStringArray3D(eios: Pointer; count, x, y, z: Int32): array of String; overload;
 type
   TStringArray = array of String;
 begin
-  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_STRING, count, x, y, z));
+  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionType.RI_STRING, count, x, y, z));
 end;
 
 Function RGetStaticObjectArray3D(eios: Pointer; count, x, y, z: Int32): array of Pointer; overload;
 type
   TObjectArray = array of Pointer;
 begin
-  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_OBJECT, count, x, y, z));
+  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionType.RI_OBJECT, count, x, y, z));
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -606,66 +601,66 @@ Function RGetStaticBoolArray4D(eios: Pointer; x, y, z, w: SizeUInt): Boolean;
 type
   PBool = ^Boolean;
 begin
-  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, x, y, z, w))^;
+  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BOOLEAN, x, y, z, w))^;
 end;
 
 Function RGetStaticCharArray4D(eios: Pointer; x, y, z, w: SizeUInt): Char;
 begin
-  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_CHAR, x, y, z, w))^;
+  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionType.RI_CHAR, x, y, z, w))^;
 end;
 
 Function RGetStaticByteArray4D(eios: Pointer; x, y, z, w: SizeUInt): Byte;
 type
   PByte = ^Byte;
 begin
-  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_BYTE, x, y, z, w))^;
+  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BYTE, x, y, z, w))^;
 end;
 
 Function RGetStaticShortArray4D(eios: Pointer; x, y, z, w: SizeUInt): Int16;
 type
   PShort = ^Int16;
 begin
-  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_SHORT, x, y, z, w))^;
+  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionType.RI_SHORT, x, y, z, w))^;
 end;
 
 Function RGetStaticIntArray4D(eios: Pointer; x, y, z, w: SizeUInt): Int32;
 type
   PInt = ^Int32;
 begin
-  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_INT, x, y, z, w))^;
+  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionType.RI_INT, x, y, z, w))^;
 end;
 
 Function RGetStaticLongArray4D(eios: Pointer; x, y, z, w: SizeUInt): Int64;
 type
   PLong = ^Int64;
 begin
-  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_LONG, x, y, z, w))^;
+  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionType.RI_LONG, x, y, z, w))^;
 end;
 
 Function RGetStaticFloatArray4D(eios: Pointer; x, y, z, w: SizeUInt): Single;
 type
   PFloat = ^Single;
 begin
-  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_FLOAT, x, y, z, w))^;
+  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionType.RI_FLOAT, x, y, z, w))^;
 end;
 
 Function RGetStaticDoubleArray4D(eios: Pointer; x, y, z, w: SizeUInt): Double;
 type
   PDouble = ^Double;
 begin
-  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_DOUBLE, x, y, z, w))^;
+  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionType.RI_DOUBLE, x, y, z, w))^;
 end;
 
 Function RGetStaticStringArray4D(eios: Pointer; x, y, z, w: SizeUInt): String;
 type
   PString = ^String;
 begin
-  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_STRING, x, y, z, w))^;
+  Result := PString(RIGetArraySingleElement(eios, nil, ReflectionType.RI_STRING, x, y, z, w))^;
 end;
 
 Function RGetStaticObjectArray4D(eios: Pointer; x, y, z, w: SizeUInt): Pointer;
 begin
-  Result := RIGetArraySingleElement(eios, nil, ReflectionArrayType.RI_OBJECT, x, y, z, w);
+  Result := RIGetArraySingleElement(eios, nil, ReflectionType.RI_OBJECT, x, y, z, w);
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
@@ -675,70 +670,70 @@ Function RGetStaticBoolArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): arra
 type
   TBooleanArray = array of Boolean;
 begin
-  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BOOLEAN, count, x, y, z, w));
+  Result := TBooleanArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BOOLEAN, count, x, y, z, w));
 end;
 
 Function RGetStaticCharArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Char; overload;
 type
   TCharArray = array of Char;
 begin
-  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_CHAR, count, x, y, z, w));
+  Result := TCharArray(RIGetArrayElement(eios, nil, ReflectionType.RI_CHAR, count, x, y, z, w));
 end;
 
 Function RGetStaticByteArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Byte; overload;
 type
   TByteArray = array of Byte;
 begin
-  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_BYTE, count, x, y, z, w));
+  Result := TByteArray(RIGetArrayElement(eios, nil, ReflectionType.RI_BYTE, count, x, y, z, w));
 end;
 
 Function RGetStaticShortArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Int16; overload;
 type
   TShortArray = array of Int16;
 begin
-  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_SHORT, count, x, y, z, w));
+  Result := TShortArray(RIGetArrayElement(eios, nil, ReflectionType.RI_SHORT, count, x, y, z, w));
 end;
 
 Function RGetStaticIntArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Int32; overload;
 type
   TIntArray = array of Int32;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_INT, count, x, y, z, w));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_INT, count, x, y, z, w));
 end;
 
 Function RGetStaticLongArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Int64; overload;
 type
   TIntArray = array of Int64;
 begin
-  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_LONG, count, x, y, z, w));
+  Result := TIntArray(RIGetArrayElement(eios, nil, ReflectionType.RI_LONG, count, x, y, z, w));
 end;
 
 Function RGetStaticFloatArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Single; overload;
 type
   TFloatArray = array of Single;
 begin
-  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_FLOAT, count, x, y, z, w));
+  Result := TFloatArray(RIGetArrayElement(eios, nil, ReflectionType.RI_FLOAT, count, x, y, z, w));
 end;
 
 Function RGetStaticDoubleArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Double; overload;
 type
   TDoubleArray = array of Double;
 begin
-  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_DOUBLE, count, x, y, z, w));
+  Result := TDoubleArray(RIGetArrayElement(eios, nil, ReflectionType.RI_DOUBLE, count, x, y, z, w));
 end;
 
 Function RGetStaticStringArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of String; overload;
 type
   TStringArray = array of String;
 begin
-  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_STRING, count, x, y, z, w));
+  Result := TStringArray(RIGetArrayElement(eios, nil, ReflectionType.RI_STRING, count, x, y, z, w));
 end;
 
 Function RGetStaticObjectArray4D(eios: Pointer; count, x, y, z, w: SizeUInt): array of Pointer; overload;
 type
   TObjectArray = array of Pointer;
 begin
-  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionArrayType.RI_OBJECT, count, x, y, z, w));
+  Result := TObjectArray(RIGetArrayElement(eios, nil, ReflectionType.RI_OBJECT, count, x, y, z, w));
   {$IFDEF TRACK_MEMORY}
   MemoryTracker.Add(Result);
   {$ENDIF}
