@@ -90,9 +90,15 @@ Function R_OpenWorldSwitcher: Boolean;
 var
   Widget: RSWidget;
 begin
-  R_OpenGametab(GAMETAB_LOGOUT);
+  Result := not R_WidgetIsHidden(R_WORLD_SWITCHER_SCROLL_UP);
+  if Result then
+    Exit(True);
 
-  Wait(50, RandomRange(250, 692));
+  if R_WidgetIsHidden(R_LOGOUT_CONTAINER) then
+  begin
+    R_OpenGametab(GAMETAB_LOGOUT);
+    Wait(50, RandomRange(250, 692));
+  end;
 
   if (not R_WaitUntilVisible(R_LOGOUT_CONTAINER, 2500)) or R_WidgetIsHidden(R_LOGOUT_WORLD_SWITCHER_BUTTON) then
     Exit(False);

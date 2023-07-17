@@ -189,6 +189,7 @@ Function R_WidgetIsHidden(Constant: RWidget): Boolean;
 var
   Widget: RSWidget;
 begin
+  Result := True;
   Widget := RSWidget.Get(Constant.Group, Constant.Child);
   if Widget.ref <> nil then
   begin
@@ -198,21 +199,8 @@ begin
 end;
 
 Function R_WaitUntilVisible(Constant: RWidget; WaitTime: Int32 = 1000): Boolean;
-var
-  Widget: RSWidget;
-  T: Int32;
-
 begin
-  Widget := RSWidget.Get(Constant.Group, Constant.Child);
-  if Widget.ref <> nil then
-  begin
-    T := GetTickCount;
-    repeat
-      Wait(50, RandomRange(100, 324));
-    until (not Widget.IsHidden) or ((GetTickCount - T) > WaitTime);
-    Result := Widget.IsHidden;
-    Widget.Free;
-  end;
+  Result := WaitUntil(not R_WidgetIsHidden(Constant), RandomRange(100, 324), WaitTime);
 end;
 
 {*
