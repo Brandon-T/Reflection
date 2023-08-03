@@ -149,7 +149,7 @@ WallDecoration_ID: THook =                        ['jt', 'ap', 'J', 344804217585
 WallDecoration_Flags: THook =                     ['jt', 'aq', 'I', 1288984241];
 WallDecoration_Plane: THook =                     ['jt', 'aw', 'I', -1446438165];
 WallDecoration_Height: THook =                    ['jt', 'as', 'I', -757999873];
-WallDecoration_LocalX: THook =                    ['jt', 'ay', 'I', 49283072];
+WallDecoration_LocalX: THook =                    ['jt', 'ay', 'I', 2017840623];
 WallDecoration_LocalY: THook =                    ['jt', 'ar', 'I', 448727349];
 WallDecoration_RelativeX: THook =                 ['jt', 'aj', 'I', 621012193];
 WallDecoration_RelativeY: THook =                 ['jt', 'ag', 'I', -830283377];
@@ -160,7 +160,7 @@ WallDecoration_Renderable2: THook =               ['jt', 'av', 'Lit;', 1];
 {FloorDecoration: ip}
 FloorDecoration_ID: THook =                       ['ip', 'as', 'J', 2356774916473464461];
 FloorDecoration_Flags: THook =                    ['ip', 'aj', 'I', 1900783163];
-FloorDecoration_LocalX: THook =                   ['ip', 'ay', 'I', -1307574272];
+FloorDecoration_LocalX: THook =                   ['ip', 'ay', 'I', 232249761];
 FloorDecoration_LocalY: THook =                   ['ip', 'ar', 'I', 751258427];
 FloorDecoration_Plane: THook =                    ['ip', 'aw', 'I', -1530728791];
 FloorDecoration_Renderable: THook =               ['ip', 'am', 'Lit;', 1];
