@@ -280,7 +280,7 @@ Actor_IsWalking: THook =                          ['dx', 'an', 'Z', 1];
 Actor_CombatInfoList: THook =                     ['dx', 'co', 'Lor;', 1];
 Actor_SpotAnimation: THook =                      ['dx', 'di', 'I', -287971117];
 Actor_SpotAnimationFrame: THook =                 ['N/A', 'N/A', 'N/A', 1];
-Actor_SpotAnimationFrameCycle: THook =            ['N/A', 'N/A', 'N/A', 1];
+Actor_SpotAnimationFrameCycle: THook =            ['dx', 'cg', 'I', -567357867];
 Actor_GraphicsId: THook =                         ['N/A', 'N/A', 'N/A', 1];
 Actor_Height: THook =                             ['dx', 'df', 'I', 357335143];
 
@@ -418,7 +418,7 @@ Client_PlayerIndex: THook =                       ['client', 'mg', 'I', -1017365
 Client_LoopCycle: THook =                         ['client', 'em', 'I', 1238765663];
 Client_GameState: THook =                         ['client', 'dq', 'I', 1417535651];
 Client_LoginState: THook =                        ['client', 'go', 'I', 616343285];
-Client_IsLoading: THook =                         ['N/A', 'N/A', 'N/A', 1];
+Client_IsLoading: THook =                         ['client', 'et', 'Z', 1];
 Client_CrossHairColor: THook =                    ['client', 'mr', 'I', 1218159829];
 Client_AnimationFrameCache: THook =               ['ig', 'av', 'Lld;', 1];
 Client_GroundItems: THook =                       ['client', 'nk', '[[[Lod;', 1];
