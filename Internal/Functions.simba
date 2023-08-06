@@ -2,8 +2,6 @@
 {$IFNDEF FUNCTIONS}
 {$DEFINE FUNCTIONS}
 
-type ReflectionType = ReflectionArrayType;
-
 {$IFDEF TRACK_MEMORY}
 //Used to check for leaks in the include..
 type

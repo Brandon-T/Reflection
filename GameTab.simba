@@ -183,12 +183,12 @@ var
   ID: RWidget;
   Widget: RSWidget;
 begin
+  if R_IsGameTabOpen(Tab) then
+    Exit(True);
+
   if UseMouse then
   begin
     ID := R_GameTabIDs[Tab];
-
-    if R_IsGameTabOpen(Tab) then
-      Exit(True);
 
     Widget := RSWidget.Get(ID.Group, ID.Child);
     if Widget.ref <> nil then
@@ -199,7 +199,7 @@ begin
     end;
   end else
   begin
-    Keyboard.PressKey(R_GetGameTabKey(GAMETAB_MUSIC));
+    Keyboard.PressKey(R_GetGameTabKey(Tab));
     if R_IsGameTabOpen(Tab) then
       Result := True;
   end;
