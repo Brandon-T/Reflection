@@ -30,11 +30,18 @@ REMOTE_INPUT_PLUGIN = 'libRemoteInput64.dylib';
 {$ENDIF}
 
 Procedure RSetup;
+const
+  RS_EXECUTABLE = {$IFDEF WINDOWS}'JagexLauncher.exe'{$ELSE}'java'{$ENDIF};
 var
   PID: Int32;
   I, ClientCount: SizeUInt;
 begin
+  {$IFNDEF SIMBAHEADLESS}
   RIInject(GetSimbaTargetPID());
+  {$ELSE}  
+  WriteLn('Running Simba in Headless Mode. Automatically trying to find a RS client.');
+  RIInject(RS_EXECUTABLE);
+  {$ENDIF}
 
   PID := -1;
   ClientCount := EIOS_GetClients(true);
