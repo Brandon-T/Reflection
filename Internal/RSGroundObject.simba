@@ -250,21 +250,24 @@ begin
   //Hash := X or (Y shl 14) or (RSClient.Plane shl 28);
   //Index := Hash and (ItemsSize - 1);
 
-  Head := NodeDeque.Head;
-  Curr := Head.Next;
-  Garbage := [NodeDeque, Head, Curr];
-
-  while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+  if NodeDeque.ref <> nil then
   begin
-    ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
-    Stack := RGetInt(R_EIOS, Curr.ref, ITEM_STACKSIZES);
-
-    Item := [ID, Stack, [X, Y]];
-    Result += item;
-
-    Curr := Curr.Next;
-    Garbage += Curr;
+    Head := NodeDeque.Head;
+    Curr := Head.Next;
+    Garbage := [NodeDeque, Head, Curr];
+  
+    while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+    begin
+      ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
+      Stack := RGetInt(R_EIOS, Curr.ref, ITEM_STACKSIZES);
+  
+      Item := [ID, Stack, [X, Y]];
+      Result += item;
+  
+      Curr := Curr.Next;
+      Garbage += Curr;
+    end;
+  
+    Garbage.Free;
   end;
-
-  Garbage.Free;
 end;
