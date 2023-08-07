@@ -48,7 +48,7 @@ type
     YANILLE,
     PORT_KHAZARD,
     BLAST_FURNACE,
-    WOODCUTTING_GUILD,
+    WOODCUTTING_GUILD
   );
 
 {$scopedenums on}
