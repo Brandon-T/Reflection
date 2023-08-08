@@ -117,6 +117,9 @@ end;
 
 Function RSObject.ID: Int32; constref;
 begin
+  if (ref = nil) then
+    exit(-1);
+
   Result := (self.Hash shr 17) and $FFFFFFFF;
 end;
 
