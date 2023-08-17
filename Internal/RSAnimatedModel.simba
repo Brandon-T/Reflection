@@ -14,7 +14,7 @@ Function RSAnimatedModel.Triangles: Array of TTriangle; constref;
 {$ENDIF}
 var
   I, IndicesSize: SizeUInt;
-  Indices: Array[0..3] of Array of Int32;
+  Indices: Array[0..2] of Array of Int32;
   Model: RSModel;
 begin
   Model.ref := self.ref;
