@@ -193,7 +193,8 @@ begin
     Widget := RSWidget.Get(ID.Group, ID.Child);
     if Widget.ref <> nil then
     begin
-      Mouse.Click(Widget.Bounds, MOUSE_LEFT);
+      Mouse.Move(Widget.Bounds, True);
+      Mouse.Click(MOUSE_LEFT);
       Result := True;
       Widget.Free;
     end;

@@ -238,6 +238,66 @@ begin
   end;
 end;
 
+Function RSClient.Projectiles: Array of RSProjectile; static;
+var
+  NodeDeque: RSNodeDeque;
+  Head, Current: RSNode;
+begin
+  NodeDeque.ref := RGetStaticObject(R_EIOS, CLIENT_PROJECTILES);
+  if NodeDeque.ref = nil then
+    Exit;
+
+  Head := NodeDeque.Head;
+  if Head.ref = nil then
+  begin
+    NodeDeque.Free;
+    Exit;
+  end;
+
+  Current := Head.Next;
+
+  while not RObjectsEqual(R_EIOS, Head.ref, Current.ref) do
+  begin
+    Result += Current;
+    Current := Current.Next;
+    if Current.ref = nil then
+      break;
+  end;
+
+  Head.Free;
+  NodeDeque.Free;
+end;
+
+Function RSClient.GraphicsObjects: Array of RSGraphicsObject; static;
+var
+  NodeDeque: RSNodeDeque;
+  Head, Current: RSNode;
+begin
+  NodeDeque.ref := RGetStaticObject(R_EIOS, CLIENT_GRAPHICSOBJECTS);
+  if NodeDeque.ref = nil then
+    Exit;
+
+  Head := NodeDeque.Head;
+  if Head.ref = nil then
+  begin
+    NodeDeque.Free;
+    Exit;
+  end;
+
+  Current := Head.Next;
+
+  while not RObjectsEqual(R_EIOS, Head.ref, Current.ref) do
+  begin
+    Result += Current;
+    Current := Current.Next;
+    if Current.ref = nil then
+      break;
+  end;
+
+  Head.Free;
+  NodeDeque.Free;
+end;
+
 Function RSClient.Region: RSRegion; static;
 begin
   Result.ref := RGetStaticObject(R_EIOS, CLIENT_REGION);
@@ -399,6 +459,11 @@ end;
 Function RSClient.IsItemSelected: Boolean; static;
 begin
   Result := RGetStaticInt(R_EIOS, CLIENT_ISITEMSELECTED) = 1;
+end;
+
+Function RSClient.IsSpellSelected: Boolean; static;
+begin
+  Result := RGetStaticBool(R_EIOS, CLIENT_ISSPELLSELECTED);
 end;
 
 Function RSClient.LoginIndex: Int32; static;

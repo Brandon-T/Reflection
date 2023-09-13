@@ -179,6 +179,18 @@ GameObject_WorldY: THook =                        ['jy', 'aa', 'I', 1748940281];
 GameObject_OffsetX: THook =                       ['jy', 'ap', 'I', 80120955];
 GameObject_OffsetY: THook =                       ['jy', 'af', 'I', 1302717711];
 
+{GraphicsObject: cg}
+GraphicsObject_ID: THook =                        ['cg', 'au', 'I', 539793439];
+GraphicsObject_LocalX: THook =                    ['cg', 'at', 'I', 540026663];
+GraphicsObject_LocalY: THook =                    ['cg', 'ac', 'I', -37149761];
+GraphicsObject_Height: THook =                    ['cg', 'ai', 'I', 284515791];
+GraphicsObject_Plane: THook =                     ['cg', 'ao', 'I', -49690437];
+GraphicsObject_SequenceDefinition: THook =        ['cg', 'az', 'Lib;', 1];
+GraphicsObject_Frame: THook =                     ['cg', 'ap', 'I', -956501499];
+GraphicsObject_FrameCycle: THook =                ['cg', 'aa', 'I', -1971256985];
+GraphicsObject_StartCycle: THook =                ['cg', 'ae', 'I', 794022017];
+GraphicsObject_IsFinished: THook =                ['cg', 'af', 'Z', 1];
+
 {SceneTile: ii}
 SceneTile_BoundaryObject: THook =                 ['ii', 'az', 'Ljo;', 1];
 SceneTile_SceneTileObject: THook =                ['ii', 'aj', 'Lii;', 1];
@@ -292,10 +304,13 @@ NPCDefinition_ModelIDs: THook =                   ['hw', 'aa', '[I', 1];
 NPCDefinition_CombatLevel: THook =                ['hw', 'bd', 'I', 989486243];
 NPCDefinition_Visible: THook =                    ['hw', 'bm', 'Z', 1];
 NPCDefinition_ModelCache: THook =                 ['hw', 'ac', 'Lle;', 1];
+NPCDefinition_DefinitionCache: THook =            ['hw', 'at', 'Lle;', 1];
 NPCDefinition_Transformations: THook =            ['hw', 'bl', '[I', 1];
 NPCDefinition_ModelTileSize: THook =              ['hw', 'ap', 'I', -733591527];
 NPCDefinition_ModelScaleWidth: THook =            ['hw', 'by', 'I', 1754811063];
 NPCDefinition_ModelScaleHeight: THook =           ['hw', 'bs', 'I', -183655351];
+NPCDefinition_TransformVarbit: THook =            ['hw', 'bp', 'I', 715362785];
+NPCDefinition_TransformVarp: THook =              ['hw', 'bu', 'I', -541634501];
 
 {NPC: dx}
 NPC_Definition: THook =                           ['dx', 'au', 'Lhw;', 1];
@@ -316,6 +331,7 @@ Player_Definition: THook =                        ['df', 'ae', 'Lmt;', 1];
 Player_CombatLevel: THook =                       ['df', 'az', 'I', 424288465];
 Player_Index: THook =                             ['df', 'aw', 'I', 1857589841];
 Player_IsAnimating: THook =                       ['df', 'as', 'Z', 1];
+Player_OverheadPrayerIcon: THook =                ['df', 'at', 'I', 1489130693];
 
 {ObjectDefinition: hv}
 ObjectDefinition_ID: THook =                      ['hv', 'aa', 'I', 1130646297];
@@ -329,6 +345,30 @@ ObjectDefinition_Actions: THook =                 ['hv', 'bk', '[Ljava/lang/Stri
 ObjectDefinition_Transformations: THook =         ['hv', 'bb', '[I', 1];
 ObjectDefinition_TransformationVarbit: THook =    ['hv', 'br', 'I', -549604083];
 ObjectDefinition_TransformationVarp: THook =      ['hv', 'be', 'I', 244969535];
+
+{Projectile: ck}
+Projectile_ID: THook =                            ['ck', 'au', 'I', -549374795];
+Projectile_Plane: THook =                         ['ck', 'ae', 'I', -1311387965];
+Projectile_SourceX: THook =                       ['ck', 'ao', 'I', -1087687777];
+Projectile_SourceY: THook =                       ['ck', 'at', 'I', -1807665337];
+Projectile_SourceZ: THook =                       ['ck', 'ac', 'I', -1307089547];
+Projectile_X: THook =                             ['ck', 'ag', 'D', 1];
+Projectile_Y: THook =                             ['ck', 'am', 'D', 1];
+Projectile_Z: THook =                             ['ck', 'ax', 'D', 1];
+Projectile_Speed: THook =                         ['ck', 'ay', 'D', 1];
+Projectile_SpeedX: THook =                        ['ck', 'ah', 'D', 1];
+Projectile_SpeedY: THook =                        ['ck', 'as', 'D', 1];
+Projectile_SpeedZ: THook =                        ['ck', 'aj', 'D', 1];
+Projectile_AccelerationZ: THook =                 ['ck', 'av', 'D', 1];
+Projectile_StartHeight: THook =                   ['ck', 'al', 'I', 48542785];
+Projectile_EndHeight: THook =                     ['ck', 'ai', 'I', -171002147];
+Projectile_StartCycle: THook =                    ['ck', 'af', 'I', 1420572405];
+Projectile_EndCycle: THook =                      ['ck', 'ad', 'I', 855194403];
+Projectile_InteractingIndex: THook =              ['ck', 'ar', 'I', -731923483];
+Projectile_Pitch: THook =                         ['ck', 'ak', 'I', -600416715];
+Projectile_Yaw: THook =                           ['ck', 'aw', 'I', -556808089];
+Projectile_isMoving: THook =                      ['ck', 'ab', 'Z', 1];
+Projectile_AnimationFrame: THook =                ['ck', 'bj', 'I', 1245655713];
 
 {WidgetNode: ds}
 WidgetNode_ID: THook =                            ['ds', 'au', 'I', 2086760251];
@@ -345,10 +385,13 @@ Widget_StackSizes: THook =                        ['N/A', 'N/A', 'N/A', 1];
 Widget_ItemAmount: THook =                        ['mi', 'gt', 'I', 1666268347];
 Widget_SpriteID: THook =                          ['mi', 'ct', 'I', 1694560891];
 Widget_TextureID: THook =                         ['mi', 'cy', 'I', -329704335];
+Widget_ModelID: THook =                           ['mi', 'dd', 'I', -1600832609];
+Widget_AnimationID: THook =                       ['mi', 'dy', 'I', 1110473721];
 Widget_Actions: THook =                           ['N/A', 'N/A', 'N/A', 1];
 Widget_ActionType: THook =                        ['mi', 'bb', 'I', 2112192689];
 Widget_Type: THook =                              ['mi', 'bo', 'I', -1370156439];
 Widget_IsHidden: THook =                          ['mi', 'cd', 'Z', 1];
+Widget_Opacity: THook =                           ['mi', 'cb', 'I', -1458216043];
 Widget_AbsoluteX: THook =                         ['mi', 'bn', 'I', 1356456497];
 Widget_AbsoluteY: THook =                         ['mi', 'bw', 'I', -1035953241];
 Widget_RelativeX: THook =                         ['mi', 'cw', 'I', 979552283];
@@ -423,7 +466,9 @@ Client_CrossHairColor: THook =                    ['client', 'mj', 'I', 19500622
 Client_AnimationFrameCache: THook =               ['ib', 'aa', 'Lle;', 1];
 Client_GroundItems: THook =                       ['client', 'nr', '[[[Low;', 1];
 Client_CollisionMaps: THook =                     ['client', 'jz', '[Lis;', 1];
-Client_TradingPostOffers: THook =                 ['client', 'wf', '[Loh;', 1];
+Client_Projectiles: THook =                       ['client', 'nn', 'Low;', 1];
+Client_GraphicsObjects: THook =                   ['client', 'nw', 'Low;', 1];
+Client_GrandExchangeOffers: THook =               ['client', 'wf', '[Loh;', 1];
 Client_CameraX: THook =                           ['hw', 'kk', 'I', 757716957];
 Client_CameraY: THook =                           ['fr', 'km', 'I', 1907020251];
 Client_CameraZ: THook =                           ['fl', 'kc', 'I', 912731593];
@@ -473,5 +518,6 @@ Client_CurrentWorld: THook =                      ['client', 'bg', 'I', -8315610
 Client_Energy: THook =                            ['client', 'px', 'I', 2106479597];
 Client_Weight: THook =                            ['client', 'pt', 'I', 679999119];
 Client_IsItemSelected: THook =                    ['client', 'ov', 'I', 61632949];
+Client_IsSpellSelected: THook =                   ['client', 'or', 'Z', 1];
 
 {$ENDIF}

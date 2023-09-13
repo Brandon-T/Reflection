@@ -11,6 +11,7 @@ begin
   h := (High(points) - 1);
 
   if (h = -1) then
+  if (h <= 0) then
     exit;
 
   for i := 0 to h do
@@ -169,6 +170,17 @@ var
   Bounds: T2DRectangle;
 begin
   Bounds := tile.Project;
+  self.LineTo(Bounds.NW, Bounds.NE, Colour);
+  self.LineTo(Bounds.NE, Bounds.SE, Colour);
+  self.LineTo(Bounds.SE, Bounds.SW, Colour);
+  self.LineTo(Bounds.SW, Bounds.NW, Colour);
+end;
+
+Procedure TMufasaBitmap.DrawTile(constref tile: RSTile; Size: Int32; Colour: TColor); overload;
+var
+  Bounds: T2DRectangle;
+begin
+  Bounds := tile.Project(Size, Size, RSClient.Plane);
   self.LineTo(Bounds.NW, Bounds.NE, Colour);
   self.LineTo(Bounds.NE, Bounds.SE, Colour);
   self.LineTo(Bounds.SE, Bounds.SW, Colour);

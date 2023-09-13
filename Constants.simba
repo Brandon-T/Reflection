@@ -180,7 +180,7 @@ const  //Interfaces
   R_INTERFACE_MINIMAP_ORB_RUN_ICON: RWidget =       [R_INTERFACE_MINIMAP_ORBS, 32];
   R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL: RWidget = [R_INTERFACE_MINIMAP_ORBS, 33];
   R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL_LABEL: RWidget = [R_INTERFACE_MINIMAP_ORBS, 36];
-  R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL_BACKGROUND: RWidget = [R_INTERFACE_MINIMAP_ORBS, 40];
+  R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL_BACKGROUND: RWidget = [R_INTERFACE_MINIMAP_ORBS, 37];
   R_INTERFACE_MINIMAP_ORB_COMBAT_SPECIAL_ICON: RWidget = [R_INTERFACE_MINIMAP_ORBS, 41];
   R_INTERFACE_MINIMAP_ORB_WORLD: RWidget =          [R_INTERFACE_MINIMAP_ORBS, 53];
 
@@ -318,6 +318,12 @@ const //Widgets
   R_DEPOSITBOX_CONTAINER: RWidget =                 [R_INTERFACE_DEPOSITBOX, 0];
   R_DEPOSITBOX_TITLE: RWidget =                     [R_INTERFACE_DEPOSITBOX, 1, 1];
   R_DEPOSITBOX_CLOSE_BUTTON: RWidget =              [R_INTERFACE_DEPOSITBOX, 11];
+  R_DEPOSITBOX_INVENTORY_BAG: RWidget =             [R_INTERFACE_DEPOSITBOX, 4];
+  R_DEPOSITBOX_INVENTORY_BAG_ICON: RWidget =        [R_INTERFACE_DEPOSITBOX, 5];
+  R_DEPOSITBOX_INVENTORY_ARMOUR: RWidget =          [R_INTERFACE_DEPOSITBOX, 6];
+  R_DEPOSITBOX_INVENTORY_ARMOUR_ICON: RWidget =     [R_INTERFACE_DEPOSITBOX, 7];
+  R_DEPOSITBOX_INVENTORY_LOOT: RWidget =            [R_INTERFACE_DEPOSITBOX, 8];
+  R_DEPOSITBOX_INVENTORY_LOOT_ICON: RWidget =       [R_INTERFACE_DEPOSITBOX, 9];
 
   { BANK PIN }
   R_BANK_PIN_CONTAINER: RWidget =                   [R_INTERFACE_PINSCREEN, 0];
@@ -816,35 +822,35 @@ const //Widgets
   R_PRAYER_RATIO_ICON: RWidget =                     [R_INTERFACE_PRAYER, 2, 0];
   R_PRAYER_RATIO_TEXT: RWidget =                     [R_INTERFACE_PRAYER, 2, 1];
   R_PRAYER_CONTAINER_CHILD: RWidget =                [R_INTERFACE_PRAYER, 4];
-  R_PRAYER_THICK_SKIN: RWidget =                     [R_INTERFACE_PRAYER, 5];
-  R_PRAYER_BURST_OF_STRENGTH: RWidget =              [R_INTERFACE_PRAYER, 6];
-  R_PRAYER_CLARITY_OF_THOUGHT: RWidget =             [R_INTERFACE_PRAYER, 7];
-  R_PRAYER_ROCK_SKIN: RWidget =                      [R_INTERFACE_PRAYER, 8];
-  R_PRAYER_SUPERHUMAN_STRENGTH: RWidget =            [R_INTERFACE_PRAYER, 9];
-  R_PRAYER_IMPROVED_REFLEXES: RWidget =              [R_INTERFACE_PRAYER, 10];
-  R_PRAYER_RAPID_RESTORE: RWidget =                  [R_INTERFACE_PRAYER, 11];
-  R_PRAYER_RAPID_HEAL: RWidget =                     [R_INTERFACE_PRAYER, 12];
-  R_PRAYER_PROTECT_ITEM: RWidget =                   [R_INTERFACE_PRAYER, 13];
-  R_PRAYER_STEEL_SKIN: RWidget =                     [R_INTERFACE_PRAYER, 14];
-  R_PRAYER_ULTIMATE_STRENGTH: RWidget =              [R_INTERFACE_PRAYER, 15];
-  R_PRAYER_INCREDIBLE_REFLEXES: RWidget =            [R_INTERFACE_PRAYER, 16];
-  R_PRAYER_PROTECT_FROM_MAGIC: RWidget =             [R_INTERFACE_PRAYER, 17];
-  R_PRAYER_PROTECT_FORM_MISSILES: RWidget =          [R_INTERFACE_PRAYER, 18];
-  R_PRAYER_PROTECT_FROM_MELEE: RWidget =             [R_INTERFACE_PRAYER, 19];
-  R_PRAYER_RETRIBUTION: RWidget =                    [R_INTERFACE_PRAYER, 20];
-  R_PRAYER_REDEMPTION: RWidget =                     [R_INTERFACE_PRAYER, 21];
-  R_PRAYER_SMITE: RWidget =                          [R_INTERFACE_PRAYER, 22];
-  R_PRAYER_SHARP_EYE: RWidget =                      [R_INTERFACE_PRAYER, 23];
-  R_PRAYER_MYSTIC_WILL: RWidget =                    [R_INTERFACE_PRAYER, 24];
-  R_PRAYER_HAWK_EYE: RWidget =                       [R_INTERFACE_PRAYER, 25];
-  R_PRAYER_MYSTIC_LORE: RWidget =                    [R_INTERFACE_PRAYER, 26];
-  R_PRAYER_EAGLE_EYE: RWidget =                      [R_INTERFACE_PRAYER, 27];
-  R_PRAYER_MYSTIC_MIGHT: RWidget =                   [R_INTERFACE_PRAYER, 28];
-  R_PRAYER_CHIVALRY: RWidget =                       [R_INTERFACE_PRAYER, 29];
-  R_PRAYER_PIETY: RWidget =                          [R_INTERFACE_PRAYER, 30];
-  R_PRAYER_RIGOUR: RWidget =                         [R_INTERFACE_PRAYER, 31];
-  R_PRAYER_AUGURY: RWidget =                         [R_INTERFACE_PRAYER, 32];
-  R_PRAYER_PRESERVE: RWidget =                       [R_INTERFACE_PRAYER, 33];
+  R_PRAYER_THICK_SKIN: RWidget =                     [R_INTERFACE_PRAYER, 9];
+  R_PRAYER_BURST_OF_STRENGTH: RWidget =              [R_INTERFACE_PRAYER, 10];
+  R_PRAYER_CLARITY_OF_THOUGHT: RWidget =             [R_INTERFACE_PRAYER, 11];
+  R_PRAYER_ROCK_SKIN: RWidget =                      [R_INTERFACE_PRAYER, 12];
+  R_PRAYER_SUPERHUMAN_STRENGTH: RWidget =            [R_INTERFACE_PRAYER, 13];
+  R_PRAYER_IMPROVED_REFLEXES: RWidget =              [R_INTERFACE_PRAYER, 14];
+  R_PRAYER_RAPID_RESTORE: RWidget =                  [R_INTERFACE_PRAYER, 15];
+  R_PRAYER_RAPID_HEAL: RWidget =                     [R_INTERFACE_PRAYER, 16];
+  R_PRAYER_PROTECT_ITEM: RWidget =                   [R_INTERFACE_PRAYER, 17];
+  R_PRAYER_STEEL_SKIN: RWidget =                     [R_INTERFACE_PRAYER, 18];
+  R_PRAYER_ULTIMATE_STRENGTH: RWidget =              [R_INTERFACE_PRAYER, 19];
+  R_PRAYER_INCREDIBLE_REFLEXES: RWidget =            [R_INTERFACE_PRAYER, 20];
+  R_PRAYER_PROTECT_FROM_MAGIC: RWidget =             [R_INTERFACE_PRAYER, 21];
+  R_PRAYER_PROTECT_FROM_MISSILES: RWidget =          [R_INTERFACE_PRAYER, 22];
+  R_PRAYER_PROTECT_FROM_MELEE: RWidget =             [R_INTERFACE_PRAYER, 23];
+  R_PRAYER_RETRIBUTION: RWidget =                    [R_INTERFACE_PRAYER, 24];
+  R_PRAYER_REDEMPTION: RWidget =                     [R_INTERFACE_PRAYER, 25];
+  R_PRAYER_SMITE: RWidget =                          [R_INTERFACE_PRAYER, 26];
+  R_PRAYER_SHARP_EYE: RWidget =                      [R_INTERFACE_PRAYER, 27];
+  R_PRAYER_HAWK_EYE: RWidget =                       [R_INTERFACE_PRAYER, 28];
+  R_PRAYER_EAGLE_EYE: RWidget =                      [R_INTERFACE_PRAYER, 29];
+  R_PRAYER_MYSTIC_WILL: RWidget =                    [R_INTERFACE_PRAYER, 30];
+  R_PRAYER_MYSTIC_LORE: RWidget =                    [R_INTERFACE_PRAYER, 31];
+  R_PRAYER_MYSTIC_MIGHT: RWidget =                   [R_INTERFACE_PRAYER, 32];
+  R_PRAYER_RIGOUR: RWidget =                         [R_INTERFACE_PRAYER, 33];
+  R_PRAYER_CHIVALRY: RWidget =                       [R_INTERFACE_PRAYER, 34];
+  R_PRAYER_PIETY: RWidget =                          [R_INTERFACE_PRAYER, 35];
+  R_PRAYER_AUGURY: RWidget =                         [R_INTERFACE_PRAYER, 36];
+  R_PRAYER_PRESERVE: RWidget =                       [R_INTERFACE_PRAYER, 37];
 
   { EMOTE }
   R_EMOTE_CONTAINER: RWidget =                       [R_INTERFACE_EMOTE, 0];
@@ -1139,7 +1145,7 @@ const //Widgets
   R_NPC_CONTACT_HONEST_JIMMY: RWidget =              [R_INTERFACE_NPC_CONTACT, 3];
   R_NPC_CONTACT_BERT_THE_SANDMAN: RWidget =          [R_INTERFACE_NPC_CONTACT, 6];
   R_NPC_CONTACT_ADVISOR_GHRIM: RWidget =             [R_INTERFACE_NPC_CONTACT, 9];
-  R_NPC_CONTACT_DARK_MAGE: RWidget =                 [R_INTERFACE_NPC_CONTACT, 12];
+  R_NPC_CONTACT_DARK_MAGE: RWidget =                 [R_INTERFACE_NPC_CONTACT, 15];
   R_NPC_CONTACT_LANTHUS: RWidget =                   [R_INTERFACE_NPC_CONTACT, 15];
   R_NPC_CONTACT_SPRIA: RWidget =                     [R_INTERFACE_NPC_CONTACT, 18];
   R_NPC_CONTACT_TURAEL: RWidget =                    [R_INTERFACE_NPC_CONTACT, 19];

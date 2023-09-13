@@ -79,9 +79,45 @@ begin
   Result.Z := Result.X;
 end;
 
+Function RSNPCDefinition.TransformVarbit: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, NPCDEFINITION_TRANSFORMVARBIT);
+end;
+
+Function RSNPCDefinition.TransformVarp: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, NPCDEFINITION_TRANSFORMVARP);
+end;
+
 Function RSNPCDefinition.ModelCache: RSCache; static;
 begin
   Result.ref := RGetStaticObject(R_EIOS, NPCDEFINITION_MODELCACHE);
+end;
+
+Function RSNPCDefinition.DefinitionCache: RSCache; static;
+begin
+  Result.ref := RGetStaticObject(R_EIOS, NPCDEFINITION_DEFINITIONCACHE);
+end;
+
+Function RSNPCDefinition.DefinitionCache(ID: Int32): RSNPCDefinition; static; overload;
+var
+  Cache: RSCache;
+  HashTable: RSIterableHashTable;
+  Garbage: RSTypeArray;
+begin
+  Cache.ref := RSNPCDefinition.DefinitionCache.ref;
+
+  if Cache.ref <> nil then
+  begin
+    HashTable := Cache.HashTable;
+    if HashTable.ref <> nil then
+    begin
+      Result.ref := HashTable.GetObject(ID).ref;
+    end;
+  end;
+
+  Garbage := [HashTable, Cache];
+  Garbage.Free;
 end;
 
 Function RSNPCDefinition.CachedModel: RSModel; constref;

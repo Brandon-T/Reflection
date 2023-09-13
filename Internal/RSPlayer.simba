@@ -77,6 +77,12 @@ begin
   Result := RGetInt(R_EIOS, ref, PLAYER_INDEX) + 32768;
 end;
 
+Function RSPlayer.LocalDestination: RSTile;
+begin
+  Result.X := RSClient.DestinationX;
+  Result.Y := RSClient.DestinationY;
+end;
+
 Function RSPlayer.Destination: RSTile;
 var
   X, Y: Int32;
@@ -96,6 +102,11 @@ end;
 Function RSPlayer.IsMoving: Boolean; constref
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_QUEUESIZE) > 0;
+end;
+
+Function RSPlayer.OverheadPrayerIcon: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PLAYER_OVERHEADPRAYERICON);
 end;
 
 Function RSPlayer.Model: RSModel; constref;

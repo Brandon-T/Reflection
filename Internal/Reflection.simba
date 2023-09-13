@@ -35,6 +35,8 @@
 {$include_once RSObjectDefinition.simba}
 {$include_once RSGroundObject.simba}
 {$include_once RSObject.simba}
+{$include_once RSProjectile.simba}
+{$include_once RSGraphicsObject.simba}
 {$include_once RSItemDefinition.simba}
 {$include_once RSItem.simba}
 {$include_once RSItemNode.simba}

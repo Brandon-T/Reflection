@@ -2,6 +2,7 @@
 {$include_once RSNode.simba}
 {$include_once RSClient.simba}
 {$include_once RSCombatInfo.simba}
+{$include_once RSTile.simba}
 
 
 Function RSActor.SpokenText: String; constref;
@@ -264,4 +265,58 @@ begin
     Result := ((Tile.X <= Bounds.X1) and (Tile.X >= Bounds.X2) and (Tile.Y <= Bounds.Y1) and (Tile.Y >= Bounds.Y2))
   else if (Tile.X <= Bounds.X1) and (Tile.Y >= Bounds.Y1) then
     Result := ((Tile.X <= Bounds.X1) and (Tile.X >= Bounds.X2) and (Tile.Y >= Bounds.Y1) and (Tile.Y <= Bounds.Y2));
+end;
+
+Function RSActor.QueueSize: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, ACTOR_QUEUESIZE);
+end;
+
+Function RSActor.QueueX: Array of Int32; constref;
+var
+  Queue: Pointer;
+  QueueSize: SizeUInt;
+begin
+  QueueSize := 0;
+  Queue := RGetArray(R_EIOS, ref, QueueSize, ACTOR_QUEUEX);
+  if Queue = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Queue, 0, QueueSize);
+  RFreeObject(R_EIOS, Queue);
+end;
+
+Function RSActor.QueueY: Array of Int32; constref;
+var
+  Queue: Pointer;
+  QueueSize: SizeUInt;
+begin
+  QueueSize := 0;
+  Queue := RGetArray(R_EIOS, ref, QueueSize, ACTOR_QUEUEY);
+  if Queue = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Queue, 0, QueueSize);
+  RFreeObject(R_EIOS, Queue);
+end;
+
+Function RSActor.Queue: Array of RSTile; constref;
+var
+  X: Array of Int32;
+  Y: Array of Int32;
+  I, L: Int32;
+begin
+  X := self.QueueX;
+  Y := self.QueueY;
+
+  L := Min(Length(X), Length(Y));
+  if L = 0 then
+    Exit;
+
+  SetLength(Result, L);
+  For I := 0 To L - 1 do
+  begin
+    Result[I] := [X[I], Y[I]];
+    Result[I] := Result[I].SceneToLocal();
+  end;
 end;

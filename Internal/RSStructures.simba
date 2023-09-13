@@ -52,6 +52,10 @@ type
 
   RSObjectDefinition = type RSType;
 
+  RSProjectile = type RSType;
+
+  RSGraphicsObject = type RSType;
+
   RSEntity = type RSType;
 
   RSActor = type RSType;
@@ -126,14 +130,14 @@ begin
   ref := nil;
 end;
 
-Procedure RSTypeArray.Free;
+Procedure RSTypeArray.Free; constref;
 type
   PPointerArray = Array of Pointer;
 begin
   RFreeObjects(R_EIOS, PPointerArray(self));
 end;
 
-Procedure RSObjectArray.Free;
+Procedure RSObjectArray.Free; constref;
 var
   I: Int32;
   Garbage: Array of Pointer;
@@ -144,7 +148,7 @@ begin
   RFreeObjects(R_EIOS, Garbage);
 end;
 
-Procedure RSAnimatedModelArray.Free;
+Procedure RSAnimatedModelArray.Free; constref;
 var
   I: Int32;
   Garbage: Array of Pointer;

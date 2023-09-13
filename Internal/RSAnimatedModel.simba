@@ -23,6 +23,9 @@ begin
   IndicesSize := Length(Indices[0]);
   SetLength(Result, IndicesSize);
 
+  if Length(Vertices) <= 0 then
+    Exit;
+
   for I := 0 to IndicesSize - 1 do
   begin
     Result[I].A := Vertices[Indices[0][I]];

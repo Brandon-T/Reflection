@@ -135,6 +135,16 @@ begin
   Result := RGetInt(R_EIOS, ref, WIDGET_TEXTUREID);
 end;
 
+Function RSWidget.ModelID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_MODELID);
+end;
+
+Function RSWidget.AnimationID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_ANIMATIONID);
+end;
+
 Function RSWidget.Actions: Array of String; constref;
 var
   Actions: Pointer;
@@ -177,9 +187,14 @@ begin
   Result := self.GroupID <> RSWidget.RootInterface();
 end;
 
-Function RSWidget.Cycle: Int32;
+Function RSWidget.Cycle: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, WIDGET_WIDGETCYCLE);
+end;
+
+Function RSWidget.Opacity: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, WIDGET_OPACITY);
 end;
 
 Function RSWidget.AbsoluteX: Int32; constref;
@@ -505,6 +520,30 @@ begin
     if (Length(WX) > 0) and (WX[0] <> nil) then
     begin
       Result := RSWidgetArray(RGetObjectArray(R_EIOS, WX[0], 0, RGetArraySize(R_EIOS, WX[0])));
+      RSTypeArray(WX).Free;
+    end;
+  end;
+
+  RFreeObject(R_EIOS, Widgets);
+end;
+
+Function RSWidget.WidgetsSize(Index: Int32): Int32; static; overload;
+var
+  Widgets: Pointer;
+  WidgetsSize: SizeUInt;
+  WX: Array of Pointer;
+begin
+  WidgetsSize := 0;
+  Widgets := RGetStaticArray(R_EIOS, WidgetsSize, CLIENT_WIDGETS);
+  if Widgets = nil then
+    Exit;
+
+  if WidgetsSize > 0 then
+  begin
+    WX := RGetObjectArray(R_EIOS, Widgets, Index, 1);
+    if (Length(WX) > 0) and (WX[0] <> nil) then
+    begin
+      Result := RGetArraySize(R_EIOS, WX[0]);
       RSTypeArray(WX).Free;
     end;
   end;

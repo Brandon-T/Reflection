@@ -774,3 +774,270 @@ Function R_PathTo(Start, Destination: RSTile): Array of RSTile;
 begin
   Result := R_PathToEx(Start, Destination, True, False);
 end;
+
+Function R_CanReach(Start, Destination: RSTile): Boolean;
+const
+  FLAG_NORTH = 19136800;
+  FLAG_EAST = 19136896;
+  FLAG_SOUTH = 19136770;
+  FLAG_WEST = 19136776;
+  FLAG_NORTH_EAST = 19136992;
+  FLAG_SOUTH_EAST = 19136899;
+  FLAG_SOUTH_WEST = 19136782;
+  FLAG_NORTH_WEST = 19136824;
+var
+  I, J, Plane: Int32;
+  CollisionMaps: Array of RSCollisionMap;
+  Flags: Array of Array of Int32;
+  Directions: Array [0..127] of Array [0..127] of Int32;
+  Distances: Array [0..127] of Array [0..127] of Int32;
+  Buffer: Array [0..4095] of TPoint;
+  P1, P2, Middle, Current, MapLocation, Offset: TPoint;
+  Index1, Index2, CurrentDistance: Int32;
+  TileCount: Int32;
+  D, DX, DY, MaxApproximateRange, MaxDistance: Int32;
+  ApproximateDestination: TPoint;
+  Reachable: Boolean;
+begin
+  Plane := RSClient.Plane;
+  CollisionMaps := RSClient.CollisionMaps;
+  if Length(CollisionMaps) = 0 then
+  begin
+    Exit;
+  end;
+
+  if CollisionMaps[Plane].ref = nil then
+  begin
+    RSTypeArray(CollisionMaps).Free;
+    Exit;
+  end;
+
+  Flags := CollisionMaps[Plane].Adjacency;
+  RSTypeArray(CollisionMaps).Free;
+  SetLength(CollisionMaps, 0);
+
+  For I := 0 to High(Directions) do
+  begin
+    For J := 0 to High(Directions) do
+    begin
+      Directions[I][J] := 0;
+      Distances[I][J] := High(Int32);
+    end;
+  end;
+
+  P1 := Start.GlobalToScene;
+  P2 := Destination.GlobalToScene;
+  Middle := P1;
+  Current := Middle;
+  Offset := [64, 64];
+
+  Directions[Offset.X][Offset.Y] := 99;
+  Distances[Offset.X][Offset.Y] := 0;
+
+  Index1 := 0;
+  Index2 := 1;
+  Buffer[0] := Current;
+
+  Reachable := False;
+  While (Index1 <> Index2) do
+  begin
+    Current := Buffer[Index1];
+    Index1 := (Index1 + 1) and 4095;
+
+    MapLocation.X := Current.X - Middle.X + Offset.X;
+    MapLocation.Y := Current.Y - Middle.Y + Offset.Y;
+
+    if (Current = P2) then
+    begin
+      Reachable := True;
+      Break;
+    end;
+
+    CurrentDistance := Distances[MapLocation.X][MapLocation.Y] + 1;
+
+    // Can Move West
+    if (MapLocation.X > 0) and
+       (Directions[MapLocation.X - 1][MapLocation.Y] = 0) and
+       ((Flags[Current.X - 1][Current.Y] and FLAG_WEST) = 0) then
+    begin
+      Buffer[Index2].X := Current.X - 1;
+      Buffer[index2].Y := Current.Y;
+      Index2 := (Index2 + 1) and 4095;
+
+      Directions[MapLocation.X - 1][MapLocation.Y] := 2;
+      Distances[MapLocation.X - 1][MapLocation.Y] := CurrentDistance;
+    end;
+
+    // Can Move East
+    if (MapLocation.X < 127) and
+       (Directions[MapLocation.X + 1][MapLocation.Y] = 0) and
+       ((Flags[Current.X + 1][Current.Y] and FLAG_EAST) = 0) then
+    begin
+      Buffer[Index2].X := Current.X + 1;
+      Buffer[Index2].Y := Current.Y;
+      Index2 := (Index2 + 1) and 4095;
+
+      Directions[MapLocation.X + 1][MapLocation.Y] := 8;
+      Distances[MapLocation.X + 1][MapLocation.Y] := CurrentDistance;
+    end;
+
+    // Can Move South
+    if (MapLocation.Y > 0) and
+       (Directions[MapLocation.X][MapLocation.Y - 1] = 0) and
+       ((Flags[Current.X][Current.Y - 1] and FLAG_SOUTH) = 0) then
+    begin
+      Buffer[Index2].X := Current.X;
+      Buffer[Index2].Y := Current.Y - 1;
+      Index2 := (Index2 + 1) and 4095;
+
+      Directions[MapLocation.X][MapLocation.Y - 1] := 1;
+      Distances[MapLocation.X][MapLocation.Y - 1] := CurrentDistance;
+    end;
+
+    // Can Move North
+    if (MapLocation.Y < 127) and
+       (Directions[MapLocation.X][MapLocation.Y + 1] = 0) and
+       ((Flags[Current.X][Current.Y + 1] and FLAG_NORTH) = 0) then
+    begin
+      Buffer[Index2].X := Current.X;
+      Buffer[Index2].Y := Current.Y + 1;
+      Index2 := (Index2 + 1) and 4095;
+
+      Directions[MapLocation.X][MapLocation.Y + 1] := 4;
+      Distances[MapLocation.X][MapLocation.Y + 1] := CurrentDistance;
+    end;
+
+    // Can Move South-West
+    if (MapLocation.X > 0) and
+       (MapLocation.Y > 0) and
+       (Directions[MapLocation.X - 1][MapLocation.Y - 1] = 0) and
+       ((Flags[Current.X - 1][Current.Y - 1] and FLAG_SOUTH_WEST) = 0) and
+       ((Flags[Current.X - 1][Current.Y] and FLAG_WEST) = 0) and
+       ((Flags[Current.X][Current.Y - 1] and FLAG_SOUTH) = 0) then
+    begin
+      Buffer[Index2].X := Current.X - 1;
+      Buffer[Index2].Y := Current.Y - 1;
+      Index2 := (Index2 + 1) and 4095;
+
+      Directions[MapLocation.X - 1][MapLocation.Y - 1] := 3;
+      Distances[MapLocation.X - 1][MapLocation.Y - 1] := CurrentDistance;
+    end;
+
+    // Can Move South-East
+    if (MapLocation.X < 127) and
+       (MapLocation.Y > 0) and
+       (Directions[MapLocation.X + 1][MapLocation.Y - 1] = 0) and
+       ((Flags[Current.X + 1][Current.Y - 1] and FLAG_SOUTH_EAST) = 0) and
+       ((Flags[Current.X + 1][Current.Y] and FLAG_EAST) = 0) and
+       ((Flags[Current.X][Current.Y - 1] and FLAG_SOUTH) = 0) then
+		begin
+		  Buffer[Index2].X := Current.X + 1;
+			Buffer[Index2].Y := Current.Y - 1;
+			Index2 := (Index2 + 1) and 4095;
+
+			Directions[MapLocation.X + 1][MapLocation.Y - 1] := 9;
+			Distances[MapLocation.X + 1][MapLocation.Y - 1] := CurrentDistance;
+		end;
+
+    // Can Move North-West
+    if (MapLocation.X > 0) and
+       (MapLocation.Y < 127) and
+       (Directions[MapLocation.X - 1][MapLocation.Y + 1] = 0) and
+       ((Flags[Current.X - 1][Current.Y + 1] and FLAG_NORTH_WEST) = 0) and
+       ((Flags[Current.X - 1][Current.Y] and FLAG_WEST) = 0) and
+       ((Flags[Current.X][Current.Y + 1] and FLAG_NORTH) = 0) then
+		begin
+		  Buffer[Index2].X := Current.X - 1;
+			Buffer[Index2].Y := Current.Y + 1;
+			Index2 := (Index2 + 1) and 4095;
+
+			Directions[MapLocation.X - 1][MapLocation.Y + 1] := 6;
+			Distances[MapLocation.X - 1][MapLocation.Y + 1] := CurrentDistance;
+		end;
+
+    // Can Move North-East
+    if (MapLocation.X < 127) and
+       (MapLocation.Y < 127) and
+       (Directions[MapLocation.X + 1][MapLocation.Y + 1] = 0) and
+       ((Flags[Current.X + 1][Current.Y + 1] and FLAG_NORTH_EAST) = 0) and
+       ((Flags[Current.X + 1][Current.Y] and FLAG_EAST) = 0) and
+       ((Flags[Current.X][Current.Y + 1] and FLAG_NORTH) = 0) then
+		begin
+		  Buffer[Index2].X := Current.X + 1;
+			Buffer[Index2].Y := Current.Y + 1;
+			Index2 := (Index2 + 1) and 4095;
+
+			Directions[MapLocation.X + 1][MapLocation.Y + 1] := 12;
+			Distances[MapLocation.X + 1][MapLocation.Y + 1] := CurrentDistance;
+		end;
+  end;
+
+  if (Not Reachable) then
+  begin
+    // Find Tile Closest to the target Destination
+    MaxDistance := High(Int32);
+    TileCount := High(Int32);
+    ApproximateDestination := P2;
+    MaxApproximateRange := 10;
+
+    I := ApproximateDestination.X - MaxApproximateRange;
+    While (I <= MaxApproximateRange + ApproximateDestination.X) do
+    begin
+      J := ApproximateDestination.Y - MaxApproximateRange;
+
+      While (J <= MaxApproximateRange + ApproximateDestination.Y) do
+      begin
+        MapLocation.X := I - Middle.X + Offset.X;
+        MapLocation.Y := J - Middle.Y + Offset.Y;
+
+        if (MapLocation.X >= 0) and
+           (MapLocation.Y >= 0) and
+           (MapLocation.X < 128) and
+           (MapLocation.Y < 128) and
+           (Distances[MapLocation.X][MapLocation.Y] < 100) then
+        begin
+          DX := 0;
+          DY := 0;
+
+          if (I < ApproximateDestination.X) then
+          begin
+            DX := ApproximateDestination.X - I;
+          end else if (I > ApproximateDestination.X) then
+            begin
+              DX := I - ApproximateDestination.X;
+            end;
+
+          if (J < ApproximateDestination.Y) then
+          begin
+            DY := ApproximateDestination.Y - J;
+          end else if (J > ApproximateDestination.Y) then
+            begin
+              DY := J - ApproximateDestination.Y;
+            end;
+
+          D := (DX * DX) + (DY * DY);
+          if (D < MaxDistance) or
+             ((D = MaxDistance) and
+              (Distances[MapLocation.X][MapLocation.Y] < TileCount)) then
+          begin
+            MaxDistance := D;
+            TileCount := Distances[MapLocation.X][MapLocation.Y];
+            Current := [I, J];
+          end;
+        end;
+
+        Inc(J);
+      end;
+
+      Inc(I);
+    end;
+
+    // No Path
+    if MaxDistance = High(Int32) then
+    begin
+      Exit;
+    end;
+  end;
+
+  Result := True;
+end;

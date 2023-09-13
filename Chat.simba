@@ -50,7 +50,10 @@ begin
     Message := Children[I + 1].Text.SanitizeRS;
 
     if (Name = '') and (Message = '') then
-      break;
+    begin
+      I += 1;
+      Continue;
+    end;
 
     if (Name <> '') and (Message = '') then
       Swap(Name, Message);

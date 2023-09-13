@@ -9,6 +9,51 @@ begin
   Result.ref := RGetObject(R_EIOS, ref, NPC_DEFINITION);
 end;
 
+Function RSNPC.TransformedDefinition: RSNPCDefinition; constref;
+var
+  Definition: RSNPCDefinition;
+  Bit, TransformID: Int32;
+  DefinitionID: Int32;
+  Transformations: Array of Int32;
+begin
+  Definition := self.Definition;
+  if Definition.ref <> nil then
+  begin
+    Bit := -1;
+    TransformID := Definition.TransformVarbit;
+
+    if TransformID <> -1 then
+    begin
+      Bit := RSClient.GetVarBit(TransformID);
+    end else
+      begin
+        Bit := RSVarps.VarpMain(Definition.TransformVarp);
+      end;
+
+    Transformations := Definition.Transformations;
+    if (Bit >= 0) and (Bit < (Length(Transformations) - 1)) then
+    begin
+			DefinitionID := Transformations[Bit];
+    end else
+      if Length(Transformations) > 0 then
+      begin
+        DefinitionID := Transformations[Length(Transformations) - 1];
+      end;
+
+    if DefinitionID <> -1 then
+    begin
+      Result.ref := RSNPCDefinition.DefinitionCache(DefinitionID).ref;
+      if Result.ref <> nil then
+      begin
+        Definition.Free;
+        Exit;
+      end;
+    end;
+
+    Result.ref := Definition.ref;
+  end;
+end;
+
 Function RSNPC.AllNPCs: Array of RSNPC; static;
 var
   NPCs: Pointer;
@@ -45,7 +90,7 @@ Function RSNPC.Model: RSModel; constref;
 var
   Definition: RSNPCDefinition;
 begin
-  Definition := self.Definition;
+  Definition := self.TransformedDefinition;
   if Definition.ref = nil then
     Exit;
   Result := Definition.CachedModel;

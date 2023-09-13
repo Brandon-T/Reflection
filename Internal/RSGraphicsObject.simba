@@ -1,0 +1,65 @@
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+//{$include_once RSAnimationSequence.simba}
+
+Function RSGraphicsObject.ID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_ID);
+end;
+
+Function RSGraphicsObject.LocalX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_LOCALX);
+end;
+
+Function RSGraphicsObject.LocalY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_LOCALY);
+end;
+
+Function RSGraphicsObject.Height: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_HEIGHT);
+end;
+
+Function RSGraphicsObject.Plane: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_PLANE);
+end;
+
+//Function RSGraphicsObject.AnimationSequence: RSAnimationSequence; constref;
+//begin
+//  Result.ref := RGetObject(R_EIOS, ref, GRAPHICSOBJECT_SEQUENCEDEFINITION);
+//end;
+
+Function RSGraphicsObject.Frame: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_FRAME);
+end;
+
+Function RSGraphicsObject.FrameCycle: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_FRAMECYCLE);
+end;
+
+Function RSGraphicsObject.StartCycle: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_STARTCYCLE);
+end;
+
+Function RSGraphicsObject.IsFinished: Boolean; constref;
+begin
+  Result := RGetBool(R_EIOS, ref, GRAPHICSOBJECT_ISFINISHED);
+end;
+
+Function RSGraphicsObject.LocalTile: RSTile; constref;
+begin
+  Result.X := self.LocalX;
+  Result.Y := self.LocalY;
+end;
+
+Function RSGraphicsObject.Tile: RSTile; constref;
+begin
+  Result.X := RSClient.BaseX + self.LocalX div 128;
+  Result.Y := RSClient.BaseY + self.LocalY div 128;
+end;

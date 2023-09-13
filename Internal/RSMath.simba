@@ -450,10 +450,10 @@ end;
 
 Function RSTile.Project: T2DRectangle; constref;
 begin
-  Result := self.Project(RSClient.Plane);
+  Result := self.Project(1, 1, RSClient.Plane);
 end;
 
-Function RSTile.Project(Plane: Int32): T2DRectangle; constref; overload;
+Function RSTile.Project(SizeX, SizeY, Plane: Int32): T2DRectangle; constref; overload;
 const
   LocalTileSize = (1 shl 7);
 var
@@ -494,10 +494,10 @@ begin
 
   xSize := Sar(self.X, 7);
   ySize := Sar(self.Y, 7);
-  swX := self.X - (LocalTileSize div 2);
-	swY := self.Y - (LocalTileSize div 2);
-  neX := self.X + (LocalTileSize div 2);
-	neY := self.Y + (LocalTileSize div 2);
+  swX := self.X - (SizeX * LocalTileSize div 2);
+	swY := self.Y - (SizeY * LocalTileSize div 2);
+  neX := self.X + (SizeX * LocalTileSize div 2);
+	neY := self.Y + (SizeY * LocalTileSize div 2);
 
   if (xSize >= 0) and (ySize >= 0) and (xSize < 104) and (ySize < 104) then
   begin

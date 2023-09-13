@@ -1,0 +1,126 @@
+{$include_once RSStructures.simba}
+{$include_once RSClient.simba}
+
+Function RSProjectile.ID: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_ID);
+end;
+
+Function RSProjectile.Plane: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_PLANE);
+end;
+
+Function RSProjectile.SourceX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_SOURCEX);
+end;
+
+Function RSProjectile.SourceY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_SOURCEY);
+end;
+
+Function RSProjectile.SourceZ: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_SOURCEZ);
+end;
+
+Function RSProjectile.X: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_X);
+end;
+
+Function RSProjectile.Y: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_Y);
+end;
+
+Function RSProjectile.Z: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_Z);
+end;
+
+Function RSProjectile.Speed: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_SPEED);
+end;
+
+Function RSProjectile.SpeedX: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_SPEEDX);
+end;
+
+Function RSProjectile.SpeedY: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_SPEEDY);
+end;
+
+Function RSProjectile.SpeedZ: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_SPEEDZ);
+end;
+
+Function RSProjectile.AccelerationZ: Double; constref;
+begin
+  Result := RGetDouble(R_EIOS, ref, PROJECTILE_ACCELERATIONZ);
+end;
+
+Function RSProjectile.StartHeight: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_STARTHEIGHT);
+end;
+
+Function RSProjectile.EndHeight: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_ENDHEIGHT);
+end;
+
+Function RSProjectile.StartCycle: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_STARTCYCLE);
+end;
+
+Function RSProjectile.EndCycle: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_ENDCYCLE);
+end;
+
+Function RSProjectile.InteractingIndex: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_INTERACTINGINDEX);
+end;
+
+Function RSProjectile.Pitch: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_PITCH);
+end;
+
+Function RSProjectile.Yaw: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_YAW);
+end;
+
+Function RSProjectile.IsMoving: Boolean; constref;
+begin
+  Result := RGetBool(R_EIOS, ref, PROJECTILE_ISMOVING);
+end;
+
+Function RSProjectile.AnimationFrame: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_ANIMATIONFRAME);
+end;
+
+Function RSProjectile.LocalTile: RSTile; constref;
+begin
+  Result.X := Int32(Floor(self.X));
+  Result.Y := Int32(Floor(self.Y));
+end;
+
+Function RSProjectile.Tile: RSTile; constref;
+begin
+  Result.X := RSClient.BaseX + Int32(Floor(self.X)) div 128;
+  Result.Y := RSClient.BaseY + Int32(Floor(self.Y)) div 128;
+end;
+
+
