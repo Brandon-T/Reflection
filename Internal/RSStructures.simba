@@ -130,14 +130,15 @@ begin
   ref := nil;
 end;
 
-Procedure RSTypeArray.Free; constref;
+Procedure RSTypeArray.Free;
 type
   PPointerArray = Array of Pointer;
 begin
   RFreeObjects(R_EIOS, PPointerArray(self));
+  SetLength(self, 0);
 end;
 
-Procedure RSObjectArray.Free; constref;
+Procedure RSObjectArray.Free;
 var
   I: Int32;
   Garbage: Array of Pointer;
@@ -146,9 +147,10 @@ begin
   for I := 0 to high(self) do
     Garbage[I] := self[I].ref;
   RFreeObjects(R_EIOS, Garbage);
+  SetLength(self, 0);
 end;
 
-Procedure RSAnimatedModelArray.Free; constref;
+Procedure RSAnimatedModelArray.Free;
 var
   I: Int32;
   Garbage: Array of Pointer;
@@ -157,4 +159,5 @@ begin
   for I := 0 to high(self) do
     Garbage[I] := self[I].ref;
   RFreeObjects(R_EIOS, Garbage);
+  SetLength(self, 0);
 end;

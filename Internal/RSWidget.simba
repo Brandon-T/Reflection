@@ -409,12 +409,26 @@ begin
   Result := [Location.X, Location.Y, Location.X + self.Width, Location.Y + self.Height];
 end;
 
+Function RSWidget.ClientWidgets(var Size: SizeUInt): Pointer; static;
+var
+  WidgetHolder: Pointer;
+begin
+  WidgetHolder := RGetStaticObject(R_EIOS, CLIENT_WIDGETHOLDER);
+  if WidgetHolder = nil then
+    Exit;
+
+  Result := RGetArray(R_EIOS, WidgetHolder, Size, CLIENT_WIDGETS);
+  RFreeObject(R_EIOS, WidgetHolder);
+end;
+
 Function RSWidget.Get(ContainerIndex, Parent, Child: Int32 = -1): RSWidget; static;
 var
+  WidgetsSize: SizeUInt;
   Widgets: Pointer;
   wParent: RSWidget;
 begin
-  Widgets := RGetStaticArray(R_EIOS, CLIENT_WIDGETS);
+  WidgetsSize := 0;
+  Widgets := RSWidget.ClientWidgets(WidgetsSize);
   if Widgets = nil then
     Exit;
 
@@ -479,7 +493,7 @@ var
     RSWidgetArray = Array of RSWidget;
 begin
   WidgetsSize := 0;
-  Widgets := RGetStaticArray(R_EIOS, WidgetsSize, CLIENT_WIDGETS);
+  Widgets := RSWidget.ClientWidgets(WidgetsSize);
   if Widgets = nil then
     Exit;
 
@@ -510,7 +524,7 @@ var
     RSWidgetArray = Array of RSWidget;
 begin
   WidgetsSize := 0;
-  Widgets := RGetStaticArray(R_EIOS, WidgetsSize, CLIENT_WIDGETS);
+  Widgets := RSWidget.ClientWidgets(WidgetsSize);
   if Widgets = nil then
     Exit;
 
@@ -534,7 +548,7 @@ var
   WX: Array of Pointer;
 begin
   WidgetsSize := 0;
-  Widgets := RGetStaticArray(R_EIOS, WidgetsSize, CLIENT_WIDGETS);
+  Widgets := RSWidget.ClientWidgets(WidgetsSize);
   if Widgets = nil then
     Exit;
 

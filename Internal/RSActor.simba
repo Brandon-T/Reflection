@@ -225,6 +225,7 @@ end;
 Function RSActor.GetInteracting: RSActor; constref;
 var
   Index: Int32;
+  Size: SizeUInt;
   Actors: Pointer;
 begin
   Index := self.InteractingIndex;
@@ -233,22 +234,21 @@ begin
 
   if Index < 32768 then
   begin
-    Actors := RGetStaticObject(R_EIOS, CLIENT_LOCALNPCS);
-    if Actors <> nil then
+    Actors := RGetStaticArray(R_EIOS, Size, CLIENT_LOCALNPCS);
+    if (Actors <> nil) and (Index < Size) then
     begin
       Result.ref := RGetObjectArray(R_EIOS, Actors, Index);
-      RFreeObject(R_EIOS, Actors);
-      Exit;
     end;
+    RFreeObject(R_EIOS, Actors);
   end else
     begin
-      Actors := RGetStaticObject(R_EIOS, CLIENT_LOCALPLAYERS);
-      if Actors <> nil then
+      Index -= 32768;
+      Actors := RGetStaticArray(R_EIOS, Size, CLIENT_LOCALPLAYERS);
+      if (Actors <> nil) and (Index < Size) then
       begin
-        Result.ref := RGetObjectArray(R_EIOS, Actors, Index - 32768);
-        RFreeObject(R_EIOS, Actors);
-        Exit;
+        Result.ref := RGetObjectArray(R_EIOS, Actors, Index);
       end;
+      RFreeObject(R_EIOS, Actors);
     end;
 end;
 
@@ -319,4 +319,17 @@ begin
     Result[I] := [X[I], Y[I]];
     Result[I] := Result[I].SceneToLocal();
   end;
+end;
+
+Function RSActor.TrueLocalTile: RSTile; constref;
+var
+  Path: Array of RSTile;
+begin
+  Path := self.Queue;
+  if Length(Path) > 0 then
+  begin
+    Exit(Path[0]);
+  end;
+
+  Result := self.LocalTile;
 end;
