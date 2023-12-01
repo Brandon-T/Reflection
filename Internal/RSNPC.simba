@@ -93,6 +93,7 @@ begin
   Definition := self.TransformedDefinition;
   if Definition.ref = nil then
     Exit;
+
   Result := Definition.CachedModel;
   Definition.Free;
 end;
@@ -163,23 +164,47 @@ begin
   Garbage.Free;
 end;
 
-function RSNPC.ToTPA(): TPointArray
+Function RSNPC.ClickArea: TPointArray;
 var
-  objModel: RSModel;
-  objTile: RSTile;
-  triangles: array of T2DTriangle;
-  points: TPointArray;
-  i: Int32;
+  Model: RSAnimatedModel;
+  Definition: RSNPCDefinition;
+  Tile, HeightTile: RSTile;
+  ModelTileSize: Int32;
+  ShouldScale: Boolean;
+  ModelScale: TVector;
+  Vertices: Array of TVector;
 begin
-  objModel := Self.Model;
-  objTile := Self.LocalTile;
-  triangles := objModel.Project(objTile.X, objTile.Y, objTile.GetHeight(), 0);
-  objModel.free;
-  for i := 0 to high(triangles) do
+  Model := self.AnimatedModel;
+  if Model.ref = nil then
+    Exit;
+
+  ModelTileSize := 1;
+  ShouldScale := false;
+
+  Definition := self.Definition;
+  if Definition.ref <> nil then
   begin
-    points += triangles[i].A;
-    points += triangles[i].B;
-    points += triangles[i].C;
+    ModelTileSize := Definition.ModelTileSize;
+    ModelScale := Definition.ModelScale;
+    ShouldScale := (ModelScale.X <> 128) and (ModelScale.Y <> 128);
+    Definition.Free;
   end;
-  Result := points;
+
+  Tile := self.LocalTile;
+  HeightTile := Tile;
+  Vertices := Model.Vertices;
+
+  if ModelTileSize > 0 then
+  begin
+    HeightTile.X += (ModelTileSize * 64) - 64;
+    HeightTile.Y += (ModelTileSize * 64) - 64;
+  end;
+
+  if ShouldScale then
+  begin
+    RSModel.scale(Vertices, modelScale);
+  end;
+
+  Result := Model.Bounds(Vertices, Tile.X, Tile.Y, HeightTile.GetHeight(), self.Orientation);
+  Model.Free;
 end;

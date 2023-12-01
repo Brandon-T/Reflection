@@ -351,23 +351,16 @@ begin
   RFreeObject(R_EIOS, Entity.ref);
 end;
 
-Function RSObject.ToTPA(): TPointArray;
+Function RSObject.ClickArea: TPointArray;
 var
-  model: RSModel;
-  tile: RSTile;
-  triangles: array of T2DTriangle;
-  points: TPointArray;
-  i: Int32;
+  Model: RSModel;
+  Tile: RSTile;
 begin
-  model := Self.Model;
-  tile := Self.LocalTile;
-  triangles := model.Project(tile.X, tile.Y, tile.GetHeight(), 0);
-  model.free;
-  for i := 0 to high(triangles) do
-  begin
-    points += triangles[i].A;
-    points += triangles[i].B;
-    points += triangles[i].C;
-  end;
-  Result := points;
+  Model := self.Model;
+  if Model.ref = nil then
+    Exit;
+
+  Tile := self.LocalTile;
+  Result := Model.Bounds(Model.Vertices, Tile.X, Tile.Y, Tile.GetHeight(), 0);
+  Model.Free;
 end;

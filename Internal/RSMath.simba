@@ -526,14 +526,13 @@ begin
   Result.SW := Point(-1, -1);
 end;
 
-Function RSModel.AABB(LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
+Function RSModel.AABB(Vertices: Array of TVector; LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
 var
   I: Int32;
   xMin, xMax: Int32;
   yMin, yMax: Int32;
   zMin, zMax: Int32;
   SinAngle, CosAngle: Int32;
-  Vertices: Array[0..2] of Array of Int32;
   VX, VY, VZ: Int32;
   xMid, yMid, zMid: Int32;
   xMidOffset, yMidOffset, zMidOffset: Int32;
@@ -545,18 +544,16 @@ var
   X1, Y1, Z1, X2, Y2, Z2: Int32;
   Bounds: Array of TVector;
 begin
-  Vertices := self.RawVertices;
-
   //Calculate Cylindrical Bounds
 	Height := 0;
 	BottomY := 0;
 	xzRadius := 0;
 
-  For I := 0 to High(Vertices[0]) do
+  For I := 0 to High(Vertices) do
   begin
-    VX := Vertices[0][I];
-    VY := Vertices[1][I];
-    VZ := Vertices[2][I];
+    VX := Vertices[I].X;
+    VY := Vertices[I].Y;
+    VZ := Vertices[I].Z;
 
     Height := max(Height, -VY);
     BottomY := max(BottomY, VY);
@@ -578,12 +575,12 @@ begin
   SinAngle := SINE[Orientation];
   CosAngle := COSINE[Orientation];
 
-  For I := 0 to High(Vertices[0]) do
+  For I := 0 to High(Vertices) do
   begin
     //Rotate
-    VX := Sar(((Vertices[0][I] * CosAngle) + (Vertices[2][I] * SinAngle)), 16); //X * COSINE[Orientation] + Z * SINE[Orientation] >> 16;
-    VZ := Vertices[1][I];
-    VY := Sar(((Vertices[2][I] * CosAngle) - (Vertices[0][I] * SinAngle)), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
+    VX := Sar(((Vertices[I].X * CosAngle) + (Vertices[I].Z * SinAngle)), 16); //X * COSINE[Orientation] + Z * SINE[Orientation] >> 16;
+    VZ := Vertices[I].Y;
+    VY := Sar(((Vertices[I].Z * CosAngle) - (Vertices[I].X * SinAngle)), 16); //Z * COSINE[Orientation] - X * SINE[Orientation] >> 16;
 
     //Bounds
     xMin := min(xMin, VX);
@@ -636,7 +633,7 @@ begin
   Result := System.Project(Bounds, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
 end;
 
-Function RSModel.Bounding2DEdges(LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
+Function RSModel.Bounding2DEdges(Vertices: Array of TVector; LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
 var
   TPA: TPointArray;
   I, J, K, MinX, MaxX, MinY, MaxY, XS, YS: Int32;
@@ -644,7 +641,7 @@ var
   FaceColours: Array of Int32;
   Nope: Boolean;
 begin
-  TPA := System.Project(self.Vertices, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+  TPA := System.Project(Vertices, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
   Indices := self.RawIndices;
   FaceColours := self.FaceColors3;
 
@@ -701,13 +698,21 @@ begin
   Result := TPABorder(Result);
 end;
 
-Function RSModel.Bounds(LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
+Function RSModel.Bounds(Vertices: Array of TVector; LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
 begin
   if self.FitsSingleTile then
   begin
-    Result := self.AABB(LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+    Result := self.AABB(Vertices, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
     Exit;
   end;
 
-  Result := self.Bounding2DEdges(LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+  Result := self.Bounding2DEdges(Vertices, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
+end;
+
+Function RSAnimatedModel.Bounds(Vertices: Array of TVector; LocalTileX, LocalTileY, LocalTileHeight, Orientation: Int32): TPointArray;
+var
+  Model: RSModel;
+begin
+  Model.ref := self.ref;
+  Result := Model.Bounds(Vertices, LocalTileX, LocalTileY, LocalTileHeight, Orientation);
 end;

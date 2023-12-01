@@ -48,7 +48,7 @@ begin
   for I := 0 to ClientCount - 1 do
   begin
     PID := EIOS_GetClientPID(I);
-    if PID <> -1 then
+    if PID = GetSimbaTargetPID() then
     begin
       SetEIOSTarget(PLUGINPATH + REMOTE_INPUT_PLUGIN, IntToStr(PID));
       break;

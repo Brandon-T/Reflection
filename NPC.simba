@@ -198,7 +198,7 @@ begin
     EachNPCDef := EachNPC.Definition;
     if (EachNPC.SpokenText <> '') and (MyName in EachNPC.SpokenText) then begin
       Wait(1200, 5000);
-      NPCTPA := EachNPC.ToTPA;
+      NPCTPA := EachNPC.ClickArea;
       Mouse.Move(MiddleTPA(NPCTPA), 5, true);
       if TakeLamp and (EachNPCDef.Name = 'Genie') then begin
         Mouse.Click(MOUSE_LEFT);

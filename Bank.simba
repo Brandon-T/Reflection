@@ -310,7 +310,7 @@ begin
     Obj := RSObject.Get(BoothType, Booths[I].X, Booths[I].Y);
     if (IDs.Find(Obj.ID) <> -1) then
     begin
-      Bounds := Obj.ToTPA();
+      Bounds := Obj.ClickArea;
       Box :=  Bounds.MinAreaRect.Bounds;
 
       while not SRL.PointInPoly(Pnt, Bounds) do
@@ -1054,7 +1054,7 @@ begin
 
   Mouse.Move(Item.Bounds, True);
   Wait(50 + RandomRange(50, 100));
-  if R_WaitUptext(['Withdraw-' + IntToStr(Amount)], True, RandomRange(200, 300)) then
+  if R_WaitUptext(['Withdraw-' + IntToStr(Amount) + ' '], True, RandomRange(200, 300)) then
   begin
     Mouse.Click(Item.Bounds, MOUSE_LEFT);
     Exit(True);
@@ -1062,7 +1062,7 @@ begin
 
   Mouse.Click(Item.Bounds, MOUSE_RIGHT);
   Wait(50 + RandomRange(50, 100));
-  if R_ChooseOptions(['Withdraw-' + IntToStr(Amount)]) then
+  if R_ChooseOptions(['Withdraw-' + IntToStr(Amount) + ' ']) then
     Exit(True);
 
   if R_ChooseOptions(['Withdraw-X']) then

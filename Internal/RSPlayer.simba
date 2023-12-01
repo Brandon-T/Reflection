@@ -186,3 +186,17 @@ begin
 
   Garbage.Free;
 end;
+
+Function RSPlayer.ClickArea: TPointArray;
+var
+  Model: RSAnimatedModel;
+  Tile: RSTile;
+begin
+  Model := self.AnimatedModel;
+  if Model.ref = nil then
+    Exit;
+
+  Tile := self.LocalTile;
+  Result := Model.Bounds(Model.Vertices, Tile.X, Tile.Y, Tile.GetHeight(), self.Orientation);
+  Model.Free;
+end;

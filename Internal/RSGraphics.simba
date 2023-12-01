@@ -10,7 +10,6 @@ var
 begin
   h := (High(points) - 1);
 
-  if (h = -1) then
   if (h <= 0) then
     exit;
 
