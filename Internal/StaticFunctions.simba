@@ -90,57 +90,43 @@ end;
 // MARK: - Array of 1-Dimension
 
 Function RGetStaticBoolArray(eios: Pointer; index: SizeUInt): Boolean;
-type
-  PBool = ^Boolean;
 begin
-  Result := PBool(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BOOLEAN, index))^;
+  Result := Boolean(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BOOLEAN, index))^;
 end;
 
 Function RGetStaticCharArray(eios: Pointer; index: SizeUInt): Char;
 begin
-  Result := PChar(RIGetArraySingleElement(eios, nil, ReflectionType.RI_CHAR, index))^;
+  Result := Char(RIGetArraySingleElement(eios, nil, ReflectionType.RI_CHAR, index))^;
 end;
 
 Function RGetStaticByteArray(eios: Pointer; index: SizeUInt): Byte;
-type
-  PByte = ^Byte;
 begin
-  Result := PByte(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BYTE, index))^;
+  Result := Byte(RIGetArraySingleElement(eios, nil, ReflectionType.RI_BYTE, index))^;
 end;
 
 Function RGetStaticShortArray(eios: Pointer; index: SizeUInt): Int16;
-type
-  PShort = ^Int16;
 begin
-  Result := PShort(RIGetArraySingleElement(eios, nil, ReflectionType.RI_SHORT, index))^;
+  Result := Int16(RIGetArraySingleElement(eios, nil, ReflectionType.RI_SHORT, index))^;
 end;
 
 Function RGetStaticIntArray(eios: Pointer; index: SizeUInt): Int32;
-type
-  PInt = ^Int32;
 begin
-  Result := PInt(RIGetArraySingleElement(eios, nil, ReflectionType.RI_INT, index))^;
+  Result := Int32(RIGetArraySingleElement(eios, nil, ReflectionType.RI_INT, index))^;
 end;
 
 Function RGetStaticLongArray(eios: Pointer; index: SizeUInt): Int64;
-type
-  PLong = ^Int64;
 begin
-  Result := PLong(RIGetArraySingleElement(eios, nil, ReflectionType.RI_LONG, index))^;
+  Result := Int64(RIGetArraySingleElement(eios, nil, ReflectionType.RI_LONG, index))^;
 end;
 
 Function RGetStaticFloatArray(eios: Pointer; index: SizeUInt): Single;
-type
-  PFloat = ^Single;
 begin
-  Result := PFloat(RIGetArraySingleElement(eios, nil, ReflectionType.RI_FLOAT, index))^;
+  Result := Single(RIGetArraySingleElement(eios, nil, ReflectionType.RI_FLOAT, index))^;
 end;
 
 Function RGetStaticDoubleArray(eios: Pointer; index: SizeUInt): Double;
-type
-  PDouble = ^Double;
 begin
-  Result := PDouble(RIGetArraySingleElement(eios, nil, ReflectionType.RI_DOUBLE, index))^;
+  Result := Double(RIGetArraySingleElement(eios, nil, ReflectionType.RI_DOUBLE, index))^;
 end;
 
 Function RGetStaticStringArray(eios: Pointer; index: SizeUInt): String;

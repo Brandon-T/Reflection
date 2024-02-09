@@ -278,14 +278,12 @@ end;
 // MARK: - Array of 1-Dimension
 
 Function RGetBoolArray(eios: Pointer; instance: Pointer; index: SizeUInt): Boolean;
-type
-  PBool = ^Boolean;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetBoolArray(Index)');
   {$ENDIF}
 
-  Result := PBool(RIGetArraySingleElement(eios, instance, ReflectionType.RI_BOOLEAN, index))^;
+  Result := Boolean(RIGetArraySingleElement(eios, instance, ReflectionType.RI_BOOLEAN, index))^;
 end;
 
 Function RGetCharArray(eios: Pointer; instance: Pointer; index: SizeUInt): Char;
@@ -294,73 +292,61 @@ begin
   RAssertNotNull(instance, 'RGetCharArray(Index)');
   {$ENDIF}
 
-  Result := PChar(RIGetArraySingleElement(eios, instance, ReflectionType.RI_CHAR, index))^;
+  Result := Char(RIGetArraySingleElement(eios, instance, ReflectionType.RI_CHAR, index))^;
 end;
 
 Function RGetByteArray(eios: Pointer; instance: Pointer; index: SizeUInt): Byte;
-type
-  PByte = ^Byte;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetByteArray(Index)');
   {$ENDIF}
 
-  Result := PByte(RIGetArraySingleElement(eios, instance, ReflectionType.RI_BYTE, index))^;
+  Result := Byte(RIGetArraySingleElement(eios, instance, ReflectionType.RI_BYTE, index))^;
 end;
 
 Function RGetShortArray(eios: Pointer; instance: Pointer; index: SizeUInt): Int16;
-type
-  PShort = ^Int16;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetShortArray(Index)');
   {$ENDIF}
 
-  Result := PShort(RIGetArraySingleElement(eios, instance, ReflectionType.RI_SHORT, index))^;
+  Result := Int16(RIGetArraySingleElement(eios, instance, ReflectionType.RI_SHORT, index))^;
 end;
 
 Function RGetIntArray(eios: Pointer; instance: Pointer; index: SizeUInt): Int32;
-type
-  PInt = ^Int32;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetIntArray(Index)');
   {$ENDIF}
 
-  Result := PInt(RIGetArraySingleElement(eios, instance, ReflectionType.RI_INT, index))^;
+  Result := Int32(RIGetArraySingleElement(eios, instance, ReflectionType.RI_INT, index));
 end;
 
 Function RGetLongArray(eios: Pointer; instance: Pointer; index: SizeUInt): Int64;
-type
-  PLong = ^Int64;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetLongArray(Index)');
   {$ENDIF}
 
-  Result := PLong(RIGetArraySingleElement(eios, instance, ReflectionType.RI_LONG, index))^;
+  Result := Int64(RIGetArraySingleElement(eios, instance, ReflectionType.RI_LONG, index))^;
 end;
 
 Function RGetFloatArray(eios: Pointer; instance: Pointer; index: SizeUInt): Single;
-type
-  PFloat = ^Single;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetFloatArray(Index)');
   {$ENDIF}
 
-  Result := PFloat(RIGetArraySingleElement(eios, instance, ReflectionType.RI_FLOAT, index))^;
+  Result := Single(RIGetArraySingleElement(eios, instance, ReflectionType.RI_FLOAT, index))^;
 end;
 
 Function RGetDoubleArray(eios: Pointer; instance: Pointer; index: SizeUInt): Double;
-type
-  PDouble = ^Double;
 begin
   {$IFDEF DEBUG_REFLECTION_NULLPTR}
   RAssertNotNull(instance, 'RGetDoubleArray(Index)');
   {$ENDIF}
 
-  Result := PDouble(RIGetArraySingleElement(eios, instance, ReflectionType.RI_DOUBLE, index))^;
+  Result := Double(RIGetArraySingleElement(eios, instance, ReflectionType.RI_DOUBLE, index))^;
 end;
 
 Function RGetStringArray(eios: Pointer; instance: Pointer; index: SizeUInt): String;
