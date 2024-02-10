@@ -27,13 +27,17 @@ begin
       Bit := RSClient.GetVarBit(TransformID);
     end else
       begin
-        Bit := RSVarps.VarpMain(Definition.TransformVarp);
+        TransformID := Definition.TransformVarp;
+        if TransformID <> -1 then
+        begin
+          Bit := RSVarps.VarpMain(Definition.TransformVarp);
+        end;
       end;
 
     Transformations := Definition.Transformations;
     if (Bit >= 0) and (Bit < (Length(Transformations) - 1)) then
     begin
-			DefinitionID := Transformations[Bit];
+      DefinitionID := Transformations[Bit];
     end else
       if Length(Transformations) > 0 then
       begin
