@@ -3,7 +3,6 @@
 {$include_once Worlds.simba}
 
 
-
 {*
 R_IsInLobby
 ~~~~~~~~~~~~~
@@ -12,12 +11,8 @@ Checks to see if the Lobby is open.
 Function R_IsInLobby: Boolean;
 var
   State: Boolean;
-  LoggedInObject: Pointer;
 begin
-  //State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30) and (RGetStaticInt(R_EIOS, CLIENT_LOGINSTATE) = 16); //Change in Rev 20.
-
-  LoggedInObject := RGetStaticObject(R_EIOS, ['cv', 'am', 'Lcv;', 1]);
-  State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30) and (RIObjectsEqual(R_EIOS, RGetStaticObject(R_EIOS, CLIENT_LOGINSTATE), LoggedInObject));
+  State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30);
   if State then
   begin
     Result := RSWidget.IsValid(R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Group, R_POST_LOGIN_CLICK_TO_PLAY_CONTAINER.Child);
@@ -36,13 +31,8 @@ Example:
 Function R_IsLoggedIn: Boolean;
 var
   State: Boolean;
-  LoggedInObject: Pointer;
 begin
-  // IsOnLoginScreen = (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30)
-  //State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30) and (RGetStaticInt(R_EIOS, CLIENT_LOGINSTATE) = 16);  //Change in Rev 20.
-
-  LoggedInObject := RGetStaticObject(R_EIOS, ['cv', 'am', 'Lcv;', 1]);
-  State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30) and (RIObjectsEqual(R_EIOS, RGetStaticObject(R_EIOS, CLIENT_LOGINSTATE), LoggedInObject));
+  State := (RGetStaticInt(R_EIOS, CLIENT_GAMESTATE) = 30);
   if State then
   begin
     Result := Not R_IsInLobby;
