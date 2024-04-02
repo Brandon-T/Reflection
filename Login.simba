@@ -164,7 +164,7 @@ begin
              LoginButton := [X + 27, 301, X + 27 + W, 301 + H];
              CancelButton := [X + 187, 301, X + 187 + W, 301 + H];
 
-             if (RSClient.Username = Username) and (RSClient.Password = Password) then
+             if (RSClient.Username = Username) and ((RSClient.Password = Password) or ((Length(Password) > 20) and Password.StartsWith(RSClient.Password))) then
              begin
                Mouse.Click(LoginButton, MOUSE_LEFT);
                if not WaitUntil((RSClient.GameState <> GameState) or (RSClient.LoginIndex <> LoginIndex), 500, 2000) then
@@ -228,7 +228,7 @@ begin
                if WaitUntil(RSClient.ActiveLoginField = 1, 500, 2000) then
                begin
                  Keyboard.Send(Password);
-                 if RSClient.Password = Password then
+                 if (RSClient.Password = Password) or ((Length(Password) > 20) and Password.StartsWith(RSClient.Password)) then
                  begin
                   Keyboard.PressKey(VK_ENTER);
                  end else
