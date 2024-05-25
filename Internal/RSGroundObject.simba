@@ -23,6 +23,8 @@ var
   X, Y: Int32;
   Player: RSPlayer;
 
+  GameInstance: Pointer;
+
   Items: Pointer;
   ItemsSize: SizeUInt;
   NodeDeque: RSNodeDeque;
@@ -45,8 +47,12 @@ begin
   MaxX := BaseX + 104;
   MaxY := BaseY + 104;
 
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+
   ItemsSize := 0;
-  Items := RGetStaticArray(R_EIOS, ItemsSize, Client_GroundItems);
+  Items := RGetArray(R_EIOS, GameInstance, ItemsSize, GAMEINSTANCE_GROUNDITEMS);
+  RFreeObject(R_EIOS, GameInstance);
+
   if ItemsSize = 0 then
     Exit;
 
@@ -99,6 +105,8 @@ var
   X, Y: Int32;
   Player: RSPlayer;
 
+  GameInstance: Pointer;
+
   Item: RSGroundItem;
   Items: Pointer;
   ItemsSize: SizeUInt;
@@ -121,8 +129,12 @@ begin
   MaxX := BaseX + 104;
   MaxY := BaseY + 104;
 
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+
   ItemsSize := 0;
-  Items := RGetStaticArray(R_EIOS, ItemsSize, Client_GroundItems);
+  Items := RGetArray(R_EIOS, GameInstance, ItemsSize, GAMEINSTANCE_GROUNDITEMS);
+  RFreeObject(R_EIOS, GameInstance);
+
   if ItemsSize = 0 then
     Exit;
 
@@ -140,6 +152,91 @@ begin
         while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
         begin
           if ItemID = RGetInt(R_EIOS, Curr.ref, ITEM_ID) then
+          begin
+            ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
+            Stack := RGetInt(R_EIOS, Curr.ref, ITEM_STACKSIZES);
+
+            Item := [ID, Stack, [X, Y]];
+            Result += item;
+          end;
+
+          Curr := Curr.Next;
+          Garbage += Curr;
+        end;
+      end;
+    end;
+  end;
+
+  Garbage.Free;
+  RFreeObject(R_EIOS, Items);
+end;
+
+(*
+RSGroundObject.GetItemByID
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns an array of RSGroundItem that contain a specific item IDs.
+
+Example:
+
+  Writeln(RSGroundObject.GetItemsByIDs([526]));
+*)
+Function RSGroundObject.GetItemsByIDs(ItemIDs: Array of Int32): Array of RSGroundItem; static;
+var
+  Tile: RSTile;
+  Plane: Int32;
+  BaseX, BaseY: Int32;
+  MinX, MinY, MaxX, MaxY: Int32;
+  X, Y: Int32;
+  Player: RSPlayer;
+
+  GameInstance: Pointer;
+
+  Item: RSGroundItem;
+  Items: Pointer;
+  ItemsSize: SizeUInt;
+  NodeDeque: RSNodeDeque;
+  Head, Curr: RSNode;
+  Garbage: RSTYpeArray;
+
+  ID, Stack: Int32;
+begin
+  Player := RSPlayer.Me;
+  Tile := Player.Tile;
+  Player.Free;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+  Plane := RSClient.Plane;
+
+  MinX := BaseX;
+  MinY := BaseY;
+  MaxX := BaseX + 104;
+  MaxY := BaseY + 104;
+
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+
+  ItemsSize := 0;
+  Items := RGetArray(R_EIOS, GameInstance, ItemsSize, GAMEINSTANCE_GROUNDITEMS);
+  RFreeObject(R_EIOS, GameInstance);
+
+  if ItemsSize = 0 then
+    Exit;
+
+  for Y := MinY to MaxY - 1 do
+  begin
+    for X := MinX to MaxX - 1 do
+    begin
+      NodeDeque.ref := RGetObjectArray3D(R_EIOS, Items, Plane, X - BaseX, Y - BaseY);
+      if NodeDeque.ref <> nil then
+      begin
+        Head := NodeDeque.Head;
+        Curr := Head.Next;
+        Garbage := [NodeDeque, Head, Curr];
+
+        while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+        begin
+          if TIntegerArray(ItemIDs).Find(RGetInt(R_EIOS, Curr.ref, ITEM_ID)) <> -1 then
           begin
             ID := RGetInt(R_EIOS, Curr.ref, ITEM_ID);
             Stack := RGetInt(R_EIOS, Curr.ref, ITEM_STACKSIZES);
@@ -178,6 +275,7 @@ var
   X, Y: Int32;
   Player: RSPlayer;
 
+  GameInstance: Pointer;
   Items: Pointer;
   ItemsSize: SizeUInt;
   NodeDeque: RSNodeDeque;
@@ -197,8 +295,12 @@ begin
   MaxX := BaseX + 104;
   MaxY := BaseY + 104;
 
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+
   ItemsSize := 0;
-  Items := RGetStaticArray(R_EIOS, ItemsSize, Client_GroundItems);
+  Items := RGetArray(R_EIOS, GameInstance, ItemsSize, GAMEINSTANCE_GROUNDITEMS);
+  RFreeObject(R_EIOS, GameInstance);
+
   if ItemsSize = 0 then
     Exit;
 
@@ -229,12 +331,87 @@ begin
   RFreeObject(R_EIOS, Items);
 end;
 
+(*
+RSGroundObject.GetTilesByIDs
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns all tiles that contain a specific object IDs.
+
+Example:
+
+  Writeln(RSGroundObject.GetTileByID(526));
+*)
+Function RSGroundObject.GetTilesByIDs(ItemIDs: Array of Int32): Array of RSTile; static;
+var
+  Tile: RSTile;
+  Plane: Int32;
+  BaseX, BaseY: Int32;
+  MinX, MinY, MaxX, MaxY: Int32;
+  X, Y: Int32;
+  Player: RSPlayer;
+
+  GameInstance: Pointer;
+  Items: Pointer;
+  ItemsSize: SizeUInt;
+  NodeDeque: RSNodeDeque;
+  Head, Curr: RSNode;
+  Garbage: RSTYpeArray;
+begin
+  Player := RSPlayer.Me;
+  Tile := Player.Tile;
+  Player.Free;
+
+  BaseX := RSClient.BaseX;
+  BaseY := RSClient.BaseY;
+  Plane := RSClient.Plane;
+
+  MinX := BaseX;
+  MinY := BaseY;
+  MaxX := BaseX + 104;
+  MaxY := BaseY + 104;
+
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+
+  ItemsSize := 0;
+  Items := RGetArray(R_EIOS, GameInstance, ItemsSize, GAMEINSTANCE_GROUNDITEMS);
+  RFreeObject(R_EIOS, GameInstance);
+
+  if ItemsSize = 0 then
+    Exit;
+
+  for Y := MinY to MaxY - 1 do
+  begin
+    for X := MinX to MaxX - 1 do
+    begin
+      NodeDeque.ref := RGetObjectArray3D(R_EIOS, Items, Plane, X - BaseX, Y - BaseY);
+      if NodeDeque.ref <> nil then
+      begin
+        Head := NodeDeque.Head;
+        Curr := Head.Next;
+        Garbage := [NodeDeque, Head, Curr];
+
+        while not RObjectsEqual(R_EIOS, Head.ref, Curr.ref) do
+        begin
+          if TIntegerArray(ItemIDs).Find(RGetInt(R_EIOS, Curr.ref, ITEM_ID)) <> -1 then
+            Result += [X, Y];
+
+          Curr := Curr.Next;
+          Garbage += Curr;
+        end;
+      end;
+    end;
+  end;
+
+  Garbage.Free;
+  RFreeObject(R_EIOS, Items);
+end;
+
 Function RSGroundObject.GetItemsAt(X, Y: Int32): Array of RSGroundItem; static;
 var
   ID, Stack: Int32;
   BaseX, BaseY: Int32;
   //Index, Hash: Int32;
-  Items: Pointer;
+  GameInstance, Items: Pointer;
   NodeDeque: RSNodeDeque;
   Head, Curr: RSNode;
   Garbage: RSTYpeArray;
@@ -243,7 +420,10 @@ begin
   BaseX := RSClient.BaseX;
   BaseY := RSClient.BaseY;
 
-  Items := RGetStaticObject(R_EIOS, Client_GroundItems);
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+  Items := RGetArray(R_EIOS, GameInstance, GAMEINSTANCE_GROUNDITEMS);
+  RFreeObject(R_EIOS, GameInstance);
+
   NodeDeque.ref := RGetObjectArray3D(R_EIOS, Items, RSClient.Plane, X - BaseX, Y - BaseY);
   RFreeObject(R_EIOS, items);
 

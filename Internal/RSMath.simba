@@ -647,8 +647,8 @@ begin
 
   For I := 0 To High(Indices[0]) do
   begin
-    if FaceColours[I] = -2 then
-      continue;
+    //if FaceColours[I] = -2 then
+    //  continue;
 
     MinX := High(Int32);
     MinY := High(Int32);

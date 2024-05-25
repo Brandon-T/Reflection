@@ -24,6 +24,31 @@ begin
 end;
 
 (*
+R_GetGroundItemByIDs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Returns the RSTile of a specific item ID.
+
+Example:
+
+   Mouse.Move(R_GetGroundItemByIDs([526])[0]);
+*)
+Function R_GetGroundItems(ItemIDs: Array of Int32): Array of RSTile;
+var
+  I: Integer;
+  Items: Array of RSTile;
+begin
+  Items := RSGroundObject.GetTilesByIDs(ItemIDs);
+  if Length(Items) < 1 then
+    Exit;
+
+  for I := 0 to Length(Items) - 1 do
+    Result += RSTile(Items[i]);
+
+  //RSTypeArray(Items).Free;
+end;
+
+(*
 R_IsGroundItemOnTile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

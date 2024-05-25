@@ -60,19 +60,30 @@ end;
 
 Function RSNPC.AllNPCs: Array of RSNPC; static;
 var
+  GameInstance: RSGameInstance;
   NPCs: Pointer;
   NPCsArray: Array of Pointer;
   Indices: Array of Int32;
   I, NPCsSize, Actual: SizeUInt;
 begin
-  Indices := RSClient.NPCIndices();
-  if Length(Indices) < 1 then
+  GameInstance := RSClient.GameInstance();
+  if GameInstance.ref = nil then
     Exit;
 
-  NPCsSize := 0;
-  NPCs := RGetStaticArray(R_EIOS, NPCsSize, CLIENT_LOCALNPCS);
-  if NPCs = nil then
+  Indices := GameInstance.NPCIndices();
+  if Length(Indices) < 1 then
+  begin
+    GameInstance.Free;
     Exit;
+  end;
+
+  NPCsSize := 0;
+  NPCs := RGetArray(R_EIOS, GameInstance.ref, NPCsSize, GAMEINSTANCE_NPCS);
+  if NPCs = nil then
+  begin
+    GameInstance.Free;
+    Exit;
+  end;
 
   NPCsArray := RGetObjectArray(R_EIOS, NPCs, Indices);
   RFreeObject(R_EIOS, NPCs);
@@ -88,6 +99,7 @@ begin
     end;
   end;
   SetLength(Result, Actual);
+  GameInstance.Free;
 end;
 
 Function RSNPC.Model: RSModel; constref;

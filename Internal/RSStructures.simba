@@ -22,6 +22,8 @@ type
 
   RSRegion = type RSType;
 
+  RSGameInstance = type RSType;
+
   RSClient = type RSType;
 
   RSCamera = type RSType;

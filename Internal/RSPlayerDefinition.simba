@@ -8,9 +8,9 @@ begin
   Result := RGetInt(R_EIOS, ref, PLAYERDEFINITION_NPCTRANSFORMID);
 end;
 
-Function RSPlayerDefinition.IsFemale: Boolean; constref;
+Function RSPlayerDefinition.Gender: Int32; constref;
 begin
-  Result := RGetBool(R_EIOS, ref, PLAYERDEFINITION_ISFEMALE);
+  Result := RGetInt(R_EIOS, ref, PLAYERDEFINITION_GENDER);
 end;
 
 Function RSPlayerDefinition.ModelID: Int64; constref;

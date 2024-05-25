@@ -3,6 +3,11 @@
 {$include_once RSVarbitDefinition.simba}
 {$include_once RSVarps.simba}
 
+Function RSClient.GameInstance: RSGameInstance; static;
+begin
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+end;
+
 Function RSClient.LoopCycle: Int32; static;
 begin
   Result := RGetStaticInt(R_EIOS, CLIENT_LOOPCYCLE);
@@ -40,18 +45,39 @@ begin
 end;
 
 Function RSClient.Plane: Int32; static;
+var
+  GameInstance: RSGameInstance;
 begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_PLANE);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.Plane();
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.BaseX: Int32; static;
+var
+  GameInstance: RSGameInstance;
 begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_BASEX);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.BaseX();
+    GameInstance.Free;;
+  end;
 end;
 
 Function RSClient.BaseY: Int32; static;
+var
+  GameInstance: RSGameInstance;
 begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_BASEY);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.BaseY();
+    GameInstance.Free;;
+  end;
 end;
 
 Function RSClient.DestinationX: Int32; static;
@@ -86,124 +112,98 @@ end;
 
 Function RSClient.NPCIndices(NPCCount: Int32): Array of Int32; static;
 var
-  Indices: Pointer;
-  IndicesSize: SizeUInt;
+  GameInstance: RSGameInstance;
 begin
-  IndicesSize := 0;
-  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_NPCINDICES);
-  if Indices = nil then
-    Exit;
-
-  Result := RGetIntArray(R_EIOS, Indices, 0, Min(NPCCount, IndicesSize));
-  RFreeObject(R_EIOS, Indices);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.NPCIndices(NPCCount);
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.NPCIndices: Array of Int32; static; overload;
 var
-  Indices: Pointer;
-  IndicesSize: SizeUInt;
+  GameInstance: RSGameInstance;
 begin
-  IndicesSize := 0;
-  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_NPCINDICES);
-  if Indices = nil then
-    Exit;
-
-  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
-  RFreeObject(R_EIOS, Indices);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.NPCIndices();
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.NPCCount: Int32; static;
+var
+  GameInstance: RSGameInstance;
 begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_NPCCOUNT);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.NPCCount();
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.PlayerIndices(PlayerCount: Int32): Array of Int32; static;
 var
-  Indices: Pointer;
-  IndicesSize: SizeUInt;
+  GameInstance: RSGameInstance;
 begin
-  IndicesSize := 0;
-  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_PLAYERINDICES);
-  if Indices = nil then
-    Exit;
-
-  Result := RGetIntArray(R_EIOS, Indices, 0, Min(PlayerCount, IndicesSize));
-  RFreeObject(R_EIOS, Indices);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.PlayerIndices(PlayerCount);
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.PlayerIndices: Array of Int32; static; overload;
 var
-  Indices: Pointer;
-  IndicesSize: SizeUInt;
+  GameInstance: RSGameInstance;
 begin
-  IndicesSize := 0;
-  Indices := RGetStaticArray(R_EIOS, IndicesSize, CLIENT_PLAYERINDICES);
-  if Indices = nil then
-    Exit;
-
-  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
-  RFreeObject(R_EIOS, Indices);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.PlayerIndices();
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.PlayerCount: Int32; static;
+var
+  GameInstance: RSGameInstance;
 begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_PLAYERCOUNT);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.PlayerCount();
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.AllNPCs: Array of RSNPC; static;
 var
-  NPCs: Pointer;
-  NPCsArray: Array of Pointer;
-  I, J, NPCsSize: SizeUInt;
+  GameInstance: RSGameInstance;
 begin
-  NPCsSize := 0;
-  NPCs := RGetStaticArray(R_EIOS, NPCsSize, CLIENT_LOCALNPCs);
-  if NPCs = nil then
-    Exit;
-
-  NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
-  RFreeObject(R_EIOS, NPCs);
-
-  SetLength(Result, NPCsSize);
-
-  for I := 0 to NPCsSize - 1 do
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
   begin
-    if NPCsArray[I] <> nil then
-    begin
-      Result[J].ref := NPCsArray[I];
-      Inc(J);
-    end;
+    Result := GameInstance.NPCs();
+    GameInstance.Free;
   end;
-
-  SetLength(Result, J);
 end;
 
 Function RSClient.AllPlayers: Array of RSPlayer; static;
 var
-  Players: Pointer;
-  PlayersArray: Array of Pointer;
-  I, J, PlayersSize: SizeUInt;
+  GameInstance: RSGameInstance;
 begin
-  PlayersSize := 0;
-  Players := RGetStaticArray(R_EIOS, PlayersSize, CLIENT_LOCALPLAYERS);
-  if Players = nil then
-    Exit;
-
-  PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
-  RFreeObject(R_EIOS, Players);
-
-  SetLength(Result, PlayersSize);
-
-  for I := 0 to PlayersSize - 1 do
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
   begin
-    if PlayersArray[I] <> nil then
-    begin
-      Result[J].ref := PlayersArray[I];
-      Inc(J);
-    end;
+    Result := GameInstance.Players();
+    GameInstance.Free;
   end;
-
-  SetLength(Result, J);
 end;
 
 Function RSClient.AnimationFrameCache: RSCache; static;
@@ -218,89 +218,50 @@ end;
 
 Function RSClient.CollisionMaps: Array of RSCollisionMap; static;
 var
-  I: Int32;
-  Size: SizeUInt;
-  CollisionMaps: Pointer;
-  SX: Array of Pointer;
+  GameInstance: RSGameInstance;
 begin
-  Size := 0;
-  CollisionMaps := RGetStaticArray(R_EIOS, Size, CLIENT_COLLISIONMAPS);
-  if CollisionMaps = nil then
-    Exit;
-
-  SetLength(Result, Size);
-  SX := RGetObjectArray(R_EIOS, CollisionMaps, 0, Size);
-  RFreeObject(R_EIOS, CollisionMaps);
-
-  For I := 0 to High(SX) do
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
   begin
-    Result[I].ref := SX[I];
+    Result := GameInstance.CollisionMaps();
+    GameInstance.Free;
   end;
 end;
 
 Function RSClient.Projectiles: Array of RSProjectile; static;
 var
-  NodeDeque: RSNodeDeque;
-  Head, Current: RSNode;
+  GameInstance: RSGameInstance;
 begin
-  NodeDeque.ref := RGetStaticObject(R_EIOS, CLIENT_PROJECTILES);
-  if NodeDeque.ref = nil then
-    Exit;
-
-  Head := NodeDeque.Head;
-  if Head.ref = nil then
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
   begin
-    NodeDeque.Free;
-    Exit;
+    Result := GameInstance.Projectiles();
+    GameInstance.Free;
   end;
-
-  Current := Head.Next;
-
-  while not RObjectsEqual(R_EIOS, Head.ref, Current.ref) do
-  begin
-    Result += Current;
-    Current := Current.Next;
-    if Current.ref = nil then
-      break;
-  end;
-
-  Head.Free;
-  NodeDeque.Free;
 end;
 
 Function RSClient.GraphicsObjects: Array of RSGraphicsObject; static;
 var
-  NodeDeque: RSNodeDeque;
-  Head, Current: RSNode;
+  GameInstance: RSGameInstance;
 begin
-  NodeDeque.ref := RGetStaticObject(R_EIOS, CLIENT_GRAPHICSOBJECTS);
-  if NodeDeque.ref = nil then
-    Exit;
-
-  Head := NodeDeque.Head;
-  if Head.ref = nil then
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
   begin
-    NodeDeque.Free;
-    Exit;
+    Result := GameInstance.GraphicsObjects();
+    GameInstance.Free;
   end;
-
-  Current := Head.Next;
-
-  while not RObjectsEqual(R_EIOS, Head.ref, Current.ref) do
-  begin
-    Result += Current;
-    Current := Current.Next;
-    if Current.ref = nil then
-      break;
-  end;
-
-  Head.Free;
-  NodeDeque.Free;
 end;
 
 Function RSClient.Region: RSRegion; static;
+var
+  GameInstance: RSGameInstance;
 begin
-  Result.ref := RGetStaticObject(R_EIOS, CLIENT_REGION);
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.Region();
+    GameInstance.Free;
+  end;
 end;
 
 Function RSClient.IsRegionInstanced: Boolean; static;

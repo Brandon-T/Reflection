@@ -160,7 +160,7 @@ begin
   RFreeObject(R_EIOS, Tiles);
 end;
 
-Function RSRegion.InteractableObjects: Array of RSObject; constref;
+Function RSRegion.GameObjects: Array of RSObject; constref;
 var
   Objects: Pointer;
   I, ObjectsSize: SizeUInt;
@@ -169,7 +169,7 @@ type
   RSObjectArray = Array of RSObject;
 begin
   ObjectsSize := 0;
-  Objects := RGetArray(R_EIOS, ref, REGION_INTERACTABLEOBJECTS);
+  Objects := RGetArray(R_EIOS, ref, REGION_GAMEOBJECTS);
   if Objects = nil then
     Exit;
 

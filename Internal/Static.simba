@@ -42,12 +42,19 @@ end;
 
 Procedure RInitializeTileSettings;
 var
+  GameInstance: Pointer;
   Settings: Pointer;
   I, J, SettingsSize: SizeUInt;
   SX, SY: Array of Pointer;
 begin
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+  if GameInstance = nil then
+    Exit;
+
   SettingsSize := 0;
-  Settings := RGetStaticArray(R_EIOS, SettingsSize, CLIENT_TILESETTINGS);
+  Settings := RGetArray(R_EIOS, GameInstance, SettingsSize, GAMEINSTANCE_TILESETTINGS);
+  RFreeObject(R_EIOS, GameInstance);
+
   SX := RGetObjectArray(R_EIOS, Settings, 0, SettingsSize);
   RFreeObject(R_EIOS, Settings);
 
@@ -70,12 +77,19 @@ end;
 
 Procedure RInitializeTileHeights;
 var
+  GameInstance: Pointer;
   Heights: Pointer;
   I, J, HeightsSize: SizeUInt;
   SX, SY: Array of Pointer;
 begin
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+  if GameInstance = nil then
+    Exit;
+
   HeightsSize := 0;
-  Heights := RGetStaticArray(R_EIOS, HeightsSize, CLIENT_TILEHEIGHTS);
+  Heights := RGetArray(R_EIOS, GameInstance, HeightsSize, GAMEINSTANCE_TILEHEIGHTS);
+  RFreeObject(R_EIOS, GameInstance);
+
   SX := RGetObjectArray(R_EIOS, Heights, 0, HeightsSize);
   RFreeObject(R_EIOS, Heights);
 

@@ -23,6 +23,7 @@
 {$include_once RSNPCDefinition.simba}
 {$include_once RSNPC.simba}
 {$include_once RSCamera.simba}
+{$include_once RSGameInstance.simba}
 {$include_once RSClient.simba}
 {$include_once RSCombatInfo.simba}
 {$include_once RSAnimation.simba}

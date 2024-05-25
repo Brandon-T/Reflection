@@ -15,19 +15,30 @@ end;
 
 Function RSPlayer.AllPlayers: Array of RSPlayer; static;
 var
+  GameInstance: RSGameInstance;
   Players: Pointer;
   PlayersArray: Array of Pointer;
   Indices: Array of Int32;
   I, PlayersSize, Actual: SizeUInt;
 begin
-  Indices := RSClient.PlayerIndices();
-  if Length(Indices) < 1 then
+  GameInstance := RSClient.GameInstance();
+  if GameInstance.ref = nil then
     Exit;
 
-  PlayersSize := 0;
-  Players := RGetStaticArray(R_EIOS, PlayersSize, CLIENT_LOCALPLAYERS);
-  if Players = nil then
+  Indices := GameInstance.PlayerIndices();
+  if Length(Indices) < 1 then
+  begin
+    GameInstance.Free;
     Exit;
+  end;
+
+  PlayersSize := 0;
+  Players := RGetArray(R_EIOS, GameInstance.ref, PlayersSize, GAMEINSTANCE_PLAYERS);
+  if Players = nil then
+  begin
+    GameInstance.Free;
+    Exit;
+  end;
 
   PlayersArray := RGetObjectArray(R_EIOS, Players, Indices);
   RFreeObject(R_EIOS, Players);
@@ -43,6 +54,7 @@ begin
     end;
   end;
   SetLength(Result, Actual);
+  GameInstance.Free;
 end;
 
 Function RSPlayer.Name: String; constref;

@@ -226,15 +226,19 @@ Function RSActor.GetInteracting: RSActor; constref;
 var
   Index: Int32;
   Size: SizeUInt;
-  Actors: Pointer;
+  Actors, GameInstance: Pointer;
 begin
   Index := self.InteractingIndex;
   if (Index = -1) or (Index = 65535) then
     Exit;
 
+  GameInstance := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
+  if GameInstance = nil then
+    Exit;
+
   if Index < 32768 then
   begin
-    Actors := RGetStaticArray(R_EIOS, Size, CLIENT_LOCALNPCS);
+    Actors := RGetArray(R_EIOS, GameInstance, Size, GAMEINSTANCE_NPCS);
     if (Actors <> nil) and (Index < Size) then
     begin
       Result.ref := RGetObjectArray(R_EIOS, Actors, Index);
@@ -243,13 +247,14 @@ begin
   end else
     begin
       Index -= 32768;
-      Actors := RGetStaticArray(R_EIOS, Size, CLIENT_LOCALPLAYERS);
+      Actors := RGetStaticArray(R_EIOS, Size, GAMEINSTANCE_PLAYERS);
       if (Actors <> nil) and (Index < Size) then
       begin
         Result.ref := RGetObjectArray(R_EIOS, Actors, Index);
       end;
       RFreeObject(R_EIOS, Actors);
     end;
+  RFreeObject(R_EIOS, GameInstance);
 end;
 
 Function RSActor.InBox(Bounds: TBox): Boolean;

@@ -224,7 +224,7 @@ Model_TexVerticesY: THook =                       ['kb', 'ag', '[I', 1];
 Model_TexVerticesZ: THook =                       ['kb', 'bs', '[I', 1];
 Model_TexVerticesLength: THook =                  ['kb', 'am', 'I', 1];
 Model_Skins: THook =                              ['kb', 'bf', '[[I', 1];
-Model_FaceColors3: THook =                        ['kb', 'N/A', 'N/A', 1];
+Model_FaceColors3: THook =                        ['kb', 'bs', '[I', 1];
 Model_ShadowIntensity: THook =                    ['kb', 'be', 'I', 1];
 Model_FitsSingleTile: THook =                     ['kb', 'bn', 'Z', 1];
 
@@ -387,6 +387,8 @@ Widget_StackSizes: THook =                        ['nb', 'ga', '[I', 1];
 Widget_ItemAmount: THook =                        ['nb', 'go', 'I', 1759783679];
 Widget_SpriteID: THook =                          ['nb', 'co', 'I', 1497207771];
 Widget_TextureID: THook =                         ['nb', 'cr', 'I', 565505515];
+Widget_ModelID: THook =                           ['nb', 'N/A', 'I', 1];
+Widget_AnimationID: THook =                       ['nb', 'N/A', 'I', 1];
 Widget_Actions: THook =                           ['nb', 'el', '[Ljava/lang/String;', 1];
 Widget_ActionType: THook =                        ['nb', 'bn', 'I', 1876205579];
 Widget_Type: THook =                              ['nb', 'bt', 'I', -1541050645];
@@ -402,6 +404,7 @@ Widget_Height: THook =                            ['nb', 'bm', 'I', -73929865];
 Widget_Children: THook =                          ['nb', 'gr', '[Lnb;', 1];
 Widget_BoundsIndex: THook =                       ['nb', 'gd', 'I', 1651979771];
 Widget_WidgetCycle: THook =                       ['nb', 'gw', 'I', 2021773189];
+Widget_Opacity: THook =                           ['nb', 'N/A', 'I', 1];
 
 {WidgetHolder: nk}
 WidgetHolder_Widgets: THook =                     ['nk', 'aa', '[[Lnb;', 1];
@@ -477,12 +480,12 @@ Client_LoopCycle: THook =                         ['client', 'N/A', 'N/A', 1];
 Client_GameState: THook =                         ['client', 'db', 'I', -1485751769];
 Client_LoginState: THook =                        ['do', 'fj', 'Lca;', 1];
 Client_IsLoading: THook =                         ['client', 'df', 'Z', 1];
-Client_CrossHairColor: THook =                    ['client', 'N/A', 'N/A', 1];
+Client_CrossHairColor: THook =                    ['client', 'mc', 'I', -1072754781];
 Client_AnimationFrameCache: THook =               ['ic', 'ac', 'Llm;', 1];
 Client_GrandExchangeOffers: THook =               ['client', 'vb', '[Lpg;', 1];
 Client_CameraX: THook =                           ['nt', 'kf', 'I', -1994887817];
-Client_CameraY: THook =                           ['gb', 'kv', 'I', 406002563];
-Client_CameraZ: THook =                           ['ey', 'kq', 'I', 983493133];
+Client_CameraY: THook =                           ['ey', 'kq', 'I', 983493133];
+Client_CameraZ: THook =                           ['gb', 'kv', 'I', 406002563];
 Client_CameraPitch: THook =                       ['dh', 'kr', 'I', -2049286697];
 Client_CameraYaw: THook =                         ['hp', 'kw', 'I', 1143781377];
 Client_IsRegionInstanced: THook =                 ['client', 'N/A', 'N/A', 1];
@@ -521,7 +524,7 @@ Client_Experiences: THook =                       ['client', 'nk', '[I', 1];
 Client_CurrentWorld: THook =                      ['client', 'cw', 'I', 2015442527];
 Client_Energy: THook =                            ['client', 'pr', 'I', 576526631];
 Client_Weight: THook =                            ['client', 'pa', 'I', -1359640633];
-Client_IsItemSelected: THook =                    ['client', 'N/A', 'N/A', 1];
+Client_IsItemSelected: THook =                    ['client', 'ow', 'I', -1767500567];
 Client_IsSpellSelected: THook =                   ['client', 'N/A', 'N/A', 1];
 
 {$ENDIF}

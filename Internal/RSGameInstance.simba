@@ -1,0 +1,246 @@
+{$include_once RSStructures.simba}
+{$include_once RSNode.simba}
+{$include_once RSClient.simba}
+{$include_once RSCombatInfo.simba}
+{$include_once RSTile.simba}
+
+Function RSGameInstance.PlayerCount: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GAMEINSTANCE_PLAYERCOUNT);
+end;
+
+Function RSGameInstance.Players: Array of RSPlayer;
+var
+  Players: Pointer;
+  PlayersArray: Array of Pointer;
+  I, J, PlayersSize: SizeUInt;
+begin
+  PlayersSize := 0;
+  Players := RGetArray(R_EIOS, ref, PlayersSize, GAMEINSTANCE_PLAYERS);
+  if Players = nil then
+    Exit;
+
+  PlayersArray := RGetObjectArray(R_EIOS, Players, 0, PlayersSize);
+  RFreeObject(R_EIOS, Players);
+
+  SetLength(Result, PlayersSize);
+
+  for I := 0 to PlayersSize - 1 do
+  begin
+    if PlayersArray[I] <> nil then
+    begin
+      Result[J].ref := PlayersArray[I];
+      Inc(J);
+    end;
+  end;
+
+  SetLength(Result, J);
+end;
+
+Function RSGameInstance.PlayerIndices(PlayerCount: Int32): Array of Int32;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, ref, IndicesSize, GAMEINSTANCE_PLAYERINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, Min(PlayerCount, IndicesSize));
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSGameInstance.PlayerIndices: Array of Int32; overload;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, ref, IndicesSize, GAMEINSTANCE_PLAYERINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSGameInstance.NPCCount: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GAMEINSTANCE_NPCCOUNT);
+end;
+
+Function RSGameInstance.NPCs: Array of RSNPC;
+var
+  NPCs: Pointer;
+  NPCsArray: Array of Pointer;
+  I, J, NPCsSize: SizeUInt;
+begin
+  NPCsSize := 0;
+  NPCs := RGetArray(R_EIOS, ref, NPCsSize, GAMEINSTANCE_NPCS);
+  if NPCs = nil then
+    Exit;
+
+  NPCsArray := RGetObjectArray(R_EIOS, NPCs, 0, NPCsSize);
+  RFreeObject(R_EIOS, NPCs);
+
+  SetLength(Result, NPCsSize);
+
+  for I := 0 to NPCsSize - 1 do
+  begin
+    if NPCsArray[I] <> nil then
+    begin
+      Result[J].ref := NPCsArray[I];
+      Inc(J);
+    end;
+  end;
+
+  SetLength(Result, J);
+end;
+
+Function RSGameInstance.NPCIndices(NPCCount: Int32): Array of Int32;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, ref, IndicesSize, GAMEINSTANCE_NPCINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, Min(NPCCount, IndicesSize));
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSGameInstance.NPCIndices: Array of Int32; overload;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, ref, IndicesSize, GAMEINSTANCE_NPCINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSGameInstance.GetTileSettings(X, Y, Z: Int32): UInt8; static;
+begin
+  {$IFDEF USE_REGION_CACHING}
+  UpdateRegionCache(X, Y);
+  {$ENDIF}
+  Result := CACHED_TILE_SETTINGS[X][Y][Z];
+end;
+
+Function RSGameInstance.GetTileHeights(X, Y, Z: Int32): Int32; static;
+begin
+  {$IFDEF USE_REGION_CACHING}
+  UpdateRegionCache(X, Y);
+  {$ENDIF}
+  Result := CACHED_TILE_HEIGHTS[X][Y][Z];
+end;
+
+Function RSGameInstance.Region: RSRegion; constref;
+begin
+  Result.ref := RGetObject(R_EIOS, ref, GAMEINSTANCE_REGION);
+end;
+
+Function RSGameInstance.Plane: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GAMEINSTANCE_PLANE);
+end;
+
+Function RSGameInstance.BaseX: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GAMEINSTANCE_BASEX);
+end;
+
+
+Function RSGameInstance.BaseY: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, GAMEINSTANCE_BASEY);
+end;
+
+Function RSGameInstance.CollisionMaps: Array of RSCollisionMap; constref;
+var
+  I: Int32;
+  Size: SizeUInt;
+  CollisionMaps: Pointer;
+  SX: Array of Pointer;
+begin
+  Size := 0;
+  CollisionMaps := RGetArray(R_EIOS, ref, Size, GAMEINSTANCE_COLLISIONMAPS);
+  if CollisionMaps = nil then
+    Exit;
+
+  SetLength(Result, Size);
+  SX := RGetObjectArray(R_EIOS, CollisionMaps, 0, Size);
+  RFreeObject(R_EIOS, CollisionMaps);
+
+  For I := 0 to High(SX) do
+  begin
+    Result[I].ref := SX[I];
+  end;
+end;
+
+Function RSGameInstance.Projectiles: Array of RSProjectile; constref;
+var
+  NodeDeque: RSNodeDeque;
+  Head, Current: RSNode;
+begin
+  NodeDeque.ref := RGetObject(R_EIOS, ref, GAMEINSTANCE_PROJECTILES);
+  if NodeDeque.ref = nil then
+    Exit;
+
+  Head := NodeDeque.Head;
+  if Head.ref = nil then
+  begin
+    NodeDeque.Free;
+    Exit;
+  end;
+
+  Current := Head.Next;
+
+  while not RObjectsEqual(R_EIOS, Head.ref, Current.ref) do
+  begin
+    Result += Current;
+    Current := Current.Next;
+    if Current.ref = nil then
+      break;
+  end;
+
+  Head.Free;
+  NodeDeque.Free;
+end;
+
+Function RSGameInstance.GraphicsObjects: Array of RSGraphicsObject; constref;
+var
+  NodeDeque: RSNodeDeque;
+  Head, Current: RSNode;
+begin
+  NodeDeque.ref := RGetObject(R_EIOS, ref, GAMEINSTANCE_GRAPHICSOBJECTS);
+  if NodeDeque.ref = nil then
+    Exit;
+
+  Head := NodeDeque.Head;
+  if Head.ref = nil then
+  begin
+    NodeDeque.Free;
+    Exit;
+  end;
+
+  Current := Head.Next;
+
+  while not RObjectsEqual(R_EIOS, Head.ref, Current.ref) do
+  begin
+    Result += Current;
+    Current := Current.Next;
+    if Current.ref = nil then
+      break;
+  end;
+
+  Head.Free;
+  NodeDeque.Free;
+end;

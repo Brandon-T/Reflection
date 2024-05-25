@@ -106,9 +106,9 @@ begin
   Result := RGetBool(R_EIOS, ref, PROJECTILE_ISMOVING);
 end;
 
-Function RSProjectile.AnimationFrame: Int32; constref;
+Function RSProjectile.Frame: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, PROJECTILE_ANIMATIONFRAME);
+  Result := RGetInt(R_EIOS, ref, PROJECTILE_FRAME);
 end;
 
 Function RSProjectile.LocalTile: RSTile; constref;
