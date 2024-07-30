@@ -74,7 +74,7 @@ begin
 
   For I := version to version + 10 do
   begin
-    packet := [15, 0, 0, UInt8(version shr 8), UInt8(version)];
+    packet := [15, 0, 0, UInt8(version shr 8), UInt8(version), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     socket := CreateSocket;
     if socket < 0 then
