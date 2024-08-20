@@ -1,0 +1,63 @@
+{$include_once RSStructures.simba}
+
+
+Function RSMenu.Count: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, MENU_COUNT);
+end;
+
+Function RSMenu.Actions: Array of String; constref;
+var
+  Actions: Pointer;
+  ActionsSize: SizeUInt;
+begin
+  ActionsSize := 0;
+  Actions := RGetArray(R_EIOS, ref, ActionsSize, MENU_ACTIONS);
+  if Actions = nil then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Actions, 0, ActionsSize);
+  RFreeObject(R_EIOS, Actions);
+end;
+
+Function RSMenu.Options: Array of String; constref;
+var
+  Options: Pointer;
+  OptionsSize: SizeUInt;
+begin
+  OptionsSize := 0;
+  Options := RGetArray(R_EIOS, ref, OptionsSize, MENU_OPTIONS);
+  if Options = nil then
+    Exit;
+
+  Result := RGetStringArray(R_EIOS, Options, 0, OptionsSize);
+  RFreeObject(R_EIOS, Options);
+end;
+
+Function RSMenu.X: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, MENU_X);
+end;
+
+Function RSMenu.Y: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, MENU_Y);
+end;
+
+Function RSMenu.Width: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, MENU_WIDTH);
+end;
+
+Function RSMenu.Height: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, MENU_HEIGHT);
+end;
+
+Function RSMenu.Bounds: TBox;
+begin
+  Result.X1 := self.X;
+  Result.Y1 := self.Y;
+  Result.X2 := Result.X1 + self.Width;
+  Result.Y2 := Result.Y1 + self.Height;
+end;

@@ -124,6 +124,8 @@ type
 
   RSGameShell = type RSType;
 
+  RSMenu = type RSType;
+
 
 Procedure RSType.Free;
 begin

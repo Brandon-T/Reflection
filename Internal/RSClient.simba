@@ -2,6 +2,7 @@
 {$include_once RSStructures.simba}
 {$include_once RSVarbitDefinition.simba}
 {$include_once RSVarps.simba}
+{$include_once RSMenu.simba}
 
 Function RSClient.GameInstance: RSGameInstance; static;
 begin
@@ -351,65 +352,9 @@ begin
 	Result := (Varp shr LSB) and Mask;
 end;
 
-Function RSClient.MenuActions: Array of String; static;
-var
-  Actions: Pointer;
-  Size: SizeUInt;
+Function RSClient.Menu: RSMenu; static;
 begin
-  Actions := RGetStaticArray(R_EIOS, Size, CLIENT_MENUACTIONS);
-  if Actions = nil then
-    Exit;
-
-  if Size = 0 then
-    Exit;
-
-  Result := RGetStringArray(R_EIOS, Actions, 0, Size);
-  RFreeObject(R_EIOS, Actions);
-end;
-
-Function RSClient.MenuOptions: Array of String; static;
-var
-  Options: Pointer;
-  Size: SizeUInt;
-begin
-  Options := RGetStaticArray(R_EIOS, Size, CLIENT_MENUOPTIONS);
-  if Options = nil then
-    Exit;
-
-  if Size = 0 then
-    Exit;
-
-  Result := RGetStringArray(R_EIOS, Options, 0, Size);
-  RFreeObject(R_EIOS, Options);
-end;
-
-Function RSClient.MenuCount: Int32; static;
-begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_MENUCOUNT);
-end;
-
-Function RSClient.MenuLocation: TPoint; static;
-begin
-  Result.X := RGetStaticInt(R_EIOS, CLIENT_MENUX);
-  Result.Y := RGetStaticInt(R_EIOS, CLIENT_MENUY);
-end;
-
-Function RSClient.MenuWidth: SizeUInt; static;
-begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_MENUWIDTH);
-end;
-
-Function RSClient.MenuHeight: SizeUInt; static;
-begin
-  Result := RGetStaticInt(R_EIOS, CLIENT_MENUHEIGHT);
-end;
-
-Function RSClient.MenuBounds: TBox; static;
-begin
-  Result.X1 := RGetStaticInt(R_EIOS, CLIENT_MENUX);
-  Result.Y1 := RGetStaticInt(R_EIOS, CLIENT_MENUY);
-  Result.X2 := Result.X1 + RSClient.MenuWidth;
-  Result.Y2 := Result.Y1 + RSClient.MenuHeight;
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_MENU);
 end;
 
 Function RSClient.IsMenuOpen: Boolean; static;

@@ -62,11 +62,6 @@ begin
   Result := RGetInt(R_EIOS, ref, Actor_SpotAnimationFrameCycle);
 end;
 
-Function RSActor.GraphicsID : Int32; constref;
-begin
-  Result := RGetInt(R_EIOS, ref, Actor_GraphicsID);
-end;
-
 Function RSActor.AnimationFrame: Int32; constref;
 begin
   Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATIONFRAME);

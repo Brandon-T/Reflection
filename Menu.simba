@@ -13,15 +13,22 @@ Example:
 Function R_MenuItems: Array of String;
 var
   I, Count: Int32;
+  Menu: RSMenu;
   Actions: Array of String;
   Options: Array of String;
   Action, Option: String;
 begin
-  Count := RSClient.MenuCount;
+  Menu := RSClient.Menu;
+  if Menu.ref = nil then
+  begin
+    Exit;
+  end;
+
+  Count := Menu.Count;
   if Count > 0 then
   begin
-    Actions := RSClient.MenuActions;
-    Options := RSClient.MenuOptions;
+    Actions := Menu.Actions;
+    Options := Menu.Options;
 
     Count := Min(Count, Length(Actions));
     Count := Min(Count, Length(Options));
@@ -40,6 +47,8 @@ begin
       end;
     end;
   end;
+
+  Menu.Free;
 end;
 
 {*
@@ -70,6 +79,7 @@ var
   T: Int64;
   I, J, Offset: Int32;
   X, Y: Int32;
+  Menu: RSMenu;
   Items: Array of String;
   Bounds, OptionBounds: TBox;
 begin
@@ -82,8 +92,15 @@ begin
     Wait(50 + RandomRange(0, 100));
   end;
 
+  Menu := RSClient.Menu;
+  if Menu.ref = nil then
+  begin
+    Exit;
+  end;
+
   Items := R_MenuItems;
-  Bounds := RSClient.MenuBounds;
+  Bounds := Menu.Bounds;
+  Menu.Free;
 
   For I := 0 To high(Items) do
   begin
