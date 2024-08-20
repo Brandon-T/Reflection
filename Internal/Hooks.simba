@@ -384,11 +384,11 @@ Widget_ItemID: THook =                            ['nq', 'gd', 'I', 1850258375];
 Widget_ItemIDs: THook =                           ['nq', 'gh', '[I', 1];
 Widget_StackSizes: THook =                        ['nq', 'gx', '[I', 1];
 Widget_ItemAmount: THook =                        ['nq', 'gr', 'I', 1975178649];
-Widget_SpriteID: THook =                          ['nq', 'ci', 'I', -2141669609];
-Widget_TextureID: THook =                         ['nq', 'ce', 'I', -287153879];
+Widget_SpriteID: THook =                          ['nq', 'cq', 'I', 263480883];
+Widget_TextureID: THook =                         ['nq', 'ci', 'I', -2141669609];
 Widget_ModelID: THook =                           ['nq', 'ck', 'I', 1039532233];
 Widget_AnimationID: THook =                       ['nq', 'cd', 'I', -136506341];
-Widget_Actions: THook =                           ['nq', 'ai', '[Ljava/lang/String;', 1];
+Widget_Actions: THook =                           ['nq', 'ei', '[Ljava/lang/String;', 1];
 Widget_ActionType: THook =                        ['nq', 'bm', 'I', -286761497];
 Widget_Type: THook =                              ['nq', 'bo', 'I', -1417628629];
 Widget_IsHidden: THook =                          ['nq', 'bs', 'Z', 1];
@@ -427,14 +427,14 @@ ItemNode_Cache: THook =                           ['dx', 'ab', 'Lup;', 1];
 
 {Login: ca}
 Login_XPadding: THook =                           ['ca', 'an', 'I', 1315923807];
-Login_BoxXOffset: THook =                         ['ca', 'ap', 'I', -1803330259];
+Login_BoxXOffset: THook =                         ['ca', 'ap', 'I', -245400841];
 Login_LoadingPercent: THook =                     ['ca', 'ai', 'I', -1369619267];
 Login_AccountStatus: THook =                      ['ca', 'bn', 'I', -2007333059];
 Login_Index: THook =                              ['ca', 'cx', 'I', -2100978975];
 Login_ButtonSprite: THook =                       ['lf', 'ao', 'Lvb;', 1];
 Login_Username: THook =                           ['ca', 'cl', 'Ljava/lang/String;', 1];
 Login_Password: THook =                           ['ca', 'cb', 'Ljava/lang/String;', 1];
-Login_CursorField: THook =                        ['ca', 'ck', 'Z', 1];
+Login_CursorField: THook =                        ['ca', 'dv', 'I', -142860965];
 
 {Varps: ny}
 Varps_Masks: THook =                              ['ny', 'ab', '[I', 1];
@@ -519,7 +519,7 @@ Client_ViewPortScale: THook =                     ['client', 'vi', 'I', -5975951
 Client_MapAngle: THook =                          ['client', 'kw', 'I', -861187013];
 Client_Menu: THook =                              ['client', 'nu', 'Lvw;', 1];
 Client_IsMenuOpen: THook =                        ['client', 'nb', 'Z', 1];
-Client_IsResizable: THook =                       ['client', 'N/A', 'N/A', 1];
+Client_IsResizable: THook =                       ['client', 'rd', 'Z', 1];
 Client_CurrentLevels: THook =                     ['client', 'ne', '[I', 1];
 Client_RealLevels: THook =                        ['client', 'nw', '[I', 1];
 Client_Experiences: THook =                       ['client', 'nx', '[I', 1];
