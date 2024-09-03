@@ -282,7 +282,7 @@ Actor_QueueTraversed: THook =                     ['dt', 'en', '[Lko;', 1];
 Actor_QueueSize: THook =                          ['dt', 'dd', 'I', 1409302933];
 Actor_LocalX: THook =                             ['dt', 'bh', 'I', -2036971109];
 Actor_LocalY: THook =                             ['dt', 'bx', 'I', 430937913];
-Actor_InteractingIndex: THook =                   ['dt', 'dv', 'I', 783237933];
+Actor_InteractingIndex: THook =                   ['dt', 'ce', 'I', -634951883];
 Actor_Orientation: THook =                        ['dt', 'db', 'I', 304279249];
 Actor_IsWalking: THook =                          ['dt', 'an', 'Z', 1];
 Actor_CombatInfoList: THook =                     ['dt', 'cy', 'Lpf;', 1];
@@ -328,8 +328,8 @@ Player_Actions: THook =                           ['dw', 'am', '[Ljava/lang/Stri
 Player_CombatLevel: THook =                       ['dw', 'ac', 'I', 592782235];
 Player_Index: THook =                             ['dw', 'at', 'I', -881787729];
 Player_IsAnimating: THook =                       ['dw', 'ar', 'Z', 1];
-Player_OverheadSkulledIcon: THook =               ['dw', 'ac', 'I', 1];
-Player_OverheadPrayerIcon: THook =                ['dw', 'ae', 'I', 1];
+Player_OverheadSkulledIcon: THook =               ['dw', 'ac', 'I', 592782235];
+Player_OverheadPrayerIcon: THook =                ['dw', 'ax', 'I', -462991035];
 
 {ObjectDefinition: kt}
 ObjectDefinition_ID: THook =                      ['kt', 'ae', 'I', -483889925];
