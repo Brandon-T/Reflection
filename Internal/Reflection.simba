@@ -12,7 +12,7 @@
 {$include_once RSNodeDeque.simba}
 {$include_once RSHashTable.simba}
 {$include_once RSIterableHashTable.simba}
-{$include_once RSAnimableNode.simba}
+{$include_once RSDynamicObject.simba}
 {$include_once RSModel.simba}
 {$include_once RSEntity.simba}
 {$include_once RSActor.simba}
@@ -32,7 +32,7 @@
 {$include_once RSAnimationSkeleton.simba}
 {$include_once RSAnimationSequence.simba}
 {$include_once RSAnimatedModel.simba}
-{$include_once RSRegion.simba}
+{$include_once RSScene.simba}
 {$include_once RSTile.simba}
 {$include_once RSObjectDefinition.simba}
 {$include_once RSGroundObject.simba}

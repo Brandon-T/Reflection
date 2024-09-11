@@ -9,12 +9,12 @@ end;
 
 Function RSGraphicsObject.LocalX: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_LOCALX);
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_X);
 end;
 
 Function RSGraphicsObject.LocalY: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_LOCALY);
+  Result := RGetInt(R_EIOS, ref, GRAPHICSOBJECT_Y);
 end;
 
 Function RSGraphicsObject.Height: Int32; constref;

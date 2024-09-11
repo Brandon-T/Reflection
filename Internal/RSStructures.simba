@@ -20,7 +20,7 @@ type
 
   RSSceneTile = type RSType;
 
-  RSRegion = type RSType;
+  RSScene = type RSType;
 
   RSGameInstance = type RSType;
 
@@ -44,7 +44,7 @@ type
 
   RSCollisionMap = type RSType;
 
-  RSAnimableNode = type RSType;
+  RSDynamicObject = type RSType;
 
   RSModel = type RSType;
 

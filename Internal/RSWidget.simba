@@ -16,7 +16,7 @@ end;
 
 Function RSWidget.ID: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, WIDGET_WIDGETID);
+  Result := RGetInt(R_EIOS, ref, WIDGET_ID);
 end;
 
 Function RSWidget.ParentID: Int32; constref;
@@ -336,7 +336,7 @@ Function RSWidget.BoundsX: Int32; constref;
 var
   Bounds: Pointer;
 begin
-  Bounds := RGetStaticArray(R_EIOS, CLIENT_WIDGETPOSITIONX);
+  Bounds := RGetStaticArray(R_EIOS, CLIENT_WIDGETPOSITIONSX);
   if Bounds = nil then
     Exit;
   Result := RGetIntArray(R_EIOS, Bounds, self.BoundsIndex);
@@ -347,7 +347,7 @@ Function RSWidget.BoundsY: Int32; constref;
 var
   Bounds: Pointer;
 begin
-  Bounds := RGetStaticArray(R_EIOS, CLIENT_WIDGETPOSITIONY);
+  Bounds := RGetStaticArray(R_EIOS, CLIENT_WIDGETPOSITIONSY);
   if Bounds = nil then
     Exit;
   Result := RGetIntArray(R_EIOS, Bounds, self.BoundsIndex);

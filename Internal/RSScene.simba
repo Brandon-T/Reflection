@@ -55,7 +55,7 @@ Procedure UpdateSceneTilesCache(X, Y: Int32);
 var
   RegionID: Int32;
   NodeIndex: Int32;
-  Region: RSRegion;
+  Region: RSScene;
 begin
   while(IsClientLoading) do
   begin
@@ -97,7 +97,7 @@ begin
 end;
 {$ENDIF}
 
-Function RSRegion.SceneTiles: Array of Array of Array of RSSceneTile; constref;
+Function RSScene.SceneTiles: Array of Array of Array of RSSceneTile; constref;
 var
   Tiles: Pointer;
   I, J, TilesSize: SizeUInt;
@@ -106,7 +106,7 @@ type
   RSSceneTileArray = Array of RSSceneTile;
 begin
   TilesSize := 0;
-  Tiles := RGetArray(R_EIOS, ref, TilesSize, REGION_SCENETILES);
+  Tiles := RGetArray(R_EIOS, ref, TilesSize, SCENE_TILES);
   SX := RGetObjectArray(R_EIOS, Tiles, 0, TilesSize);
   RFreeObject(R_EIOS, Tiles);
 
@@ -127,7 +127,7 @@ begin
   RFreeObjects(R_EIOS, SX);
 end;
 
-Function RSRegion.SceneTiles(Plane: Int32): Array of Array of RSSceneTile; constref; overload;
+Function RSScene.SceneTiles(Plane: Int32): Array of Array of RSSceneTile; constref; overload;
 var
   Tiles: Pointer;
   I: SizeUInt;
@@ -136,7 +136,7 @@ var
 type
   RSSceneTileArray = Array of RSSceneTile;
 begin
-  Tiles := RGetArray(R_EIOS, ref, REGION_SCENETILES);
+  Tiles := RGetArray(R_EIOS, ref, SCENE_TILES);
   SX := RGetObjectArray(R_EIOS, Tiles, Plane);
   RFreeObject(R_EIOS, Tiles);
 
@@ -151,16 +151,16 @@ begin
   RFreeObjects(R_EIOS, SY);
 end;
 
-Function RSRegion.SceneTile(Plane, X, Y: Int32): RSSceneTile; constref;
+Function RSScene.SceneTile(Plane, X, Y: Int32): RSSceneTile; constref;
 var
   Tiles: Pointer;
 begin
-  Tiles := RGetArray(R_EIOS, ref, REGION_SCENETILES);
+  Tiles := RGetArray(R_EIOS, ref, SCENE_TILES);
   Result.ref := RGetObjectArray3D(R_EIOS, Tiles, Plane, X, Y);
   RFreeObject(R_EIOS, Tiles);
 end;
 
-Function RSRegion.GameObjects: Array of RSObject; constref;
+Function RSScene.GameObjects: Array of RSObject; constref;
 var
   Objects: Pointer;
   I, ObjectsSize: SizeUInt;
@@ -169,7 +169,7 @@ type
   RSObjectArray = Array of RSObject;
 begin
   ObjectsSize := 0;
-  Objects := RGetArray(R_EIOS, ref, REGION_GAMEOBJECTS);
+  Objects := RGetArray(R_EIOS, ref, SCENE_GAMEOBJECTS);
   if Objects = nil then
     Exit;
 

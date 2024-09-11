@@ -253,18 +253,55 @@ begin
   end;
 end;
 
-Function RSClient.Region: RSRegion; static;
+Function RSClient.Scene: RSScene; static;
 var
   GameInstance: RSGameInstance;
 begin
   GameInstance := RSClient.GameInstance;
   if GameInstance.ref <> nil then
   begin
-    Result := GameInstance.Region();
+    Result := GameInstance.Scene();
     GameInstance.Free;
   end;
 end;
 
+{$IFDEF RUNELITE}
+Function RSClient.IsRegionInstanced: Boolean; static;
+var
+  GameInstance: RSGameInstance;
+begin
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.IsRegionInstanced();
+    GameInstance.Free;
+  end;
+end;
+
+Function RSClient.RegionInstanceChunk(Plane, ChunkX, ChunkY: Int32): Int32; static;
+var
+  GameInstance: RSGameInstance;
+begin
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.RegionInstanceChunk(Plane, ChunkX, ChunkY);
+    GameInstance.Free;
+  end;
+end;
+
+Function RSClient.RegionInstanceChunks(Plane: Int32): Array of Array of Int32; static;
+var
+  GameInstance: RSGameInstance;
+begin
+  GameInstance := RSClient.GameInstance;
+  if GameInstance.ref <> nil then
+  begin
+    Result := GameInstance.RegionInstanceChunks(Plane);
+    GameInstance.Free;
+  end;
+end;
+{$ELSE}
 Function RSClient.IsRegionInstanced: Boolean; static;
 begin
   Result := RGetStaticBool(R_EIOS, CLIENT_ISREGIONINSTANCED);
@@ -305,6 +342,7 @@ begin
 
   RFreeObjects(R_EIOS, SY);
 end;
+{$ENDIF}
 
 Function RSClient.IsResizable: Boolean; static;
 var

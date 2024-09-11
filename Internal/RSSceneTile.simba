@@ -1,13 +1,13 @@
 {$include_once RSStructures.simba}
 
-Function RSSceneTile.SceneX: Int32; constref;
+Function RSSceneTile.X: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, SCENETILE_SCENEX);
+  Result := RGetInt(R_EIOS, ref, SCENETILE_X);
 end;
 
-Function RSSceneTile.SceneY: Int32; constref;
+Function RSSceneTile.Y: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, SCENETILE_SCENEY);
+  Result := RGetInt(R_EIOS, ref, SCENETILE_Y);
 end;
 
 Function RSSceneTile.Plane: Int32; constref;
@@ -24,7 +24,7 @@ end;
 
 Function RSSceneTile.SceneTileObject: RSSceneTile; constref;
 begin
-  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_SCENETILEOBJECT);
+  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_SCENETILE);
 end;
 
 Function RSSceneTile.GameObject: RSObject; constref;
@@ -75,9 +75,9 @@ begin
   Result.Plane := self.Plane;
 end;
 
-Function RSSceneTile.GroundDecoration: RSObject; constref;
+Function RSSceneTile.FloorDecoration: RSObject; constref;
 begin
-  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_GROUNDDECORATION);
+  Result.ref := RGetObject(R_EIOS, ref, SCENETILE_FLOORDECORATION);
   Result.ObjectType := RSObjectType.FLOOR_DECORATION;
   Result.Plane := self.Plane;
 end;

@@ -37,7 +37,9 @@ var
   I, ClientCount: SizeUInt;
 begin
   {$IFNDEF SIMBAHEADLESS}
-  RIInject(GetSimbaTargetPID());
+    {$IFNDEF RUNELITE}
+    RIInject(GetSimbaTargetPID());
+    {$ENDIF}
   {$ELSE}  
   WriteLn('Running Simba in Headless Mode. Automatically trying to find a RS client.');
   RIInject(RS_EXECUTABLE);

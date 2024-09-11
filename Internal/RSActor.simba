@@ -39,7 +39,7 @@ end;
 
 Function RSActor.AnimationId: Int32; constref;
 begin
-  Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATION);
+  Result := RGetInt(R_EIOS, ref, ACTOR_ANIMATIONID);
 end;
 
 Function RSActor.IsAnimating: Boolean; constref;
