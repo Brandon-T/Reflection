@@ -452,10 +452,8 @@ VarbitDefinition_StartBit: THook =                ['hl', 'am', 'I', -1870632745]
 VarbitDefinition_EndBit: THook =                  ['hl', 'ax', 'I', -833963677];
 
 {GameInstance: dd}
-GameInstance_PlayerCount: THook =                 ['dd', 'aa', 'I', 1];
 GameInstance_Players: THook =                     ['dd', 'ad', '[Ldi;', 1];
-GameInstance_PlayerIndices: THook =               ['dd', 'ai', '[I', 1];
-GameInstance_NPCCount: THook =                    ['dd', 'ap', 'I', 1];
+GameInstance_NPCCount: THook =                    ['dd', 'ap', 'I', -514517369];
 GameInstance_NPCs: THook =                        ['dd', 'ah', '[Lea;', 1];
 GameInstance_NPCIndices: THook =                  ['dd', 'ab', '[I', 1];
 GameInstance_TileHeights: THook =                 ['dd', 'ar', '[[[I', 1];
@@ -468,6 +466,10 @@ GameInstance_CollisionMaps: THook =               ['dd', 'ag', '[Lkd;', 1];
 GameInstance_GroundItems: THook =                 ['dd', 'ao', '[[[Lpk;', 1];
 GameInstance_Projectiles: THook =                 ['dd', 'ay', 'Lpk;', 1];
 GameInstance_GraphicsObjects: THook =             ['dd', 'aj', 'Lpk;', 1];
+
+{PlayerUpdateManager: eh}
+PlayerUpdateManager_PlayerCount: THook =          ['eh', 'at', 'I', -396152079];
+PlayerUpdateManager_PlayerIndices: THook =        ['eh', 'au', '[I', 1];
 
 {Menu: vl}
 Menu_Count: THook =                               ['vl', 'ae', 'I', 2098117423];
@@ -482,6 +484,7 @@ Menu_Height: THook =                              ['vl', 'az', 'I', 1044396085];
 Client_Revision: THook =                          ['client', '225', 'I', 1];
 Client_Client: THook =                            ['ae', 'be', 'Lclient;', 1];
 Client_GameInstance: THook =                      ['gs', 'jj', 'Ldd;', 1];
+Client_PlayerUpdateManager: THook =               ['client', 'jl', 'Leh;', 1];
 Client_LocalPlayer: THook =                       ['qm', 'mm', 'Ldi;', 1];
 Client_PlayerIndex: THook =                       ['client', 'mf', 'I', -797776089];
 Client_LoopCycle: THook =                         ['client', 'do', 'I', 1472813913];
