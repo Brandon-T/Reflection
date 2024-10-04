@@ -4,11 +4,6 @@
 {$include_once RSCombatInfo.simba}
 {$include_once RSTile.simba}
 
-Function RSGameInstance.PlayerCount: Int32; constref;
-begin
-  Result := RGetInt(R_EIOS, ref, GAMEINSTANCE_PLAYERCOUNT);
-end;
-
 Function RSGameInstance.Players: Array of RSPlayer;
 var
   Players: Pointer;
@@ -35,34 +30,6 @@ begin
   end;
 
   SetLength(Result, J);
-end;
-
-Function RSGameInstance.PlayerIndices(PlayerCount: Int32): Array of Int32;
-var
-  Indices: Pointer;
-  IndicesSize: SizeUInt;
-begin
-  IndicesSize := 0;
-  Indices := RGetArray(R_EIOS, ref, IndicesSize, GAMEINSTANCE_PLAYERINDICES);
-  if Indices = nil then
-    Exit;
-
-  Result := RGetIntArray(R_EIOS, Indices, 0, Min(PlayerCount, IndicesSize));
-  RFreeObject(R_EIOS, Indices);
-end;
-
-Function RSGameInstance.PlayerIndices: Array of Int32; overload;
-var
-  Indices: Pointer;
-  IndicesSize: SizeUInt;
-begin
-  IndicesSize := 0;
-  Indices := RGetArray(R_EIOS, ref, IndicesSize, GAMEINSTANCE_PLAYERINDICES);
-  if Indices = nil then
-    Exit;
-
-  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
-  RFreeObject(R_EIOS, Indices);
 end;
 
 Function RSGameInstance.NPCCount: Int32; constref;

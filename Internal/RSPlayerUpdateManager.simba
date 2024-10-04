@@ -1,0 +1,34 @@
+{$include_once RSStructures.simba}
+
+Function RSPlayerUpdateManager.PlayerCount: Int32; constref;
+begin
+  Result := RGetInt(R_EIOS, ref, PLAYERUPDATEMANAGER_PLAYERCOUNT);
+end;
+
+Function RSPlayerUpdateManager.PlayerIndices(PlayerCount: Int32): Array of Int32;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, ref, IndicesSize, PLAYERUPDATEMANAGER_PLAYERINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, Min(PlayerCount, IndicesSize));
+  RFreeObject(R_EIOS, Indices);
+end;
+
+Function RSPlayerUpdateManager.PlayerIndices: Array of Int32; overload;
+var
+  Indices: Pointer;
+  IndicesSize: SizeUInt;
+begin
+  IndicesSize := 0;
+  Indices := RGetArray(R_EIOS, ref, IndicesSize, PLAYERUPDATEMANAGER_PLAYERINDICES);
+  if Indices = nil then
+    Exit;
+
+  Result := RGetIntArray(R_EIOS, Indices, 0, IndicesSize);
+  RFreeObject(R_EIOS, Indices);
+end;

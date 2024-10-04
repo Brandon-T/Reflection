@@ -68,6 +68,8 @@ type
 
   RSLocalPlayer = type RSPlayer;
 
+  RSPlayerUpdateManager = type RSType;
+
   RSNameInfo = type RSType;
 
   RSCombatInfoList = type RSType;

@@ -20,6 +20,7 @@
 {$include_once RSPlayerDefinition.simba}
 {$include_once RSPlayer.simba}
 {$include_once RSLocalPlayer.simba}
+{$include_once RSPlayerUpdateManager.simba}
 {$include_once RSNPCDefinition.simba}
 {$include_once RSNPC.simba}
 {$include_once RSCamera.simba}

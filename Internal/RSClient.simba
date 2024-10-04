@@ -9,6 +9,11 @@ begin
   Result.ref := RGetStaticObject(R_EIOS, CLIENT_GAMEINSTANCE);
 end;
 
+Function RSClient.PlayerUpdateManager: RSPlayerUpdateManager; static;
+begin
+  Result.ref := RGetStaticObject(R_EIOS, CLIENT_PLAYERUPDATEMANAGER);
+end;
+
 Function RSClient.LoopCycle: Int32; static;
 begin
   Result := RGetStaticInt(R_EIOS, CLIENT_LOOPCYCLE);
@@ -149,37 +154,37 @@ end;
 
 Function RSClient.PlayerIndices(PlayerCount: Int32): Array of Int32; static;
 var
-  GameInstance: RSGameInstance;
+  PlayerManager: RSPlayerUpdateManager;
 begin
-  GameInstance := RSClient.GameInstance;
-  if GameInstance.ref <> nil then
+  PlayerManager := RSClient.PlayerUpdateManager;
+  if PlayerManager.ref <> nil then
   begin
-    Result := GameInstance.PlayerIndices(PlayerCount);
-    GameInstance.Free;
+    Result := PlayerManager.PlayerIndices(PlayerCount);
+    PlayerManager.Free;
   end;
 end;
 
 Function RSClient.PlayerIndices: Array of Int32; static; overload;
 var
-  GameInstance: RSGameInstance;
+  PlayerManager: RSPlayerUpdateManager;
 begin
-  GameInstance := RSClient.GameInstance;
-  if GameInstance.ref <> nil then
+  PlayerManager := RSClient.PlayerUpdateManager;
+  if PlayerManager.ref <> nil then
   begin
-    Result := GameInstance.PlayerIndices();
-    GameInstance.Free;
+    Result := PlayerManager.PlayerIndices();
+    PlayerManager.Free;
   end;
 end;
 
 Function RSClient.PlayerCount: Int32; static;
 var
-  GameInstance: RSGameInstance;
+  PlayerManager: RSPlayerUpdateManager;
 begin
-  GameInstance := RSClient.GameInstance;
-  if GameInstance.ref <> nil then
+  PlayerManager := RSClient.PlayerUpdateManager;
+  if PlayerManager.ref <> nil then
   begin
-    Result := GameInstance.PlayerCount();
-    GameInstance.Free;
+    Result := PlayerManager.PlayerCount();
+    PlayerManager.Free;
   end;
 end;
 

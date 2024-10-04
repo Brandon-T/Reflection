@@ -25,7 +25,7 @@ begin
   if GameInstance.ref = nil then
     Exit;
 
-  Indices := GameInstance.PlayerIndices();
+  Indices := RSClient.PlayerIndices();
   if Length(Indices) < 1 then
   begin
     GameInstance.Free;
