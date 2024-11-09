@@ -372,6 +372,16 @@ begin
   Result := False; //(W <> 765) or (H <> 503);
 end;
 
+Function RSClient.RunEnergy: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_ENERGY) div 100;
+end;
+
+Function RSClient.Weight: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_WEIGHT);
+end;
+
 Function RSClient.GetVarBit(ID: Int32): Int32; static;
 var
   Definition: RSVarbitDefinition;
@@ -477,4 +487,9 @@ end;
 Function RSClient.AccountStatus: Int32; static;
 begin
   Result := RGetStaticInt(R_EIOS, Login_AccountStatus);
+end;
+
+Function RSClient.CurrentWorld: Int32; static;
+begin
+  Result := RGetInt(R_EIOS, nil, CLIENT_CURRENTWORLD);
 end;
